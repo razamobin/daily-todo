@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql:
+    build: ./mysql
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: todo_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    networks:
+      - todo-net
+
+  golang-backend:
+    build: ./golang-backend
+    container_name: golang-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - todo-net
+
+  python-backend:
+    build: ./python-backend
+    container_name: python-backend
+    ports:
+      - "5001:5001"
+    networks:
+      - todo-net
+
+networks:
+  todo-net:
+    driver: bridge
+

@@ -1,0 +1,23 @@
+1c1
+< // golang-backend/main.go
+---
+> // main.go
+22c22
+<     Date      time.Time `json:"date"`
+---
+>     Date      string    `json:"date"`
+50c50
+<     rows, err := db.Query("SELECT * FROM DailyTodos WHERE user_id = ? AND date = ?", userID, today)
+---
+>     rows, err := db.Query("SELECT id, user_id, title, type, DATE_FORMAT(date, '%Y-%m-%d') as date, status, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND date = ?", userID, today)
+79c79
+<     todo.Date = time.Now()
+---
+>     todo.Date = time.Now().Format("2006-01-02")
+123c123
+<     rows, err := db.Query("SELECT * FROM DailyTodos WHERE user_id = ? AND date = ?", userID, yesterday)
+---
+>     rows, err := db.Query("SELECT id, user_id, title, type, DATE_FORMAT(date, '%Y-%m-%d') as date, status, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND date = ?", userID, yesterday)
+163a164,165
+> 
+> 
