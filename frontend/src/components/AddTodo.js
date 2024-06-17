@@ -8,7 +8,12 @@ function AddTodo({ setTodos }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:8080/api/todos', { title, type, goal })
+    const todo = {
+      title,
+      type,
+      goal: parseInt(goal, 10) || 0,
+    };
+    axios.post('http://localhost:8080/api/todos', todo)
       .then(response => {
         setTodos(prevTodos => [...prevTodos, response.data]);
         setTitle('');
@@ -54,5 +59,3 @@ function AddTodo({ setTodos }) {
 }
 
 export default AddTodo;
-
-

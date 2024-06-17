@@ -2,16 +2,21 @@
 20240616
 ---
 
-show the date, next to each entry
+x show the date, next to each entry
+
+x fix bug, can't accept goal # (str vs int?)
+
+make the dev mysql db persistent
 
 set timezone on database/golang so times are what i want
+    save in db per user. let you select on UI (basically controls midnight rollover)
+
+hello raza greeting, it's 10:51pm. for any time related things, show a message. close your laptop in 10 min :)
 
 typography styling of the app. write the html. play around with the css, you are good at it now. draw what it should look like on paper, then make css to do the same
     style of the form
     of the todos
     disable button if fields not filled in
-
-make the dev mysql db persistent
 
 cron job - how? and do the copy to next day at midnight
 
@@ -42,23 +47,26 @@ every user gets their own ai agent
 improve dev exp. edit files locally and it goes to react app
 
 ---
-
-secrets in github secrets
-
-push to prod
-    push to qa
-    github actions?
-
----
 make it look good, work good
 
 hook up ai
 
-deploy to prod
+deploy to prod 
+
+    put secrets in github secrets
+        fetch from there too
+
     mysql db
     golang app
     python app
     react app/css
+
+    aws 
+        aws lambda?
+
+    github actions
+
+    deploy to qa
 
 add user signup/login
 
