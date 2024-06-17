@@ -6,7 +6,9 @@ x show the date, next to each entry
 
 x fix bug, can't accept goal # (str vs int?)
 
-make the dev mysql db persistent
+x make the dev mysql db persistent
+
+make backend return all days, order by recent
 
 set timezone on database/golang so times are what i want
     save in db per user. let you select on UI (basically controls midnight rollover)
@@ -17,10 +19,14 @@ typography styling of the app. write the html. play around with the css, you are
     disable button if fields not filled in
 
 cron job - how? and do the copy to next day at midnight
+    INSERT INTO DailyTodos (user_id, title, type, date, status, goal, created_at, updated_at)
+    SELECT user_id, title, type, '2024-06-18', 0, goal, NOW(), NOW()
+    FROM DailyTodos
+    WHERE date = '2024-06-17';
 
 can update yday, but not before yday
 
-show list of last week worth of daily todos
+edit todos - like change meds 1 to quantity with goal 3
 
 enter notes next to todo items, like oh flying day couldn't hit gym. eid day couldn't do gym. etc
 
@@ -30,6 +36,7 @@ enter your mission goals vision
     save to db. save to files, and send to ai
 
 bg info - why each todo is relevant to your goals, mission, vision
+    ai can use this
 
 every user gets their own ai agent
     ai encouragement daily

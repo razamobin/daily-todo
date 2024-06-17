@@ -9,6 +9,8 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
     networks:
       - todo-net
 
@@ -42,3 +44,5 @@ networks:
   todo-net:
     driver: bridge
 
+volumes:
+  mysql_data:
