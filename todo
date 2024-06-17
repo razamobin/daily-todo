@@ -8,7 +8,7 @@ x fix bug, can't accept goal # (str vs int?)
 
 x make the dev mysql db persistent
 
-make backend return all days, order by recent
+x make backend return all days, order by recent
 
 set timezone on database/golang so times are what i want
     save in db per user. let you select on UI (basically controls midnight rollover)
@@ -24,9 +24,12 @@ cron job - how? and do the copy to next day at midnight
     FROM DailyTodos
     WHERE date = '2024-06-17';
 
+---
+
 can update yday, but not before yday
 
 edit todos - like change meds 1 to quantity with goal 3
+    only current day
 
 enter notes next to todo items, like oh flying day couldn't hit gym. eid day couldn't do gym. etc
 
@@ -48,12 +51,23 @@ every user gets their own ai agent
 improve dev exp. edit files locally and it goes to react app
 
 hello raza greeting, it's 10:51pm. for any time related things, show a message. close your laptop in 10 min :)
+    every time you hit the site, AI has something for you :D
+        knows your goals, knows your past days activities, knows your actions today
+        has memory of notable events, and references them
 
 infinite scroll?
 
 specific url for any date, can immediately go back.
 
 specific url for any date/date range
+
+reflect on the day - good, could improve upon. what are you grateful for.
+    it's time to reflect
+    ai turns off your laptop lol, and you have to reflect
+    ai runs your life, but you tell it how to run your life, and you also achieve all your goals. and you can always tell it to stop today. go to sleep ai, we'll pick it up another day
+        every half hour
+        less emotional human decisions. robotic ai sets the intention for each half hour, you just execute
+            and allow for breaks. and allow for unexpected things, surprises, etc
 
 ---
 make it look good, work good

@@ -34,7 +34,7 @@ func main() {
     }
 
     router := mux.NewRouter()
-    router.HandleFunc("/api/todos", GetTodayTodos).Methods("GET")
+    router.HandleFunc("/api/todos", GetRecentTodos).Methods("GET")
     router.HandleFunc("/api/todos", CreateOrUpdateTodayTodo).Methods("POST")
     router.HandleFunc("/api/todos/{id}", UpdateTodo).Methods("PUT")
     router.HandleFunc("/api/todos/yesterday", GetYesterdayTodos).Methods("GET")
@@ -51,11 +51,11 @@ func main() {
     log.Fatal(http.ListenAndServe(":8080", corsHandler(router)))
 }
 
-func GetTodayTodos(w http.ResponseWriter, r *http.Request) {
+func GetRecentTodos(w http.ResponseWriter, r *http.Request) {
     userID := 1 // Hardcoded for now, replace with actual user ID after authentication is added
-    today := time.Now().Format("2006-01-02")
+    lastSevenDays := time.Now().AddDate(0, 0, -7).Format("2006-01-02")
 
-    rows, err := db.Query("SELECT id, user_id, title, type, DATE_FORMAT(date, '%Y-%m-%d') as date, status, goal, DATE_FORMAT(created_at, '%Y-%m-%dT%H:%i:%sZ') as created_at, DATE_FORMAT(updated_at, '%Y-%m-%dT%H:%i:%sZ') as updated_at FROM DailyTodos WHERE user_id = ? AND date = ?", userID, today)
+    rows, err := db.Query("SELECT id, user_id, title, type, DATE_FORMAT(date, '%Y-%m-%d') as date, status, goal, DATE_FORMAT(created_at, '%Y-%m-%dT%H:%i:%sZ') as created_at, DATE_FORMAT(updated_at, '%Y-%m-%dT%H:%i:%sZ') as updated_at FROM DailyTodos WHERE user_id = ? AND date >= ? ORDER BY date DESC, ID ASC", userID, lastSevenDays)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
