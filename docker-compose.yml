@@ -11,6 +11,7 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./mysql/conf.d:/etc/mysql/conf.d  # Mount custom MySQL configuration
     networks:
       - todo-net
 
@@ -37,6 +38,24 @@ services:
     container_name: frontend-app
     ports:
       - "3000:80"
+    networks:
+      - todo-net
+
+  flyway:
+    image: flyway/flyway
+    entrypoint: [
+      "flyway",
+      "-url=jdbc:mysql://mysql:3306/todo_db?useSSL=false&allowPublicKeyRetrieval=true",
+      "-user=user",
+      "-password=password",
+      "-baselineOnMigrate=true",
+      "-locations=filesystem:/flyway/sql",
+      "migrate"
+    ]
+    volumes:
+      - ./migrations:/flyway/sql
+    depends_on:
+      - mysql
     networks:
       - todo-net
 
