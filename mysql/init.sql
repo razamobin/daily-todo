@@ -15,6 +15,7 @@ CREATE TABLE DailyTodos (
     type ENUM('yes_no', 'quantity') NOT NULL,
     date DATE NOT NULL,
     status INT DEFAULT 0,
+    goal INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(id)

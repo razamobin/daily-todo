@@ -1,0 +1,66 @@
+
+20240616
+---
+
+show the date, next to each entry
+
+set timezone on database/golang so times are what i want
+
+typography styling of the app. write the html. play around with the css, you are good at it now. draw what it should look like on paper, then make css to do the same
+    style of the form
+    of the todos
+    disable button if fields not filled in
+
+cron job - how? and do the copy to next day at midnight
+
+can update yday, but not before yday
+
+show list of last week worth of daily todos
+
+enter notes next to todo items, like oh flying day couldn't hit gym. eid day couldn't do gym. etc
+
+allow user to reorder their todo list as they like, save that state and keep it on copy
+
+infinite scroll?
+
+specific url for any date, can immediately go back.
+
+specific url for any date/date range
+
+enter your mission goals vision
+    save to db. save to files, and send to ai
+
+every user gets their own ai agent
+    ai encouragement daily
+    send you cool youtube videos - of people like kobe
+    enforce your vision
+    great job 7 day streak
+    tune ai to be useful
+
+improve dev exp. edit files locally and it goes to react app
+
+---
+
+secrets in github secrets
+
+push to prod
+    push to qa
+    github actions?
+
+---
+make it look good, work good
+
+hook up ai
+
+deploy to prod
+    mysql db
+    golang app
+    python app
+    react app/css
+
+add user signup/login
+
+add public viewing of my daily todos and what ai said to me. so save ai stuff to my db. we can surface w/o making api call
+    convo history is with open ai?
+    can share public url with skool
+    allow skool to add daily todos as a sandbox user save by cookie, that's a user
