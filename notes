@@ -11,6 +11,8 @@ typography styling of the app. write the html. play around with the css, you are
     of the todos
     disable button if fields not filled in
 
+make the dev mysql db persistent
+
 cron job - how? and do the copy to next day at midnight
 
 can update yday, but not before yday
