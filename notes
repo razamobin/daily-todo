@@ -11,8 +11,6 @@ make the dev mysql db persistent
 set timezone on database/golang so times are what i want
     save in db per user. let you select on UI (basically controls midnight rollover)
 
-hello raza greeting, it's 10:51pm. for any time related things, show a message. close your laptop in 10 min :)
-
 typography styling of the app. write the html. play around with the css, you are good at it now. draw what it should look like on paper, then make css to do the same
     style of the form
     of the todos
@@ -28,14 +26,10 @@ enter notes next to todo items, like oh flying day couldn't hit gym. eid day cou
 
 allow user to reorder their todo list as they like, save that state and keep it on copy
 
-infinite scroll?
-
-specific url for any date, can immediately go back.
-
-specific url for any date/date range
-
 enter your mission goals vision
     save to db. save to files, and send to ai
+
+bg info - why each todo is relevant to your goals, mission, vision
 
 every user gets their own ai agent
     ai encouragement daily
@@ -45,6 +39,14 @@ every user gets their own ai agent
     tune ai to be useful
 
 improve dev exp. edit files locally and it goes to react app
+
+hello raza greeting, it's 10:51pm. for any time related things, show a message. close your laptop in 10 min :)
+
+infinite scroll?
+
+specific url for any date, can immediately go back.
+
+specific url for any date/date range
 
 ---
 make it look good, work good
