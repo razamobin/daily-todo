@@ -10,13 +10,17 @@ x make the dev mysql db persistent
 
 x make backend return all days, order by recent
 
-set timezone on database/golang so times are what i want
-    save in db per user. let you select on UI (basically controls midnight rollover)
-
 typography styling of the app. write the html. play around with the css, you are good at it now. draw what it should look like on paper, then make css to do the same
     style of the form
     of the todos
     disable button if fields not filled in
+
+    rip out old styles
+    redo html in a semantic way. too many divs rn lol
+    start styling it
+        header 
+        article
+        section
 
 cron job - how? and do the copy to next day at midnight
     INSERT INTO DailyTodos (user_id, title, type, date, status, goal, created_at, updated_at)
@@ -24,6 +28,17 @@ cron job - how? and do the copy to next day at midnight
     FROM DailyTodos
     WHERE date = '2024-06-17';
 
+set timezone on database/golang so times are what i want
+    save in db per user. let you select on UI (basically controls midnight rollover)
+
+---
+
+yes/no - change it to quantity goal 1. makes everything the same and simple
+
+change UI to do that too. default 1 check box. or allow multiple checkboxes in a select dropdown
+    how many checkboxes do you want for this todo?
+        1
+        12
 ---
 
 can update yday, but not before yday
@@ -31,10 +46,7 @@ can update yday, but not before yday
 edit todos - like change meds 1 to quantity with goal 3
     only current day
 
-enter notes next to todo items, like oh flying day couldn't hit gym. eid day couldn't do gym. etc
-
-allow user to reorder their todo list as they like, save that state and keep it on copy
-
+---
 enter your mission goals vision
     save to db. save to files, and send to ai
 
@@ -48,7 +60,21 @@ every user gets their own ai agent
     great job 7 day streak
     tune ai to be useful
 
+enter notes next to todo items, like oh flying day couldn't hit gym. eid day couldn't do gym. etc
+
+---
+
+allow user to reorder their todo list as they like, save that state and keep it on copy
+
 improve dev exp. edit files locally and it goes to react app
+
+reflect on the day - good, could improve upon. what are you grateful for.
+    it's time to reflect
+    ai turns off your laptop lol, and you have to reflect
+    ai runs your life, but you tell it how to run your life, and you also achieve all your goals. and you can always tell it to stop today. go to sleep ai, we'll pick it up another day
+        every half hour
+        less emotional human decisions. robotic ai sets the intention for each half hour, you just execute
+            and allow for breaks. and allow for unexpected things, surprises, etc
 
 hello raza greeting, it's 10:51pm. for any time related things, show a message. close your laptop in 10 min :)
     every time you hit the site, AI has something for you :D
@@ -60,14 +86,6 @@ infinite scroll?
 specific url for any date, can immediately go back.
 
 specific url for any date/date range
-
-reflect on the day - good, could improve upon. what are you grateful for.
-    it's time to reflect
-    ai turns off your laptop lol, and you have to reflect
-    ai runs your life, but you tell it how to run your life, and you also achieve all your goals. and you can always tell it to stop today. go to sleep ai, we'll pick it up another day
-        every half hour
-        less emotional human decisions. robotic ai sets the intention for each half hour, you just execute
-            and allow for breaks. and allow for unexpected things, surprises, etc
 
 ---
 make it look good, work good

@@ -1,0 +1,54 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+    color: #333;
+    line-height: 1.5;
+}
+
+.container {
+    width: 300px;
+    margin: 0 auto;
+}
+
+article {
+    width: 600px;
+    margin: 0 auto;
+}
+
+header {
+    margin-bottom: 20px;
+}
+
+h1 {
+    border-bottom: 2px solid #333;
+}
+
+/* font-family: Georgia, serif; */
+.todo-list {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    grid-template-rows: auto;
+    align-content: center;
+}
+
+.day {
+    justify-self: end;
+    margin-right: 10px;
+    font-weight: bold;
+    border-right: 2px solid #eee;
+    padding-right: 10px;
+    font-size: 18px;
+}
+
+li {
+    list-style: none;
+}
+
+input[type="checkbox"] {
+    margin-right: 10px; /* Adjust the spacing as needed */
+}
