@@ -12,19 +12,22 @@ x make backend return all days, order by recent
 
 x improve dev exp. edit files locally and it goes to react app
 
+x cron job - how? and do the copy to next day at midnight
+    INSERT INTO DailyTodos (user_id, title, type, date, status, goal, created_at, updated_at)
+    SELECT user_id, title, type, '2024-06-18', 0, goal, NOW(), NOW()
+    FROM DailyTodos
+    WHERE date = '2024-06-17';
+
+x set timezone on database/golang so times are what i want
+    save in db per user. 
+
+x typography styling 
 ---
 
-typography styling of the app. write the html. play around with the css, you are good at it now. draw what it should look like on paper, then make css to do the same
-    style of the form
-    of the todos
-    disable button if fields not filled in
+style the todos
 
-    rip out old styles
-    redo html in a semantic way. too many divs rn lol
-    start styling it
-        header 
-        article
-        section
+style of the form
+    disable button if fields not filled in
 
 ---
 
@@ -39,16 +42,7 @@ change UI to do that too. default 1 check box. or allow multiple checkboxes in a
         input field: eat breakfast
         select dropdown, 1 checkboxes
 
----
-
-cron job - how? and do the copy to next day at midnight
-    INSERT INTO DailyTodos (user_id, title, type, date, status, goal, created_at, updated_at)
-    SELECT user_id, title, type, '2024-06-18', 0, goal, NOW(), NOW()
-    FROM DailyTodos
-    WHERE date = '2024-06-17';
-
-set timezone on database/golang so times are what i want
-    save in db per user. let you select on UI (basically controls midnight rollover)
+show timezone on UI, and let user change timezone
 
 ---
 
@@ -88,6 +82,10 @@ reflect on the day - good, could improve upon. what are you grateful for.
         every half hour
         less emotional human decisions. robotic ai sets the intention for each half hour, you just execute
             and allow for breaks. and allow for unexpected things, surprises, etc
+
+morning - how was your sleep?
+    6 hr straight, deep
+    enema last night, and kinda diareah stomach discomfort 2-3 hrs after dinner
 
 hello raza greeting, it's 10:51pm. for any time related things, show a message. close your laptop in 10 min :)
     every time you hit the site, AI has something for you :D

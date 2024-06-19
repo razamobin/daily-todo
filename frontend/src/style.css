@@ -11,12 +11,12 @@ body {
 }
 
 .container {
-    width: 300px;
+    width: 400px;
     margin: 0 auto;
 }
 
 article {
-    width: 600px;
+    width: 700px;
     margin: 0 auto;
 }
 
@@ -83,4 +83,28 @@ input[type="checkbox"] {
 
 .year {
     font-size: 18px;
+}
+
+.todo-list ul {
+    padding: 0;
+    margin: 0;
+}
+
+.todo-list li {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.todo-list li p {
+    flex: 1;
+    font-size: 14px;
+    margin-right: 10px;
+    /* font-weight: bold; */
+}
+
+.todo-list input[type="checkbox"] {
+    /* transform: scale(1.5); */
+    margin-right: 10px;
 }

@@ -43,8 +43,19 @@ func calculateDayNumber(t time.Time, timezone string) int {
         log.Printf("Error loading location: %v", err)
         return 0
     }
-    adjustedReferenceDate := referenceDate.In(loc)
-    return int(t.Sub(adjustedReferenceDate).Hours() / 24) + 1
+    // Adjust the reference date to midnight in the user's timezone
+    adjustedReferenceDate := time.Date(referenceDate.Year(), referenceDate.Month(), referenceDate.Day(), 0, 0, 0, 0, loc)
+    adjustedCurrentTime := t.In(loc)
+
+    log.Printf("Adjusted Reference Date: %v", adjustedReferenceDate)
+    log.Printf("Adjusted Current Time: %v", adjustedCurrentTime)
+
+    // Calculate the difference in days
+    daysDifference := int(adjustedCurrentTime.Sub(adjustedReferenceDate).Hours() / 24)
+
+    log.Printf("Days Difference: %d", daysDifference)
+
+    return daysDifference + 1 // Adding 1 to make the day number start from 1
 }
 
 // Get the user's timezone and the current time in their timezone
@@ -119,10 +130,13 @@ func getRecentTodosForUser(userID int) ([]Todo, error) {
     fmt.Println("Recent Day Number:", recentDayNumber)
     fmt.Println("Current Day Number:", currentDayNumber)
 
+    // Adjust the logic to copy todos if the current day number is greater than the recent day number
     if recentDayNumber < currentDayNumber {
         if err := copyTodosToCurrentDay(userID, recentDayNumber, currentDayNumber); err != nil {
             return nil, err
         }
+        // Update the recentDayNumber after copying todos
+        recentDayNumber = currentDayNumber
     }
 
     sevenDaysAgo := currentDayNumber - 7

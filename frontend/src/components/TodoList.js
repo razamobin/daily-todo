@@ -37,7 +37,7 @@ function TodoList({ todos, setTodos }) {
 
     const formatDayNumber = (dayNumber) => {
         const referenceDate = new Date("2024-06-16");
-        referenceDate.setDate(referenceDate.getDate() + dayNumber - 1);
+        referenceDate.setDate(referenceDate.getDate() + dayNumber);
         const options = {
             weekday: "long",
             year: "numeric",
