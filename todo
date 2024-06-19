@@ -10,6 +10,10 @@ x make the dev mysql db persistent
 
 x make backend return all days, order by recent
 
+x improve dev exp. edit files locally and it goes to react app
+
+---
+
 typography styling of the app. write the html. play around with the css, you are good at it now. draw what it should look like on paper, then make css to do the same
     style of the form
     of the todos
@@ -22,7 +26,10 @@ typography styling of the app. write the html. play around with the css, you are
         article
         section
 
+---
+
 yes/no - change it to quantity goal 1. makes everything the same and simple
+    remove db column for type
 
 change UI to do that too. default 1 check box. or allow multiple checkboxes in a select dropdown
     how many checkboxes do you want for this todo?
@@ -57,20 +64,22 @@ enter your mission goals vision
 bg info - why each todo is relevant to your goals, mission, vision
     ai can use this
 
+enter notes next to todo items, like oh flying day couldn't hit gym. eid day couldn't do gym. etc
+
 every user gets their own ai agent
     ai encouragement daily
     send you cool youtube videos - of people like kobe
     enforce your vision
     great job 7 day streak
     tune ai to be useful
+    ai reads your mission, goals, why each item is important to you/your mission. sees your progress (has tools to fetch your history, he can search any day of the past to see what you've done)
+        youtube api app to find you cool videos relevant to you
 
-enter notes next to todo items, like oh flying day couldn't hit gym. eid day couldn't do gym. etc
+daily journal - enter text. ai uses that too.
 
 ---
 
 allow user to reorder their todo list as they like, save that state and keep it on copy
-
-improve dev exp. edit files locally and it goes to react app
 
 reflect on the day - good, could improve upon. what are you grateful for.
     it's time to reflect
@@ -84,6 +93,9 @@ hello raza greeting, it's 10:51pm. for any time related things, show a message. 
     every time you hit the site, AI has something for you :D
         knows your goals, knows your past days activities, knows your actions today
         has memory of notable events, and references them
+
+---
+next / previous. pagination.
 
 infinite scroll?
 

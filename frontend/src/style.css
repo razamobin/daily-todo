@@ -52,3 +52,35 @@ li {
 input[type="checkbox"] {
     margin-right: 10px; /* Adjust the spacing as needed */
 }
+
+/* Add these styles */
+.date-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    line-height: 1;
+}
+
+.day-of-week {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 14px;
+    margin-right: 6px;
+}
+
+.date-details {
+    text-align: right;
+}
+
+.day-of-month {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.month {
+    font-size: 18px;
+}
+
+.year {
+    font-size: 18px;
+}

@@ -38,11 +38,17 @@ function TodoList({ todos, setTodos }) {
     const formatDayNumber = (dayNumber) => {
         const referenceDate = new Date("2024-06-16");
         referenceDate.setDate(referenceDate.getDate() + dayNumber - 1);
-        return referenceDate.toLocaleDateString(undefined, {
+        const options = {
+            weekday: "long",
             year: "numeric",
-            month: "long",
+            month: "short",
             day: "numeric",
-        });
+        };
+        const [weekday, month, day, year] = referenceDate
+            .toLocaleDateString("en-US", options)
+            .replace(/,/g, "")
+            .split(" ");
+        return { weekday, month, day, year };
     };
 
     const sortedDayNumbers = Object.keys(groupedTodos)
@@ -63,7 +69,24 @@ function TodoList({ todos, setTodos }) {
         <article>
             {sortedDayNumbers.map((dayNumber) => (
                 <div className="todo-list" key={dayNumber}>
-                    <p className="day">{formatDayNumber(dayNumber)}</p>
+                    <p className="day">
+                        <div className="date-container">
+                            <span className="day-of-week">
+                                {formatDayNumber(dayNumber).weekday}
+                            </span>
+                            <div className="date-details">
+                                <div className="day-of-month">
+                                    {formatDayNumber(dayNumber).day}
+                                </div>
+                                <div className="month">
+                                    {formatDayNumber(dayNumber).month}
+                                </div>
+                                <div className="year">
+                                    {formatDayNumber(dayNumber).year}
+                                </div>
+                            </div>
+                        </div>
+                    </p>
                     <ul>
                         {groupedTodos[dayNumber].map((todo) => (
                             <li key={todo.id}>
