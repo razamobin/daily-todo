@@ -33,12 +33,18 @@ type Todo struct {
 }
 
 
-// Reference date: January 1, 2024
-var referenceDate = time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC)
+// Reference date: June 16, 2024
+var referenceDate = time.Date(2024, 6, 16, 0, 0, 0, 0, time.UTC)
 
-// Calculate the day number since the reference date
-func calculateDayNumber(t time.Time) int {
-    return int(t.Sub(referenceDate).Hours() / 24) + 1
+// Calculate the day number since the reference date adjusted to the specified timezone
+func calculateDayNumber(t time.Time, timezone string) int {
+    loc, err := time.LoadLocation(timezone)
+    if err != nil {
+        log.Printf("Error loading location: %v", err)
+        return 0
+    }
+    adjustedReferenceDate := referenceDate.In(loc)
+    return int(t.Sub(adjustedReferenceDate).Hours() / 24) + 1
 }
 
 // Get the user's timezone and the current time in their timezone
@@ -100,15 +106,18 @@ func getRecentTodosForUser(userID int) ([]Todo, error) {
         return nil, err
     }
 
-    fmt.Println(userTimezone)
-    fmt.Println(currentTime)
+    fmt.Println("User Timezone:", userTimezone)
+    fmt.Println("Current Time:", currentTime)
 
     recentDayNumber, err := getMostRecentDayNumberForUser(userID)
     if err != nil {
         return nil, err
     }
 
-    currentDayNumber := calculateDayNumber(currentTime)
+    currentDayNumber := calculateDayNumber(currentTime, userTimezone)
+
+    fmt.Println("Recent Day Number:", recentDayNumber)
+    fmt.Println("Current Day Number:", currentDayNumber)
 
     if recentDayNumber < currentDayNumber {
         if err := copyTodosToCurrentDay(userID, recentDayNumber, currentDayNumber); err != nil {
@@ -195,7 +204,7 @@ func CreateOrUpdateTodayTodo(w http.ResponseWriter, r *http.Request) {
     }
 
     loc, _ := time.LoadLocation(userTimezone)
-    todo.DayNumber = calculateDayNumber(currentTime.In(loc))
+    todo.DayNumber = calculateDayNumber(currentTime.In(loc), userTimezone)
 
     result, err := db.Exec("INSERT INTO DailyTodos (user_id, title, type, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE status = ?, goal = ?", todo.UserID, todo.Title, todo.Type, todo.DayNumber, todo.Status, todo.Goal, todo.Status, todo.Goal)
     if err != nil {
@@ -247,7 +256,7 @@ func GetYesterdayTodos(w http.ResponseWriter, r *http.Request) {
     }
 
     loc, _ := time.LoadLocation(userTimezone)
-    yesterdayDayNumber := calculateDayNumber(currentTime.AddDate(0, 0, -1).In(loc))
+    yesterdayDayNumber := calculateDayNumber(currentTime.AddDate(0, 0, -1).In(loc), userTimezone)
 
     rows, err := db.Query("SELECT id, user_id, title, type, day_number, status, goal, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND day_number = ?", userID, yesterdayDayNumber)
     if err != nil {
@@ -290,5 +299,6 @@ func UpdateYesterdayTodo(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(todo)
 }
+
 
 

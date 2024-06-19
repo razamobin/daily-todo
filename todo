@@ -22,6 +22,18 @@ typography styling of the app. write the html. play around with the css, you are
         article
         section
 
+yes/no - change it to quantity goal 1. makes everything the same and simple
+
+change UI to do that too. default 1 check box. or allow multiple checkboxes in a select dropdown
+    how many checkboxes do you want for this todo?
+        1
+        12
+
+        input field: eat breakfast
+        select dropdown, 1 checkboxes
+
+---
+
 cron job - how? and do the copy to next day at midnight
     INSERT INTO DailyTodos (user_id, title, type, date, status, goal, created_at, updated_at)
     SELECT user_id, title, type, '2024-06-18', 0, goal, NOW(), NOW()
@@ -31,14 +43,6 @@ cron job - how? and do the copy to next day at midnight
 set timezone on database/golang so times are what i want
     save in db per user. let you select on UI (basically controls midnight rollover)
 
----
-
-yes/no - change it to quantity goal 1. makes everything the same and simple
-
-change UI to do that too. default 1 check box. or allow multiple checkboxes in a select dropdown
-    how many checkboxes do you want for this todo?
-        1
-        12
 ---
 
 can update yday, but not before yday

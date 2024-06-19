@@ -36,8 +36,8 @@ function TodoList({ todos, setTodos }) {
     }, {});
 
     const formatDayNumber = (dayNumber) => {
-        const referenceDate = new Date("2024-01-01");
-        referenceDate.setDate(referenceDate.getDate() + dayNumber);
+        const referenceDate = new Date("2024-06-16");
+        referenceDate.setDate(referenceDate.getDate() + dayNumber - 1);
         return referenceDate.toLocaleDateString(undefined, {
             year: "numeric",
             month: "long",
