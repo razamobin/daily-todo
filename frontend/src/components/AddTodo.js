@@ -23,14 +23,6 @@ function AddTodo({ setTodos }) {
 
     return (
         <section className="add-todo">
-            <button
-                onClick={() =>
-                    (document.getElementById("addTodoForm").style.display =
-                        "block")
-                }
-            >
-                Add Task
-            </button>
             <form id="addTodoForm" onSubmit={handleSubmit}>
                 <input
                     type="text"
@@ -40,13 +32,28 @@ function AddTodo({ setTodos }) {
                     required
                 />
                 <br />
-                <input
-                    type="number"
+                <label htmlFor="goal">Number of Checkboxes</label>
+                <select
+                    id="goal"
                     value={goal}
                     onChange={(e) => setGoal(e.target.value)}
-                    placeholder="Goal"
                     required
-                />
+                >
+                    {Array.from({ length: 100 }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                            {i + 1}
+                        </option>
+                    ))}
+                </select>
+                <br />
+                <div className="checkbox-preview">
+                    {Array.from({ length: goal }, (_, i) => (
+                        <div key={i}>
+                            <input type="checkbox" disabled />
+                            <label>Step {i + 1}</label>
+                        </div>
+                    ))}
+                </div>
                 <br />
                 <button type="submit">Add Todo</button>
             </form>

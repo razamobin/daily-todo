@@ -29,9 +29,10 @@ x style the todos
 
 ---
 
-yes/no - change it to quantity goal 1. makes everything the same and simple
-    remove db column for type
+x yes/no - change it to quantity goal 1. makes everything the same and simple
+    x remove db column for type
 
+NEXT FRIDAY JUN 21 - make the preview look exactly like the todo would look like. so the user understands what they are adding. then they can edit/submit
 change UI to do that too. default 1 check box. or allow multiple checkboxes in a select dropdown
     how many checkboxes do you want for this todo?
         1
@@ -60,6 +61,8 @@ every user gets their own ai agent
     tune ai to be useful
     ai reads your mission, goals, why each item is important to you/your mission. sees your progress (has tools to fetch your history, he can search any day of the past to see what you've done)
         youtube api app to find you cool videos relevant to you
+
+    ai suggests new todos for you. whatever daily habits it thinks will help you achieve your mission in life.
 
 daily journal - enter text. ai uses that too.
 

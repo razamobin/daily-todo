@@ -53,7 +53,7 @@ function TodoList({ todos, setTodos }) {
         <>
             {sortedDayNumbers.map((dayNumber) => (
                 <React.Fragment key={dayNumber}>
-                    <p className="day">
+                    <div className="day">
                         <div className="date-container">
                             <span className="day-of-week">
                                 {formatDayNumber(dayNumber).weekday}
@@ -70,7 +70,7 @@ function TodoList({ todos, setTodos }) {
                                 </div>
                             </div>
                         </div>
-                    </p>
+                    </div>
                     <div key={dayNumber} className="todo-list">
                         <ul>
                             {groupedTodos[dayNumber].map((todo) => (
