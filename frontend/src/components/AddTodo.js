@@ -25,7 +25,7 @@ function AddTodo({ setTodos }) {
     };
 
     return (
-        <section>
+        <section class="add-todo">
             <button
                 onClick={() =>
                     (document.getElementById("addTodoForm").style.display =

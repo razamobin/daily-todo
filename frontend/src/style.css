@@ -11,7 +11,7 @@ body {
 }
 
 .header-container {
-    width: 600px;
+    width: 500px;
     margin: 0 auto;
 }
 
@@ -19,7 +19,7 @@ body {
     width: 900px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 600px 1fr;
+    grid-template-columns: 1fr 500px 1fr;
     row-gap: 50px;
 }
 
@@ -27,15 +27,20 @@ header {
     margin-bottom: 20px;
 }
 
+.add-todo {
+    margin-bottom: 40px;
+}
+
 h1 {
+    font-weight: 500;
     border-bottom: 2px solid #333;
 }
 
 /* font-family: Georgia, serif; */
 .todo-list {
-    border-top: 1px solid #333;
-    border-bottom: 1px solid #333;
-    margin: 20px 0;
+    /* border-top: 1px solid #333; */
+    /* border-bottom: 1px solid #333; */
+    /* margin: 20px 0; */
 }
 
 .day {
@@ -44,7 +49,7 @@ h1 {
 
     margin-right: 10px;
     /* font-weight: bold; */
-    border-right: 2px solid #eee;
+    /* border-right: 2px solid #eee; */
     padding-right: 10px;
     font-size: 18px;
 }
@@ -82,30 +87,31 @@ input[type="checkbox"] {
 }
 
 .month {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .year {
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .todo-list ul {
     padding: 0;
     margin: 0;
+    border-top: 1px solid #eee;
 }
 
 .todo-list li {
     display: flex;
     align-items: center;
-    padding: 10px 0;
+    padding: 4px 0;
     border-bottom: 1px solid #eee;
 }
 
 .todo-list li p {
     flex: 1;
-    font-size: 14px;
+    font-size: 12px;
     margin-right: 10px;
-    /* font-weight: bold; */
+    font-weight: 400;
 }
 
 .todo-list input[type="checkbox"] {

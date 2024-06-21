@@ -24,11 +24,8 @@ x set timezone on database/golang so times are what i want
 x typography styling 
 ---
 
-style the todos
-    shift the day to outside todos, so todos box can be centered
-
-style of the form
-    disable button if fields not filled in
+x style the todos
+    x shift the day to outside todos, so todos box can be centered
 
 ---
 
@@ -43,14 +40,8 @@ change UI to do that too. default 1 check box. or allow multiple checkboxes in a
         input field: eat breakfast
         select dropdown, 1 checkboxes
 
-show timezone on UI, and let user change timezone
-
----
-
-can update yday, but not before yday
-
-edit todos - like change meds 1 to quantity with goal 3
-    only current day
+style of the form
+    disable button if fields not filled in
 
 ---
 enter your mission goals vision
@@ -71,6 +62,17 @@ every user gets their own ai agent
         youtube api app to find you cool videos relevant to you
 
 daily journal - enter text. ai uses that too.
+
+---
+
+edit todos - like change meds 1 to quantity with goal 3
+    only current day
+
+---
+
+show timezone on UI, and let user change timezone
+
+can update yday, but not before yday
 
 ---
 
