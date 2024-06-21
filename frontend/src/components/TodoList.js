@@ -2,20 +2,14 @@ import React from "react";
 import axios from "axios";
 
 function TodoList({ todos, setTodos }) {
-    const handleCheckboxChange = (todo, checked) => {
-        const updatedTodo = { ...todo, status: checked ? 1 : 0 };
-        axios
-            .put(`http://localhost:8080/api/todos/${todo.id}`, updatedTodo)
-            .then(() => {
-                setTodos((prevTodos) =>
-                    prevTodos.map((t) => (t.id === todo.id ? updatedTodo : t))
-                );
-            })
-            .catch((error) => console.error(error));
-    };
-
-    const handleQuantityChange = (todo, count) => {
-        const updatedTodo = { ...todo, status: count };
+    const handleQuantityChange = (todo, index) => {
+        let newStatus;
+        if (index < todo.status) {
+            newStatus = index;
+        } else {
+            newStatus = index + 1;
+        }
+        const updatedTodo = { ...todo, status: newStatus };
         axios
             .put(`http://localhost:8080/api/todos/${todo.id}`, updatedTodo)
             .then(() => {
@@ -55,20 +49,10 @@ function TodoList({ todos, setTodos }) {
         .map(Number)
         .sort((a, b) => b - a); // Sort day numbers in descending order
 
-    /*
-            <p className="blood-sugar">{post.blood_sugar}</p>
-            <section className="more-info">
-                <p className="day" style={{ textTransform: "lowercase" }}>
-                    {formatDate(post.day)}
-                </p>
-                <p className="notes">{post.notes}</p>
-            </section>
-            */
-
     return (
         <>
             {sortedDayNumbers.map((dayNumber) => (
-                <>
+                <React.Fragment key={dayNumber}>
                     <p className="day">
                         <div className="date-container">
                             <span className="day-of-week">
@@ -92,22 +76,9 @@ function TodoList({ todos, setTodos }) {
                             {groupedTodos[dayNumber].map((todo) => (
                                 <li key={todo.id}>
                                     <p>{todo.title}</p>
-                                    {todo.type === "yes_no" ? (
-                                        <input
-                                            type="checkbox"
-                                            checked={todo.status === 1}
-                                            onChange={(e) =>
-                                                handleCheckboxChange(
-                                                    todo,
-                                                    e.target.checked
-                                                )
-                                            }
-                                        />
-                                    ) : (
-                                        <section>
-                                            {Array.from({
-                                                length: todo.goal,
-                                            }).map((_, index) => (
+                                    <section>
+                                        {Array.from({ length: todo.goal }).map(
+                                            (_, index) => (
                                                 <input
                                                     key={index}
                                                     type="checkbox"
@@ -117,18 +88,18 @@ function TodoList({ todos, setTodos }) {
                                                     onChange={() =>
                                                         handleQuantityChange(
                                                             todo,
-                                                            index + 1
+                                                            index
                                                         )
                                                     }
                                                 />
-                                            ))}
-                                        </section>
-                                    )}
+                                            )
+                                        )}
+                                    </section>
                                 </li>
                             ))}
                         </ul>
                     </div>
-                </>
+                </React.Fragment>
             ))}
         </>
     );

@@ -24,7 +24,6 @@ type Todo struct {
     ID        int       `json:"id"`
     UserID    int       `json:"user_id"`
     Title     string    `json:"title"`
-    Type      string    `json:"type"`
     DayNumber int       `json:"day_number"`
     Status    int       `json:"status"`
     Goal      int       `json:"goal"`
@@ -87,21 +86,21 @@ func getMostRecentDayNumberForUser(userID int) (int, error) {
 
 // Copy todos from the most recent day to the current day
 func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int) error {
-    rows, err := db.Query("SELECT title, type, goal FROM DailyTodos WHERE user_id = ? AND day_number = ?", userID, recentDayNumber)
+    rows, err := db.Query("SELECT title, goal FROM DailyTodos WHERE user_id = ? AND day_number = ?", userID, recentDayNumber)
     if err != nil {
         return fmt.Errorf("failed to fetch recent todos: %w", err)
     }
     defer rows.Close()
 
     for rows.Next() {
-        var title, todoType string
+        var title string
         var goal int
-        if err := rows.Scan(&title, &todoType, &goal); err != nil {
+        if err := rows.Scan(&title, &goal); err != nil {
             return fmt.Errorf("failed to scan todo: %w", err)
         }
 
-        _, err := db.Exec("INSERT INTO DailyTodos (user_id, title, type, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
-            userID, title, todoType, currentDayNumber, 0, goal)
+        _, err := db.Exec("INSERT INTO DailyTodos (user_id, title, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+            userID, title, currentDayNumber, 0, goal)
         if err != nil {
             return fmt.Errorf("failed to insert new todo: %w", err)
         }
@@ -141,7 +140,7 @@ func getRecentTodosForUser(userID int) ([]Todo, error) {
 
     sevenDaysAgo := currentDayNumber - 7
 
-    rows, err := db.Query("SELECT id, user_id, title, type, day_number, status, goal, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND day_number BETWEEN ? AND ? ORDER BY day_number DESC, ID ASC", userID, sevenDaysAgo, currentDayNumber)
+    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND day_number BETWEEN ? AND ? ORDER BY day_number DESC, ID ASC", userID, sevenDaysAgo, currentDayNumber)
     if err != nil {
         return nil, fmt.Errorf("failed to fetch recent todos: %w", err)
     }
@@ -151,7 +150,7 @@ func getRecentTodosForUser(userID int) ([]Todo, error) {
     for rows.Next() {
         var todo Todo
         var createdAt, updatedAt string
-        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.Type, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt); err != nil {
+        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt); err != nil {
             return nil, fmt.Errorf("failed to scan todo: %w", err)
         }
         todo.CreatedAt = createdAt
@@ -220,7 +219,7 @@ func CreateOrUpdateTodayTodo(w http.ResponseWriter, r *http.Request) {
     loc, _ := time.LoadLocation(userTimezone)
     todo.DayNumber = calculateDayNumber(currentTime.In(loc), userTimezone)
 
-    result, err := db.Exec("INSERT INTO DailyTodos (user_id, title, type, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE status = ?, goal = ?", todo.UserID, todo.Title, todo.Type, todo.DayNumber, todo.Status, todo.Goal, todo.Status, todo.Goal)
+    result, err := db.Exec("INSERT INTO DailyTodos (user_id, title, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE status = ?, goal = ?", todo.UserID, todo.Title, todo.DayNumber, todo.Status, todo.Goal, todo.Status, todo.Goal)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -249,7 +248,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err := db.Exec("UPDATE DailyTodos SET title = ?, type = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Type, todo.Status, todo.Goal, id)
+    _, err := db.Exec("UPDATE DailyTodos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -272,7 +271,7 @@ func GetYesterdayTodos(w http.ResponseWriter, r *http.Request) {
     loc, _ := time.LoadLocation(userTimezone)
     yesterdayDayNumber := calculateDayNumber(currentTime.AddDate(0, 0, -1).In(loc), userTimezone)
 
-    rows, err := db.Query("SELECT id, user_id, title, type, day_number, status, goal, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND day_number = ?", userID, yesterdayDayNumber)
+    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND day_number = ?", userID, yesterdayDayNumber)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -282,7 +281,7 @@ func GetYesterdayTodos(w http.ResponseWriter, r *http.Request) {
     todos := []Todo{}
     for rows.Next() {
         var todo Todo
-        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.Type, &todo.DayNumber, &todo.Status, &todo.Goal, &todo.CreatedAt, &todo.UpdatedAt); err != nil {
+        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &todo.CreatedAt, &todo.UpdatedAt); err != nil {
             http.Error(w, err.Error(), http.StatusInternalServerError)
             return
         }
@@ -304,7 +303,7 @@ func UpdateYesterdayTodo(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err := db.Exec("UPDATE DailyTodos SET title = ?, type = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Type, todo.Status, todo.Goal, id)
+    _, err := db.Exec("UPDATE DailyTodos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
