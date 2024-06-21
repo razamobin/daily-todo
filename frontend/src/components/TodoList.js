@@ -66,9 +66,9 @@ function TodoList({ todos, setTodos }) {
             */
 
     return (
-        <article>
+        <>
             {sortedDayNumbers.map((dayNumber) => (
-                <div className="todo-list" key={dayNumber}>
+                <>
                     <p className="day">
                         <div className="date-container">
                             <span className="day-of-week">
@@ -87,25 +87,27 @@ function TodoList({ todos, setTodos }) {
                             </div>
                         </div>
                     </p>
-                    <ul>
-                        {groupedTodos[dayNumber].map((todo) => (
-                            <li key={todo.id}>
-                                <p>{todo.title}</p>
-                                {todo.type === "yes_no" ? (
-                                    <input
-                                        type="checkbox"
-                                        checked={todo.status === 1}
-                                        onChange={(e) =>
-                                            handleCheckboxChange(
-                                                todo,
-                                                e.target.checked
-                                            )
-                                        }
-                                    />
-                                ) : (
-                                    <section>
-                                        {Array.from({ length: todo.goal }).map(
-                                            (_, index) => (
+                    <div key={dayNumber} className="todo-list">
+                        <ul>
+                            {groupedTodos[dayNumber].map((todo) => (
+                                <li key={todo.id}>
+                                    <p>{todo.title}</p>
+                                    {todo.type === "yes_no" ? (
+                                        <input
+                                            type="checkbox"
+                                            checked={todo.status === 1}
+                                            onChange={(e) =>
+                                                handleCheckboxChange(
+                                                    todo,
+                                                    e.target.checked
+                                                )
+                                            }
+                                        />
+                                    ) : (
+                                        <section>
+                                            {Array.from({
+                                                length: todo.goal,
+                                            }).map((_, index) => (
                                                 <input
                                                     key={index}
                                                     type="checkbox"
@@ -119,16 +121,16 @@ function TodoList({ todos, setTodos }) {
                                                         )
                                                     }
                                                 />
-                                            )
-                                        )}
-                                    </section>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                                            ))}
+                                        </section>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </>
             ))}
-        </article>
+        </>
     );
 }
 

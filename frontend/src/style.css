@@ -10,14 +10,17 @@ body {
     line-height: 1.5;
 }
 
-.container {
-    width: 400px;
+.header-container {
+    width: 600px;
     margin: 0 auto;
 }
 
-article {
-    width: 700px;
+.main-container {
+    width: 900px;
     margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 600px 1fr;
+    row-gap: 50px;
 }
 
 header {
@@ -30,16 +33,17 @@ h1 {
 
 /* font-family: Georgia, serif; */
 .todo-list {
-    display: grid;
-    grid-template-columns: 150px 1fr;
-    grid-template-rows: auto;
-    align-content: center;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
+    margin: 20px 0;
 }
 
 .day {
+    grid-column: 1 / 2; /* Span the first column */
     justify-self: end;
+
     margin-right: 10px;
-    font-weight: bold;
+    /* font-weight: bold; */
     border-right: 2px solid #eee;
     padding-right: 10px;
     font-size: 18px;
@@ -74,7 +78,7 @@ input[type="checkbox"] {
 
 .day-of-month {
     font-size: 48px;
-    font-weight: bold;
+    /* font-weight: bold; */
 }
 
 .month {

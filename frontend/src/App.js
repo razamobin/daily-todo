@@ -15,7 +15,7 @@ function App() {
 
     return (
         <>
-            <div className="container">
+            <div className="header-container">
                 <header>
                     <h1>
                         daily <span>todos</span>
@@ -23,7 +23,9 @@ function App() {
                 </header>
                 <AddTodo setTodos={setTodos} />
             </div>
-            <TodoList todos={todos} setTodos={setTodos} />
+            <div className="main-container">
+                <TodoList todos={todos} setTodos={setTodos} />
+            </div>
         </>
     );
 }

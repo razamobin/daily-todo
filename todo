@@ -25,6 +25,7 @@ x typography styling
 ---
 
 style the todos
+    shift the day to outside todos, so todos box can be centered
 
 style of the form
     disable button if fields not filled in
@@ -92,6 +93,9 @@ hello raza greeting, it's 10:51pm. for any time related things, show a message. 
         knows your goals, knows your past days activities, knows your actions today
         has memory of notable events, and references them
 
+labels for each todo 0 / 1, 3 / 12
+    color code 1 / 1 is green. 0 / 1 red. 2 / 3 yellow. etc.
+        only for current day
 ---
 next / previous. pagination.
 
@@ -129,3 +133,7 @@ add public viewing of my daily todos and what ai said to me. so save ai stuff to
     convo history is with open ai?
     can share public url with skool
     allow skool to add daily todos as a sandbox user save by cookie, that's a user
+
+---
+my life's mission is to do creative work 6 hours a day and live healthy forever
+    put that at the top of your todo page
