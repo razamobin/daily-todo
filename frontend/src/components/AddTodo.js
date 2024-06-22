@@ -39,7 +39,7 @@ function AddTodo({ setTodos }) {
                     <select
                         id="goal"
                         value={goal}
-                        onChange={(e) => setGoal(e.target.value)}
+                        onChange={(e) => setGoal(parseInt(e.target.value, 10))}
                         required
                     >
                         {Array.from({ length: 100 }, (_, i) => (
@@ -48,11 +48,17 @@ function AddTodo({ setTodos }) {
                             </option>
                         ))}
                     </select>
-                    <span>times per day</span>
+                    <span
+                        style={{
+                            display: "inline-block",
+                            width: "80px",
+                            textAlign: "left",
+                        }}
+                    >
+                        {goal === 1 ? "time per day" : "times per day"}
+                    </span>
                 </div>
-                <button type="submit" style={{ marginLeft: "10px" }}>
-                    Add Todo
-                </button>
+                <button type="submit">Add Todo</button>
             </form>
         </section>
     );
