@@ -35,19 +35,21 @@ function AddTodo({ setTodos }) {
                     placeholder="Todo"
                     required
                 />
-                <select
-                    id="goal"
-                    value={goal}
-                    onChange={(e) => setGoal(e.target.value)}
-                    required
-                    style={{ marginLeft: "10px" }}
-                >
-                    {Array.from({ length: 100 }, (_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                            {i + 1}
-                        </option>
-                    ))}
-                </select>
+                <div className="goal-container">
+                    <select
+                        id="goal"
+                        value={goal}
+                        onChange={(e) => setGoal(e.target.value)}
+                        required
+                    >
+                        {Array.from({ length: 100 }, (_, i) => (
+                            <option key={i + 1} value={i + 1}>
+                                {i + 1}
+                            </option>
+                        ))}
+                    </select>
+                    <span>times per day</span>
+                </div>
                 <button type="submit" style={{ marginLeft: "10px" }}>
                     Add Todo
                 </button>

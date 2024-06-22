@@ -139,6 +139,20 @@ input[type="checkbox"] {
     flex: 1; /* Make input and select fields grow to fill space */
 }
 
+.goal-container {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Space between select and text */
+}
+
+.goal-container select {
+    width: 60px; /* Make the select element narrower */
+}
+
+.goal-container span {
+    font-size: 12px; /* Match the font size of the form */
+}
+
 #addTodoForm button {
     background-color: black;
     color: white;
