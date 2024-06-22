@@ -20,7 +20,7 @@ body {
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 500px 1fr;
-    row-gap: 50px;
+    row-gap: 45px;
 }
 
 header {

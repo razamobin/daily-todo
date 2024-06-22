@@ -41,12 +41,27 @@ x change UI to do that too. default 1 check box. or allow multiple checkboxes in
         input field: eat breakfast
         select dropdown, 1 checkboxes
 
-style of the form
-    disable button if fields not filled in
+x style of the form
+    x disable button if fields not filled in
 
 ---
 enter your mission goals vision
     save to db. save to files, and send to ai
+    profile page / account settings page
+        raza link, right side, daily todos
+            links to profile page
+
+profile page
+    change timezone
+    enter your mission
+    logout
+
+each todo is a link, and pops up a modal
+    show context - is this editing just this 1 todo for this day? or all todos?
+    edit why this is important to your mission
+    delete
+    edit title
+    edit goal number
 
 bg info - why each todo is relevant to your goals, mission, vision
     ai can use this
@@ -71,9 +86,29 @@ daily journal - enter text. ai uses that too.
 edit todos - like change meds 1 to quantity with goal 3
     only current day
 
+delete a todo
+    only current day
+
+easier way to increment/decrement a todo? checkboxes can be small and hard to hit sometimes
+
+functions
+    edit the todo 
+        title text
+        goal # per day
+    delete the todo
+    increment the todo (check next checkbox)
+    decrement the todo (uncheck the latest checkbox)
+    edit why it's relevant to mission/goals (high level)
+    edit current day's notes on that todo (low level day to day)
 ---
 
-show timezone on UI, and let user change timezone
+allow sign up
+
+allow login/logout
+
+show current time and timezone on UI, and let user change timezone
+
+---
 
 can update yday, but not before yday
 
@@ -111,7 +146,7 @@ specific url for any date, can immediately go back.
 specific url for any date/date range
 
 ---
-make it look good, work good
+x make it look good, work good
 
 hook up ai
 

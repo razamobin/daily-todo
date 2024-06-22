@@ -28,7 +28,7 @@ function AddTodo({ setTodos }) {
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Todo"
+                    placeholder="New Todo"
                     required
                 />
                 <div className="goal-container">
@@ -38,7 +38,7 @@ function AddTodo({ setTodos }) {
                         onChange={(e) => setGoal(parseInt(e.target.value, 10))}
                         required
                     >
-                        {Array.from({ length: 100 }, (_, i) => (
+                        {Array.from({ length: 24 }, (_, i) => (
                             <option key={i + 1} value={i + 1}>
                                 {i + 1}
                             </option>
