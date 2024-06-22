@@ -149,7 +149,10 @@ input[type="checkbox"] {
     width: 60px; /* Make the select element narrower */
 }
 
-.goal-container span {
+.goal-text {
+    display: inline-block;
+    width: 80px;
+    text-align: left;
     font-size: 12px; /* Match the font size of the form */
 }
 

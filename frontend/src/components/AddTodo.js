@@ -23,11 +23,7 @@ function AddTodo({ setTodos }) {
 
     return (
         <section className="add-todo">
-            <form
-                id="addTodoForm"
-                onSubmit={handleSubmit}
-                style={{ display: "flex", alignItems: "center" }}
-            >
+            <form id="addTodoForm" onSubmit={handleSubmit}>
                 <input
                     type="text"
                     value={title}
@@ -48,13 +44,7 @@ function AddTodo({ setTodos }) {
                             </option>
                         ))}
                     </select>
-                    <span
-                        style={{
-                            display: "inline-block",
-                            width: "80px",
-                            textAlign: "left",
-                        }}
-                    >
+                    <span className="goal-text">
                         {goal === 1 ? "time per day" : "times per day"}
                     </span>
                 </div>
