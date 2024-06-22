@@ -32,9 +32,9 @@ x style the todos
 x yes/no - change it to quantity goal 1. makes everything the same and simple
     x remove db column for type
 
-NEXT FRIDAY JUN 21 - make the preview look exactly like the todo would look like. so the user understands what they are adding. then they can edit/submit
-change UI to do that too. default 1 check box. or allow multiple checkboxes in a select dropdown
-    how many checkboxes do you want for this todo?
+x NEXT FRIDAY JUN 21 - make the preview look exactly like the todo would look like. so the user understands what they are adding. then they can edit/submit
+x change UI to do that too. default 1 check box. or allow multiple checkboxes in a select dropdown
+    x how many checkboxes do you want for this todo?
         1
         12
 

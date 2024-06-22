@@ -28,7 +28,7 @@ header {
 }
 
 .add-todo {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
 }
 
 h1 {
@@ -117,4 +117,38 @@ input[type="checkbox"] {
 .todo-list input[type="checkbox"] {
     /* transform: scale(1.5); */
     margin-right: 10px;
+}
+
+/* Add these styles */
+#addTodoForm {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Add space between form elements */
+}
+
+#addTodoForm input[type="text"],
+#addTodoForm select {
+    padding: 8px;
+    font-size: 12px; /* Smaller font size */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex: 1; /* Make input and select fields grow to fill space */
+}
+
+#addTodoForm button {
+    background-color: black;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px; /* Smaller font size */
+}
+
+#addTodoForm button:hover {
+    background-color: #333; /* Slightly lighter black on hover */
 }

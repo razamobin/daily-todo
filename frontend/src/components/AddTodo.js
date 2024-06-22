@@ -32,7 +32,7 @@ function AddTodo({ setTodos }) {
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Title"
+                    placeholder="Todo"
                     required
                 />
                 <select
