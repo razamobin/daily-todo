@@ -31,6 +31,10 @@ type Todo struct {
     UpdatedAt string    `json:"updated_at"`
 }
 
+type TodosResponse struct {
+    Todos  []Todo `json:"todos"`
+    NewDay bool   `json:"new_day"`
+}
 
 // Reference date: June 16, 2024
 var referenceDate = time.Date(2024, 6, 16, 0, 0, 0, 0, time.UTC)
@@ -110,10 +114,10 @@ func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int
 }
 
 // Fetch the recent todos for the user
-func getRecentTodosForUser(userID int) ([]Todo, error) {
+func getRecentTodosForUser(userID int) ([]Todo, bool, error) {
     userTimezone, currentTime, err := getUserTimezoneAndCurrentTime(userID)
     if err != nil {
-        return nil, err
+        return nil, false, err
     }
 
     fmt.Println("User Timezone:", userTimezone)
@@ -121,7 +125,7 @@ func getRecentTodosForUser(userID int) ([]Todo, error) {
 
     recentDayNumber, err := getMostRecentDayNumberForUser(userID)
     if err != nil {
-        return nil, err
+        return nil, false, err
     }
 
     currentDayNumber := calculateDayNumber(currentTime, userTimezone)
@@ -129,20 +133,22 @@ func getRecentTodosForUser(userID int) ([]Todo, error) {
     fmt.Println("Recent Day Number:", recentDayNumber)
     fmt.Println("Current Day Number:", currentDayNumber)
 
+    newDay := false
     // Adjust the logic to copy todos if the current day number is greater than the recent day number
     if recentDayNumber < currentDayNumber {
         if err := copyTodosToCurrentDay(userID, recentDayNumber, currentDayNumber); err != nil {
-            return nil, err
+            return nil, false, err
         }
         // Update the recentDayNumber after copying todos
         recentDayNumber = currentDayNumber
+        newDay = true
     }
 
     sevenDaysAgo := currentDayNumber - 7
 
     rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND day_number BETWEEN ? AND ? ORDER BY day_number DESC, ID ASC", userID, sevenDaysAgo, currentDayNumber)
     if err != nil {
-        return nil, fmt.Errorf("failed to fetch recent todos: %w", err)
+        return nil, false, fmt.Errorf("failed to fetch recent todos: %w", err)
     }
     defer rows.Close()
 
@@ -151,14 +157,14 @@ func getRecentTodosForUser(userID int) ([]Todo, error) {
         var todo Todo
         var createdAt, updatedAt string
         if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt); err != nil {
-            return nil, fmt.Errorf("failed to scan todo: %w", err)
+            return nil, false, fmt.Errorf("failed to scan todo: %w", err)
         }
         todo.CreatedAt = createdAt
         todo.UpdatedAt = updatedAt
         todos = append(todos, todo)
     }
 
-    return todos, nil
+    return todos, newDay, nil
 }
 
 func main() {
@@ -189,15 +195,20 @@ func main() {
 func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
     userID := 1 // Replace with the actual user ID from the request context/session
 
-    todos, err := getRecentTodosForUser(userID)
+    todos, newDay, err := getRecentTodosForUser(userID)
     if err != nil {
         log.Printf("failed to get recent todos: %v", err)
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
 
+    response := TodosResponse{
+        Todos:  todos,
+        NewDay: newDay,
+    }
+
     w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(todos)
+    json.NewEncoder(w).Encode(response)
 }
 
 // Handler to create or update today's todo
@@ -312,6 +323,3 @@ func UpdateYesterdayTodo(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(todo)
 }
-
-
-

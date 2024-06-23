@@ -5,13 +5,33 @@ import TodoList from "./components/TodoList";
 
 function App() {
     const [todos, setTodos] = useState([]);
+    const [dailyMessage, setDailyMessage] = useState("");
 
     useEffect(() => {
         axios
             .get("http://localhost:8080/api/todos")
-            .then((response) => setTodos(response.data))
+            .then((response) => {
+                setTodos(response.data.todos);
+                if (response.data.new_day) {
+                    fetchDailyMessage();
+                }
+            })
             .catch((error) => console.error(error));
     }, []);
+
+    const fetchDailyMessage = () => {
+        axios
+            .get("http://localhost:5001/api/daily-message", {
+                params: {
+                    user_id: 1,
+                    date: new Date().toISOString().split("T")[0],
+                },
+            })
+            .then((response) => setDailyMessage(response.data.message))
+            .catch((error) =>
+                console.error("Error fetching daily message:", error)
+            );
+    };
 
     return (
         <>
@@ -24,6 +44,9 @@ function App() {
                 <AddTodo setTodos={setTodos} />
             </div>
             <div className="main-container">
+                {dailyMessage && (
+                    <div className="daily-message">{dailyMessage}</div>
+                )}
                 <TodoList todos={todos} setTodos={setTodos} />
             </div>
         </>
