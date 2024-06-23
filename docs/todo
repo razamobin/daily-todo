@@ -13,9 +13,9 @@ x make backend return all days, order by recent
 x improve dev exp. edit files locally and it goes to react app
 
 x cron job - how? and do the copy to next day at midnight
-    INSERT INTO DailyTodos (user_id, title, type, date, status, goal, created_at, updated_at)
+    INSERT INTO daily_todos (user_id, title, type, date, status, goal, created_at, updated_at)
     SELECT user_id, title, type, '2024-06-18', 0, goal, NOW(), NOW()
-    FROM DailyTodos
+    FROM daily_todos 
     WHERE date = '2024-06-17';
 
 x set timezone on database/golang so times are what i want

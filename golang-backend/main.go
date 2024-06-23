@@ -64,7 +64,7 @@ func calculateDayNumber(t time.Time, timezone string) int {
 // Get the user's timezone and the current time in their timezone
 func getUserTimezoneAndCurrentTime(userID int) (string, time.Time, error) {
     var user User
-    err := db.QueryRow("SELECT id, timezone FROM Users WHERE id = ?", userID).Scan(&user.ID, &user.Timezone)
+    err := db.QueryRow("SELECT id, timezone FROM users WHERE id = ?", userID).Scan(&user.ID, &user.Timezone)
     if err != nil {
         return "", time.Time{}, fmt.Errorf("failed to fetch user timezone: %w", err)
     }
@@ -77,10 +77,10 @@ func getUserTimezoneAndCurrentTime(userID int) (string, time.Time, error) {
     return user.Timezone, time.Now().In(loc), nil
 }
 
-// Fetch the most recent day_number from DailyTodos for the user
+// Fetch the most recent day_number from daily_todos for the user
 func getMostRecentDayNumberForUser(userID int) (int, error) {
     var recentDayNumber int
-    err := db.QueryRow("SELECT MAX(day_number) FROM DailyTodos WHERE user_id = ?", userID).Scan(&recentDayNumber)
+    err := db.QueryRow("SELECT MAX(day_number) FROM daily_todos WHERE user_id = ?", userID).Scan(&recentDayNumber)
     if err != nil {
         return 0, fmt.Errorf("failed to fetch most recent day_number: %w", err)
     }
@@ -90,7 +90,7 @@ func getMostRecentDayNumberForUser(userID int) (int, error) {
 
 // Copy todos from the most recent day to the current day
 func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int) error {
-    rows, err := db.Query("SELECT title, goal FROM DailyTodos WHERE user_id = ? AND day_number = ?", userID, recentDayNumber)
+    rows, err := db.Query("SELECT title, goal FROM daily_todos WHERE user_id = ? AND day_number = ?", userID, recentDayNumber)
     if err != nil {
         return fmt.Errorf("failed to fetch recent todos: %w", err)
     }
@@ -103,7 +103,7 @@ func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int
             return fmt.Errorf("failed to scan todo: %w", err)
         }
 
-        _, err := db.Exec("INSERT INTO DailyTodos (user_id, title, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
+        _, err := db.Exec("INSERT INTO daily_todos (user_id, title, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
             userID, title, currentDayNumber, 0, goal)
         if err != nil {
             return fmt.Errorf("failed to insert new todo: %w", err)
@@ -146,7 +146,7 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, error) {
 
     sevenDaysAgo := currentDayNumber - 7
 
-    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND day_number BETWEEN ? AND ? ORDER BY day_number DESC, ID ASC", userID, sevenDaysAgo, currentDayNumber)
+    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM daily_todos WHERE user_id = ? AND day_number BETWEEN ? AND ? ORDER BY day_number DESC, ID ASC", userID, sevenDaysAgo, currentDayNumber)
     if err != nil {
         return nil, false, fmt.Errorf("failed to fetch recent todos: %w", err)
     }
@@ -230,7 +230,7 @@ func CreateOrUpdateTodayTodo(w http.ResponseWriter, r *http.Request) {
     loc, _ := time.LoadLocation(userTimezone)
     todo.DayNumber = calculateDayNumber(currentTime.In(loc), userTimezone)
 
-    result, err := db.Exec("INSERT INTO DailyTodos (user_id, title, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE status = ?, goal = ?", todo.UserID, todo.Title, todo.DayNumber, todo.Status, todo.Goal, todo.Status, todo.Goal)
+    result, err := db.Exec("INSERT INTO daily_todos (user_id, title, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE status = ?, goal = ?", todo.UserID, todo.Title, todo.DayNumber, todo.Status, todo.Goal, todo.Status, todo.Goal)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -259,7 +259,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err := db.Exec("UPDATE DailyTodos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
+    _, err := db.Exec("UPDATE daily_todos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -282,7 +282,7 @@ func GetYesterdayTodos(w http.ResponseWriter, r *http.Request) {
     loc, _ := time.LoadLocation(userTimezone)
     yesterdayDayNumber := calculateDayNumber(currentTime.AddDate(0, 0, -1).In(loc), userTimezone)
 
-    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM DailyTodos WHERE user_id = ? AND day_number = ?", userID, yesterdayDayNumber)
+    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM daily_todos WHERE user_id = ? AND day_number = ?", userID, yesterdayDayNumber)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -314,7 +314,7 @@ func UpdateYesterdayTodo(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err := db.Exec("UPDATE DailyTodos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
+    _, err := db.Exec("UPDATE daily_todos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
