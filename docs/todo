@@ -79,6 +79,12 @@ every user gets their own ai agent
 
     ai suggests new todos for you. whatever daily habits it thinks will help you achieve your mission in life.
 
+maybe you just want to chat with someone daily about your mission/goals, what you did that day to further your mission/goals, challenges. hash out your thinking. etc. bounce ideas.
+    and the ai sees you putting in work, knows you, your mission, your daily habits, what you did every day, what you couldn't fit it, obstacles etc.
+    ai's mission is to be an unrelenting optimistic force in Raza's life to help him achieve his mission and goals. live healthy forever, and do focused creative work for 6 hours a day forever.
+
+tell agent you want a new kanye quote daily. hormozi quote daily. new motivational yt vid daily.
+
 daily journal - enter text. ai uses that too.
 
 ---
@@ -100,6 +106,12 @@ functions
     decrement the todo (uncheck the latest checkbox)
     edit why it's relevant to mission/goals (high level)
     edit current day's notes on that todo (low level day to day)
+
+hover over a todo - then you can edit
+    name
+    relevance to mission/goals
+
+strikethrough when 3 / 3, 1 / 1 etc
 ---
 
 allow sign up
@@ -115,6 +127,8 @@ can update yday, but not before yday
 ---
 
 allow user to reorder their todo list as they like, save that state and keep it on copy
+
+---
 
 reflect on the day - good, could improve upon. what are you grateful for.
     it's time to reflect

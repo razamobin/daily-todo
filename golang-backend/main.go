@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -180,6 +181,8 @@ func main() {
     router.HandleFunc("/api/todos/{id}", UpdateTodo).Methods("PUT")
     router.HandleFunc("/api/todos/yesterday", GetYesterdayTodos).Methods("GET")
     router.HandleFunc("/api/todos/yesterday/{id}", UpdateYesterdayTodo).Methods("PUT")
+    router.HandleFunc("/api/latest-thread", GetLatestThreadIDHandler).Methods("GET")
+    router.HandleFunc("/api/user-mission", GetUserMissionHandler).Methods("GET")
 
     // Set up CORS headers
     corsHandler := handlers.CORS(
@@ -190,6 +193,109 @@ func main() {
 
     fmt.Println("Starting server on :8080")
     log.Fatal(http.ListenAndServe(":8080", corsHandler(router)))
+}
+
+func GetLatestThreadIDHandler(w http.ResponseWriter, r *http.Request) {
+    userID := r.URL.Query().Get("user_id")
+    if userID == "" {
+        http.Error(w, "user_id is required", http.StatusBadRequest)
+        return
+    }
+
+    var threadID *string
+    err := db.QueryRow("SELECT thread_id FROM user_threads WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", userID).Scan(&threadID)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            response := map[string]*string{"thread_id": nil}
+            w.Header().Set("Content-Type", "application/json")
+            json.NewEncoder(w).Encode(response)
+            return
+        } else {
+            http.Error(w, fmt.Sprintf("Failed to fetch thread ID: %v", err), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    response := map[string]*string{"thread_id": threadID}
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(response)
+}
+
+func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
+    userIDStr := r.URL.Query().Get("user_id")
+    if userIDStr == "" {
+        http.Error(w, "user_id is required", http.StatusBadRequest)
+        return
+    }
+
+    userID, err := strconv.Atoi(userIDStr)
+    if err != nil {
+        http.Error(w, "invalid user_id", http.StatusBadRequest)
+        return
+    }
+
+    var mission *string
+    err = db.QueryRow("SELECT mission FROM user_missions WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", userID).Scan(&mission)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            mission = nil
+        } else {
+            http.Error(w, fmt.Sprintf("Failed to fetch mission: %v", err), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    // Fetch the last 7 days of todos
+    todos, err := getLast7DaysTodos(userID)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to fetch todos: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    // Get the current day number
+    userTimezone, currentTime, err := getUserTimezoneAndCurrentTime(userID)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to fetch user timezone: %v", err), http.StatusInternalServerError)
+        return
+    }
+    currentDayNumber := calculateDayNumber(currentTime, userTimezone)
+
+    response := map[string]interface{}{
+        "mission":           mission,
+        "todos":             todos,
+        "current_day_number": currentDayNumber,
+    }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(response)
+}
+
+// Helper function to fetch the last 7 days of todos
+func getLast7DaysTodos(userID int) ([]map[string]interface{}, error) {
+    rows, err := db.Query(`
+        SELECT day_number, title, status, goal 
+        FROM daily_todos 
+        WHERE user_id = ? 
+        AND day_number >= (SELECT MAX(day_number) FROM daily_todos WHERE user_id = ?) - 6
+        ORDER BY day_number DESC`, userID, userID)
+    if err != nil {
+        return nil, fmt.Errorf("failed to fetch todos: %w", err)
+    }
+    defer rows.Close()
+
+    todos := []map[string]interface{}{}
+    for rows.Next() {
+        var dayNumber, status, goal int
+        var title string
+        if err := rows.Scan(&dayNumber, &title, &status, &goal); err != nil {
+            return nil, fmt.Errorf("failed to scan todo: %w", err)
+        }
+        todos = append(todos, map[string]interface{}{
+            "day_number": dayNumber,
+            "title":      title,
+            "progress":   fmt.Sprintf("%d out of %d", status, goal),
+        })
+    }
+    return todos, nil
 }
 
 func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
@@ -323,3 +429,6 @@ func UpdateYesterdayTodo(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(todo)
 }
+
+
+
