@@ -13,6 +13,7 @@ function App() {
             .then((response) => {
                 setTodos(response.data.todos);
                 if (response.data.new_day) {
+                    console.log("new day!");
                     fetchDailyMessage();
                 }
             })

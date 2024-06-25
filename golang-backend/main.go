@@ -183,6 +183,7 @@ func main() {
     router.HandleFunc("/api/todos/yesterday/{id}", UpdateYesterdayTodo).Methods("PUT")
     router.HandleFunc("/api/latest-thread", GetLatestThreadIDHandler).Methods("GET")
     router.HandleFunc("/api/user-mission", GetUserMissionHandler).Methods("GET")
+    router.HandleFunc("/api/user-thread", SaveUserThreadHandler).Methods("POST")
 
     // Set up CORS headers
     corsHandler := handlers.CORS(
@@ -194,6 +195,33 @@ func main() {
     fmt.Println("Starting server on :8080")
     log.Fatal(http.ListenAndServe(":8080", corsHandler(router)))
 }
+
+
+func SaveUserThreadHandler(w http.ResponseWriter, r *http.Request) {
+    var input struct {
+        UserID   int    `json:"user_id"`
+        ThreadID string `json:"thread_id"`
+    }
+
+    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    _, err := db.Exec(`
+        INSERT INTO user_threads (user_id, thread_id, created_at, updated_at)
+        VALUES (?, ?, NOW(), NOW())
+        ON DUPLICATE KEY UPDATE updated_at = NOW()`,
+        input.UserID, input.ThreadID)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to save user thread: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("User thread saved successfully"))
+}
+
 
 func GetLatestThreadIDHandler(w http.ResponseWriter, r *http.Request) {
     userID := r.URL.Query().Get("user_id")
