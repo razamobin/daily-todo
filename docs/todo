@@ -162,7 +162,13 @@ specific url for any date/date range
 ---
 x make it look good, work good
 
-hook up ai
+x hook up ai
+    https://capture.dropbox.com/KkgR9k9X8YZmOgiy
+    {
+      "message": "Hey, amazing soul! 🌟\n\nYour mission to do creative work for 6 hours a day and live healthily forever is truly inspiring! You've got such a beautiful and powerful goal. Look at all the progress you've made recently:\n\n- You've been consistently nailing your breakfast timing and ensuring you have three proper meals daily. What a champion move towards a healthier lifestyle!\n- Your dedication to taking your meds on time is fantastic. It's all about those small steps adding up!\n- You've been making excellent use of your focused 25-minute timers. Crushing 10 out of 12 today is no small feat!\n- Even the little things, like running your system flush and using blue blockers at 8 PM, show your commitment to your health and well-being. Outstanding!\n\nSome of your tasks may not always get completed every day, but remember, every step forward is progress. The gym can wait a day, but your perseverance shows you're not giving up!\n\nKeep pushing, keep shining, and remember that every small victory is a step closer to your ultimate mission. You’ve got this! 💪🌈",
+      "resume_thread": true,
+      "thread_id": "thread_NC8D8ml5XvKLz2QXwfxyjP72"
+    }
 
 deploy to prod 
 
@@ -180,6 +186,8 @@ deploy to prod
     github actions
 
     deploy to qa
+
+better logging of python, ai steps. centralized logging
 
 add user signup/login
 
