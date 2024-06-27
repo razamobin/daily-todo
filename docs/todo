@@ -90,8 +90,9 @@ daily journal - enter text. ai uses that too.
 ---
 NEXT june 26th 2024
     figure out how to stream it to react
-        learn yield, generate, stream_with_context
+        x learn yield, generate, stream_with_context
         how to use streaming api on assistant that calls custom functions. event hander. not the easiest thing, worth it to figure it out.
+            i could make a non web app python class to build up a get_completion streaming. stream to std out. then move it into the web app after testing
 
     react put it in 3rd column
 
@@ -102,6 +103,9 @@ NEXT june 26th 2024
     make user-mission only return days before current day, otherwise ai is critiquing day that just started - annoying.
 
     use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
+
+    the thread could cause issues if it sees incomplete day 11 in the morning, then complete day 11 in the evening, it thinks you haven't done much because incomplete is in the convo thread :(
+        prompting would help. use the highest stats for day 11. sometimes multiple day 11s when you hit get user mission multiple times per day
 ---
 
 edit todos - like change meds 1 to quantity with goal 3
