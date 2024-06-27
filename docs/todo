@@ -88,6 +88,21 @@ tell agent you want a new kanye quote daily. hormozi quote daily. new motivation
 daily journal - enter text. ai uses that too.
 
 ---
+NEXT june 26th 2024
+    figure out how to stream it to react
+        learn yield, generate, stream_with_context
+        how to use streaming api on assistant that calls custom functions. event hander. not the easiest thing, worth it to figure it out.
+
+    react put it in 3rd column
+
+    python save full response to db. react fetch from db, unless it's a new day, then generate a new message
+
+    user-mission, return most recent 7 days of ai encouragement, so ai know what it said before and can come up w new shit
+    
+    make user-mission only return days before current day, otherwise ai is critiquing day that just started - annoying.
+
+    use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
+---
 
 edit todos - like change meds 1 to quantity with goal 3
     only current day

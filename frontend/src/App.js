@@ -12,7 +12,7 @@ function App() {
             .get("http://localhost:8080/api/todos")
             .then((response) => {
                 setTodos(response.data.todos);
-                if (response.data.new_day) {
+                if (true || response.data.new_day) {
                     console.log("new day!");
                     fetchDailyMessage();
                 }
@@ -21,17 +21,24 @@ function App() {
     }, []);
 
     const fetchDailyMessage = () => {
-        axios
-            .get("http://localhost:5001/api/daily-message", {
-                params: {
-                    user_id: 1,
-                    date: new Date().toISOString().split("T")[0],
-                },
-            })
-            .then((response) => setDailyMessage(response.data.message))
-            .catch((error) =>
-                console.error("Error fetching daily message:", error)
-            );
+        /*
+        const eventSource = new EventSource(
+            "http://localhost:5001/api/daily-message?user_id=1&date=" +
+                new Date().toISOString().split("T")[0]
+        );
+        */
+        const eventSource = new EventSource(
+            "http://localhost:5001/api/stream-test"
+        );
+
+        eventSource.onmessage = (event) => {
+            setDailyMessage((prevMessage) => prevMessage + event.data);
+        };
+
+        eventSource.onerror = (error) => {
+            console.error("Error fetching daily message:", error);
+            eventSource.close();
+        };
     };
 
     return (

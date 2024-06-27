@@ -3,7 +3,7 @@ import builtins
 import json
 import textwrap
 import time
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_cors import CORS
 import requests
 import openai
@@ -125,8 +125,9 @@ def get_completion(client, message, agent, funcs, thread):
         # return assistant message
         else:
             messages = client.beta.threads.messages.list(thread_id=thread.id)
-            message = messages.data[0].content[0].text.value
-            return message
+            for message in messages.data[0].content:
+                yield message.text.value
+            break
 
 
 app = Flask(__name__)
@@ -136,6 +137,27 @@ CORS(app)
 @app.route('/')
 def home():
     return jsonify(message="Hello from the Python backend!")
+
+
+def generate_messages():
+    yield "Starting stream...\n"
+    for i in range(5):
+        yield f"Message {i}\n"
+        time.sleep(1)  # Simulating a delay in generating messages
+    yield "Stream ended.\n"
+
+
+@app.route('/api/stream-test', methods=['GET'])
+def stream():
+
+    @stream_with_context
+    def generate():
+        for message in generate_messages():
+            yield f"data: {message}\n\n"
+            import sys
+            sys.stdout.flush()
+
+    return Response(generate(), content_type='text/event-stream')
 
 
 @app.route('/api/daily-message', methods=['GET'])
@@ -193,7 +215,8 @@ def daily_message():
     # start a thread with the assistant. new thread or existing if found in the db for this user
     # add a message to the thread "send an encouraging message"
     eternal_optimist_tools = [GetUserMission]
-    message = get_completion(
+
+    message_generator = get_completion(
         client=client,
         message=
         f"send an encouraging message to user {user_id}. use tools to get the user's mission and recent daily todo history :)",
@@ -201,17 +224,28 @@ def daily_message():
         funcs=eternal_optimist_tools,
         thread=thread)
 
-    # get output from assistant, it will hopefully say call your function
-    # call your function and give it what it wants (user mission data)
-    # get output from assistant, hopefully the encouraging message. return it to the frontend. save to db.
+    @stream_with_context
+    def generate():
+        full_message = ""
+        for message in message_generator:
+            full_message += message
+            yield f"data: {message}\n\n"
+            import sys
+            sys.stdout.flush()
+            """
+        # Save the full message to the database
+        save_message_response = requests.post(
+            'http://golang-backend:8080/api/save-message',
+            json={
+                'user_id': user_id,
+                'thread_id': thread_id,
+                'message': full_message
+            })
+        if save_message_response.status_code != 200:
+            print("Failed to save message to the database")
+"""
 
-    #assistants = client.beta.assistants.list()
-    #print(type(assistants))
-    #print(assistants)
-
-    return jsonify(message=message,
-                   thread_id=thread_id,
-                   resume_thread=resume_thread)
+    return Response(generate(), content_type='text/event-stream')
 
 
 @app.route('/api/create-assistant', methods=['POST'])
