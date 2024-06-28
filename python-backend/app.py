@@ -1,16 +1,24 @@
 # python-backend/app.py
 import builtins
 import json
+import queue
 import textwrap
+import threading
 import time
 from flask import Flask, jsonify, request, Response, stream_with_context
 from flask_cors import CORS
 import requests
 import openai
-from openai import Client
+from openai import AssistantEventHandler, Client
 import os
 from typing import List
 from openai.types.beta.function_tool_param import FunctionToolParam
+from openai.types.beta.threads import Message, MessageDelta
+from openai.types.beta.threads.runs import ToolCall
+from openai.types.beta.threads.runs import RunStep
+from openai.types.beta.threads.runs import FunctionToolCallDelta
+from openai.types.beta.assistant_stream_event import AssistantStreamEvent
+from typing_extensions import override
 
 from pydantic import Field
 from instructor import OpenAISchema
@@ -139,11 +147,30 @@ def home():
     return jsonify(message="Hello from the Python backend!")
 
 
+class MessageGenerator:
+
+    def __init__(self, count):
+        self.count = count
+
+    def generate_messages(self):
+        yield "Starting stream from MessageGenerator...\n"
+        for i in range(self.count):
+            yield f"Message {i} from MessageGenerator\n"
+            time.sleep(1)  # Simulating a delay in generating messages
+        yield "Stream ended from MessageGenerator.\n"
+
+
+def generate_messages_from_object(generator):
+    for message in generator.generate_messages():
+        yield message
+
+
 def generate_messages():
     yield "Starting stream...\n"
     for i in range(5):
         yield f"Message {i}\n"
         time.sleep(1)  # Simulating a delay in generating messages
+    yield from generate_messages_from_object(MessageGenerator(5))
     yield "Stream ended.\n"
 
 
@@ -158,6 +185,173 @@ def stream():
             sys.stdout.flush()
 
     return Response(generate(), content_type='text/event-stream')
+
+
+def get_completion_stream(client, message, agent, funcs, thread, q):
+    #q.put("yield: Stream started.\n")
+
+    message = client.beta.threads.messages.create(thread_id=thread.id,
+                                                  role="user",
+                                                  content=message)
+
+    class EventHandler(AssistantEventHandler):
+
+        def __init__(self, thread_id, assistant_id, q):
+            super().__init__()
+            self.output = None
+            self.tool_id = None
+            self.thread_id = thread_id
+            self.assistant_id = assistant_id
+            self.run_id = None
+            self.run_step: RunStep | None = None
+            self.function_name = ""
+            self.arguments = ""
+            self.q = q
+
+        @override
+        def on_text_created(self, text) -> None:
+            print(f"\nassistant on_text_created > ", end="", flush=True)
+
+        @override
+        def on_text_delta(self, delta, snapshot):
+            self.q.put(f"{delta.value}\n")
+
+        @override
+        def on_end(self, ):
+            print(f"\n end assistant > ",
+                  self.current_run_step_snapshot,
+                  end="",
+                  flush=True)
+
+        @override
+        def on_exception(self, exception: Exception) -> None:
+            print(f"\nassistant > {exception}\n", end="", flush=True)
+
+        @override
+        def on_message_created(self, message: Message) -> None:
+            print(f"\nassistant on_message_created > {message}\n",
+                  end="",
+                  flush=True)
+
+        @override
+        def on_message_done(self, message: Message) -> None:
+            print(f"\nassistant on_message_done > {message}\n",
+                  end="",
+                  flush=True)
+
+        @override
+        def on_message_delta(self, delta: MessageDelta,
+                             snapshot: Message) -> None:
+            pass
+
+        def on_tool_call_created(self, tool_call: ToolCall):
+            print(f"\nassistant on_tool_call_created > {tool_call}")
+            self.function_name = tool_call.function.name
+            self.tool_id = tool_call.id
+            print(
+                f"\on_tool_call_created > run_step.status > {self.run_step.status}"
+            )
+
+            print(f"\nassistant > {tool_call.type} {self.function_name}\n",
+                  flush=True)
+
+            keep_retrieving_run = client.beta.threads.runs.retrieve(
+                thread_id=self.thread_id, run_id=self.run_id)
+
+            while keep_retrieving_run.status in ["queued", "in_progress"]:
+                keep_retrieving_run = client.beta.threads.runs.retrieve(
+                    thread_id=self.thread_id, run_id=self.run_id)
+
+                print(f"\nSTATUS: {keep_retrieving_run.status}")
+
+        @override
+        def on_tool_call_done(self, tool_call: ToolCall) -> None:
+            keep_retrieving_run = client.beta.threads.runs.retrieve(
+                thread_id=self.thread_id, run_id=self.run_id)
+
+            print(f"\nDONE STATUS: {keep_retrieving_run.status}")
+
+            if keep_retrieving_run.status == "completed":
+                all_messages = client.beta.threads.messages.list(
+                    thread_id=self.thread_id)
+
+                print(all_messages.data[0].content[0].text.value, "", "")
+                return
+
+            elif keep_retrieving_run.status == "requires_action":
+                print("here you would call your function")
+
+                func = next(
+                    iter([
+                        func for func in funcs
+                        if func.__name__ == self.function_name
+                    ]))
+
+                try:
+                    func = func(**eval(tool_call.function.arguments))
+                    self.output = func.run()
+                except Exception as e:
+                    self.output = "Error: " + str(e)
+
+                with client.beta.threads.runs.submit_tool_outputs_stream(
+                        thread_id=self.thread_id,
+                        run_id=self.run_id,
+                        tool_outputs=[{
+                            "tool_call_id": self.tool_id,
+                            "output": self.output,
+                        }],
+                        event_handler=EventHandler(self.thread_id,
+                                                   self.assistant_id,
+                                                   self.q)) as stream:
+                    stream.until_done()
+
+        @override
+        def on_run_step_created(self, run_step: RunStep) -> None:
+            print(f"on_run_step_created")
+            self.run_id = run_step.run_id
+            self.run_step = run_step
+            print("The type ofrun_step run step is ",
+                  type(run_step),
+                  flush=True)
+            print(f"\n run step created assistant > {run_step}\n", flush=True)
+
+        @override
+        def on_run_step_done(self, run_step: RunStep) -> None:
+            print(f"\n run step done assistant > {run_step}\n", flush=True)
+
+        def on_tool_call_delta(self, delta, snapshot):
+            if delta.type == 'function':
+                print(delta.function.arguments, end="", flush=True)
+                self.arguments += delta.function.arguments
+            elif delta.type == 'code_interpreter':
+                print(f"on_tool_call_delta > code_interpreter")
+                if delta.code_interpreter.input:
+                    print(delta.code_interpreter.input, end="", flush=True)
+                if delta.code_interpreter.outputs:
+                    print(f"\n\noutput >", flush=True)
+                    for output in delta.code_interpreter.outputs:
+                        if output.type == "logs":
+                            print(f"\n{output.logs}", flush=True)
+            else:
+                print("ELSE")
+                print(delta, end="", flush=True)
+
+        @override
+        def on_event(self, event: AssistantStreamEvent) -> None:
+            if event.event == "thread.run.requires_action":
+                print("\nthread.run.requires_action > submit tool call")
+                print(f"ARGS: {self.arguments}")
+
+    with client.beta.threads.runs.stream(
+            thread_id=thread.id,
+            assistant_id=agent.id,
+            event_handler=EventHandler(thread_id=thread.id,
+                                       assistant_id=agent.id,
+                                       q=q),
+    ) as stream:
+        stream.until_done()
+
+    q.put("yield: Stream ended.\n")
 
 
 @app.route('/api/daily-message', methods=['GET'])
@@ -216,6 +410,29 @@ def daily_message():
     # add a message to the thread "send an encouraging message"
     eternal_optimist_tools = [GetUserMission]
 
+    q = queue.Queue()
+
+    completion_thread = threading.Thread(
+        target=get_completion_stream,
+        args=
+        (client,
+         f"send an encouraging message to user {user_id}. use tools to get the user's mission and recent daily todo history :)",
+         assistant, eternal_optimist_tools, thread, q))
+    completion_thread.start()
+
+    @stream_with_context
+    def generate():
+        while True:
+            message = q.get(block=True)
+            if "Stream ended." in message:
+                break
+            else:
+                yield f"data: {message}\n\n"
+
+    return Response(generate(), content_type='text/event-stream')
+
+
+"""
     message_generator = get_completion(
         client=client,
         message=
@@ -232,7 +449,7 @@ def daily_message():
             yield f"data: {message}\n\n"
             import sys
             sys.stdout.flush()
-            """
+
         # Save the full message to the database
         save_message_response = requests.post(
             'http://golang-backend:8080/api/save-message',
@@ -243,9 +460,9 @@ def daily_message():
             })
         if save_message_response.status_code != 200:
             print("Failed to save message to the database")
-"""
 
     return Response(generate(), content_type='text/event-stream')
+"""
 
 
 @app.route('/api/create-assistant', methods=['POST'])

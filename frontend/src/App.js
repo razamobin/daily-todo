@@ -21,15 +21,15 @@ function App() {
     }, []);
 
     const fetchDailyMessage = () => {
-        /*
         const eventSource = new EventSource(
             "http://localhost:5001/api/daily-message?user_id=1&date=" +
                 new Date().toISOString().split("T")[0]
         );
-        */
+        /*
         const eventSource = new EventSource(
             "http://localhost:5001/api/stream-test"
         );
+        */
 
         eventSource.onmessage = (event) => {
             setDailyMessage((prevMessage) => prevMessage + event.data);

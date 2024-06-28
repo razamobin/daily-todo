@@ -1,6 +1,7 @@
 # python-backend/app.py
 import builtins
 import json
+import queue
 import textwrap
 import time
 from flask import Flask, jsonify, request, Response, stream_with_context
@@ -63,6 +64,9 @@ def wprint(*args, width=70, **kwargs):
 
 def get_completion_stream(client, message, agent, funcs, thread):
     yield "yield: Stream started.\n"
+
+    q = queue.Queue()
+
     # create new message in the thread
     message = client.beta.threads.messages.create(thread_id=thread.id,
                                                   role="user",
@@ -73,7 +77,7 @@ def get_completion_stream(client, message, agent, funcs, thread):
 
     class EventHandler(AssistantEventHandler):
 
-        def __init__(self, thread_id, assistant_id):
+        def __init__(self, thread_id, assistant_id, q):
             super().__init__()
             self.output = None
             self.tool_id = None
@@ -83,6 +87,7 @@ def get_completion_stream(client, message, agent, funcs, thread):
             self.run_step: RunStep | None = None
             self.function_name = ""
             self.arguments = ""
+            self.q = q
 
         @override
         def on_text_created(self, text) -> None:
@@ -93,7 +98,8 @@ def get_completion_stream(client, message, agent, funcs, thread):
             #print(f"\nassistant on_text_delta > {delta.value}",
             #      end="",
             #      flush=True)
-            yield f"yield: {delta.value}\n"
+            #yield f"yield: {delta.value}\n"
+            self.q.put(delta.value)
 
         @override
         def on_end(self, ):
@@ -188,8 +194,9 @@ def get_completion_stream(client, message, agent, funcs, thread):
                             "tool_call_id": self.tool_id,
                             "output": self.output,
                         }],
-                        event_handler=EventHandler(
-                            self.thread_id, self.assistant_id)) as stream:
+                        event_handler=EventHandler(self.thread_id,
+                                                   self.assistant_id,
+                                                   self.q)) as stream:
                     stream.until_done()
 
         @override
@@ -244,9 +251,13 @@ def get_completion_stream(client, message, agent, funcs, thread):
             thread_id=thread.id,
             assistant_id=agent.id,
             event_handler=EventHandler(thread_id=thread.id,
-                                       assistant_id=agent.id),
+                                       assistant_id=agent.id,
+                                       q=q),
     ) as stream:
         stream.until_done()
+
+    while not q.empty():
+        yield f"yield: {q.get()}\n"
 
     yield "yield: Stream ended.\n"
 

@@ -273,13 +273,6 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
         }
     }
 
-    // Fetch the last 7 days of todos
-    todos, err := getLast7DaysTodos(userID)
-    if err != nil {
-        http.Error(w, fmt.Sprintf("Failed to fetch todos: %v", err), http.StatusInternalServerError)
-        return
-    }
-
     // Get the current day number
     userTimezone, currentTime, err := getUserTimezoneAndCurrentTime(userID)
     if err != nil {
@@ -287,6 +280,13 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
     currentDayNumber := calculateDayNumber(currentTime, userTimezone)
+
+    // Fetch the last 7 days of todos excluding the current day
+    todos, err := getLast7DaysTodos(userID, currentDayNumber-1)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to fetch todos: %v", err), http.StatusInternalServerError)
+        return
+    }
 
     response := map[string]interface{}{
         "mission":           mission,
@@ -297,14 +297,14 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(response)
 }
 
-// Helper function to fetch the last 7 days of todos
-func getLast7DaysTodos(userID int) ([]map[string]interface{}, error) {
+// Helper function to fetch the last 7 days of todos excluding the current day
+func getLast7DaysTodos(userID int, upToDayNumber int) ([]map[string]interface{}, error) {
     rows, err := db.Query(`
         SELECT day_number, title, status, goal 
         FROM daily_todos 
         WHERE user_id = ? 
-        AND day_number >= (SELECT MAX(day_number) FROM daily_todos WHERE user_id = ?) - 6
-        ORDER BY day_number DESC`, userID, userID)
+        AND day_number BETWEEN ? AND ?
+        ORDER BY day_number DESC`, userID, upToDayNumber-6, upToDayNumber)
     if err != nil {
         return nil, fmt.Errorf("failed to fetch todos: %w", err)
     }
