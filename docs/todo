@@ -1,4 +1,41 @@
 
+20240629
+---
+
+    x make ai text column wider
+
+    x format the markdown
+
+    python save full response to db. react fetch from db, unless it's a new day, then generate a new message
+        react hit python if new day, else hit golang to get most recent saved message
+
+    edit mode - click edit link and a modal comes up. edit title, description for AI, # times per day goal. preview area. submit/cancel
+
+    allow drag n drop re-order
+
+    break 14 dd into 3 hours raza coding personal projects
+        4 hours focused dd work 
+        get 1hr 1st thing in the morning.
+        get 1hr dd before noon
+        get 1hr raza coding afternoon/night before 10pm
+
+    make it so others can set it up from scratch and use it locally from their docker
+        create user - raza
+        save your mission
+        set open ai api key
+        create assistant, save the assistant id (db might be better place)
+        start adding todos and enjoy!
+
+    dailytodos.ai
+    dailytodo.ai
+---
+
+    user-mission, return most recent 7 days of ai encouragement, so ai know what it said before and can come up w new shit
+
+    concept of "finalize" previous day
+        before ai get's today's message it asks you to make final edits to previous day and submit
+            reflect on previous day. what you did good. what could be better. any speciali notes you have on the day. final edit of checkboxes, submit. then you get new AI message for today :)
+
 20240616
 ---
 
@@ -89,10 +126,10 @@ daily journal - enter text. ai uses that too.
 
 ---
 NEXT june 26th 2024
-    figure out how to stream it to react
+    x figure out how to stream it to react
         x learn yield, generate, stream_with_context
         how to use streaming api on assistant that calls custom functions. event hander. not the easiest thing, worth it to figure it out.
-            i could make a non web app python class to build up a get_completion streaming. stream to std out. then move it into the web app after testing
+            x i could make a non web app python class to build up a get_completion streaming. stream to std out. then move it into the web app after testing
 
             on_message_done
                 has the full message once it is done
@@ -100,18 +137,20 @@ NEXT june 26th 2024
             on_text_created
                 streams the text in, nice. can yield this to caller
 
-    react put it in 3rd column
+    x react put it in 3rd column
 
     python save full response to db. react fetch from db, unless it's a new day, then generate a new message
 
     user-mission, return most recent 7 days of ai encouragement, so ai know what it said before and can come up w new shit
     
-    make user-mission only return days before current day, otherwise ai is critiquing day that just started - annoying.
+    x make user-mission only return days before current day, otherwise ai is critiquing day that just started - annoying.
 
     use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
 
     the thread could cause issues if it sees incomplete day 11 in the morning, then complete day 11 in the evening, it thinks you haven't done much because incomplete is in the convo thread :(
         prompting would help. use the highest stats for day 11. sometimes multiple day 11s when you hit get user mission multiple times per day
+        finalize previous day before make ai request on new day
+        reflect on it. what was good, what could be improved
 ---
 
 edit todos - like change meds 1 to quantity with goal 3

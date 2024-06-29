@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AddTodo from "./components/AddTodo";
 import TodoList from "./components/TodoList";
+import ReactMarkdown from "react-markdown";
 
 function App() {
     const [todos, setTodos] = useState([]);
@@ -53,7 +54,9 @@ function App() {
             </div>
             <div className="main-container">
                 {dailyMessage && (
-                    <div className="daily-message">{dailyMessage}</div>
+                    <div className="daily-message">
+                        <ReactMarkdown breaks>{dailyMessage}</ReactMarkdown>
+                    </div>
                 )}
                 <TodoList todos={todos} setTodos={setTodos} />
             </div>
