@@ -184,6 +184,7 @@ func main() {
     router.HandleFunc("/api/latest-thread", GetLatestThreadIDHandler).Methods("GET")
     router.HandleFunc("/api/user-mission", GetUserMissionHandler).Methods("GET")
     router.HandleFunc("/api/user-thread", SaveUserThreadHandler).Methods("POST")
+    router.HandleFunc("/api/user-first-name", GetUserFirstNameHandler).Methods("GET")
 
     // Set up CORS headers
     corsHandler := handlers.CORS(
@@ -196,6 +197,35 @@ func main() {
     log.Fatal(http.ListenAndServe(":8080", corsHandler(router)))
 }
 
+func GetUserFirstNameHandler(w http.ResponseWriter, r *http.Request) {
+    userIDStr := r.URL.Query().Get("user_id")
+    if userIDStr == "" {
+        http.Error(w, "user_id is required", http.StatusBadRequest)
+        return
+    }
+
+    userID, err := strconv.Atoi(userIDStr)
+    if err != nil {
+        http.Error(w, "invalid user_id", http.StatusBadRequest)
+        return
+    }
+
+    var firstName string
+    err = db.QueryRow("SELECT username FROM users WHERE id = ?", userID).Scan(&firstName)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            http.Error(w, "user not found", http.StatusNotFound)
+            return
+        } else {
+            http.Error(w, fmt.Sprintf("Failed to fetch first name: %v", err), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    response := map[string]string{"first_name": firstName}
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(response)
+}
 
 func SaveUserThreadHandler(w http.ResponseWriter, r *http.Request) {
     var input struct {

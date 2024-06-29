@@ -365,6 +365,17 @@ def daily_message():
     except ValueError:
         return jsonify(error="user_id must be an integer"), 400
 
+    # Fetch the user's first name
+    response = requests.get(
+        f'http://golang-backend:8080/api/user-first-name?user_id={user_id}')
+    if response.status_code != 200:
+        return jsonify(
+            error="Failed to fetch user's first name"), response.status_code
+
+    first_name = response.json().get('first_name')
+    if not first_name:
+        return jsonify(error="User's first name not found"), 404
+
     response = requests.get(
         f'http://golang-backend:8080/api/latest-thread?user_id={user_id}')
     if response.status_code != 200:
@@ -416,7 +427,7 @@ def daily_message():
         target=get_completion_stream,
         args=
         (client,
-         f"send an encouraging message to user {user_id}. use tools to get the user's mission and recent daily todo history :)",
+         f"send an encouraging message to the user with user_id = {user_id}. use tools to get the user's mission and recent daily todo history based on this user_id. finally, in your message addressing the user, please refer to them by their first name {first_name} :)",
          assistant, eternal_optimist_tools, thread, q))
     completion_thread.start()
 
