@@ -357,13 +357,21 @@ def get_completion_stream(client, message, agent, funcs, thread, q):
 @app.route('/api/daily-message', methods=['GET'])
 def daily_message():
     user_id_str: str = request.args.get('user_id', '')
+    new_day_number_str: str = request.args.get('new_day_number', '')
     if not user_id_str or user_id_str == '':
         return jsonify(error="user_id is required"), 400
+    if not new_day_number_str or new_day_number_str == '':
+        return jsonify(error="new_day_number is required"), 400
 
     try:
         user_id: int = int(user_id_str)  # Convert user_id to an integer
     except ValueError:
         return jsonify(error="user_id must be an integer"), 400
+    try:
+        new_day_number: int = int(
+            new_day_number_str)  # Convert new_day_number to an integer
+    except ValueError:
+        return jsonify(error="new_day_number must be an integer"), 400
 
     # Fetch the user's first name
     response = requests.get(
@@ -433,12 +441,25 @@ def daily_message():
 
     @stream_with_context
     def generate():
+        full_message = ""
         while True:
             message = q.get(block=True)
             if "Stream ended." in message:
                 break
             else:
+                full_message += message
                 yield f"data: {message}\n\n"
+
+        # Save the full message to the database
+        save_message_response = requests.post(
+            'http://golang-backend:8080/api/save-assistant-message',
+            json={
+                'user_id': user_id,
+                'day_number': new_day_number,
+                'message': full_message
+            })
+        if save_message_response.status_code != 200:
+            print("Failed to save message to the database")
 
     return Response(generate(), content_type='text/event-stream')
 

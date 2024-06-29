@@ -19,13 +19,13 @@ body {
     width: 1200px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 500px 1fr;
+    grid-template-columns: 1fr 20px 500px 20px 1fr;
     grid-template-rows: auto;
-    gap: 45px;
+    gap: 0;
 }
 
 .daily-message {
-    grid-column: 3 / 4;
+    grid-column: 5 / 6;
     grid-row: 1 / span 10;
     font-size: 14px;
 }
@@ -48,16 +48,17 @@ h1 {
     /* border-top: 1px solid #333; */
     /* border-bottom: 1px solid #333; */
     /* margin: 20px 0; */
+    grid-column: 3 / 4;
 }
 
 .day {
     grid-column: 1 / 2; /* Span the first column */
     justify-self: end;
 
-    margin-right: 10px;
     /* font-weight: bold; */
     /* border-right: 2px solid #eee; */
-    padding-right: 10px;
+    /* margin-right: 10px; */
+    /* padding-right: 10px; */
     font-size: 18px;
 }
 

@@ -33,8 +33,9 @@ type Todo struct {
 }
 
 type TodosResponse struct {
-    Todos  []Todo `json:"todos"`
-    NewDay bool   `json:"new_day"`
+    Todos        []Todo `json:"todos"`
+    NewDay       bool   `json:"new_day"`
+    NewDayNumber int    `json:"new_day_number"`
 }
 
 // Reference date: June 16, 2024
@@ -115,10 +116,10 @@ func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int
 }
 
 // Fetch the recent todos for the user
-func getRecentTodosForUser(userID int) ([]Todo, bool, error) {
+func getRecentTodosForUser(userID int) ([]Todo, bool, int, error) {
     userTimezone, currentTime, err := getUserTimezoneAndCurrentTime(userID)
     if err != nil {
-        return nil, false, err
+        return nil, false, 0, err
     }
 
     fmt.Println("User Timezone:", userTimezone)
@@ -126,7 +127,7 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, error) {
 
     recentDayNumber, err := getMostRecentDayNumberForUser(userID)
     if err != nil {
-        return nil, false, err
+        return nil, false, 0, err
     }
 
     currentDayNumber := calculateDayNumber(currentTime, userTimezone)
@@ -138,7 +139,7 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, error) {
     // Adjust the logic to copy todos if the current day number is greater than the recent day number
     if recentDayNumber < currentDayNumber {
         if err := copyTodosToCurrentDay(userID, recentDayNumber, currentDayNumber); err != nil {
-            return nil, false, err
+            return nil, false, 0, err
         }
         // Update the recentDayNumber after copying todos
         recentDayNumber = currentDayNumber
@@ -149,7 +150,7 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, error) {
 
     rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM daily_todos WHERE user_id = ? AND day_number BETWEEN ? AND ? ORDER BY day_number DESC, ID ASC", userID, sevenDaysAgo, currentDayNumber)
     if err != nil {
-        return nil, false, fmt.Errorf("failed to fetch recent todos: %w", err)
+        return nil, false, 0, fmt.Errorf("failed to fetch recent todos: %w", err)
     }
     defer rows.Close()
 
@@ -158,14 +159,14 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, error) {
         var todo Todo
         var createdAt, updatedAt string
         if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt); err != nil {
-            return nil, false, fmt.Errorf("failed to scan todo: %w", err)
+            return nil, false, 0, fmt.Errorf("failed to scan todo: %w", err)
         }
         todo.CreatedAt = createdAt
         todo.UpdatedAt = updatedAt
         todos = append(todos, todo)
     }
 
-    return todos, newDay, nil
+    return todos, newDay, currentDayNumber, nil
 }
 
 func main() {
@@ -185,6 +186,7 @@ func main() {
     router.HandleFunc("/api/user-mission", GetUserMissionHandler).Methods("GET")
     router.HandleFunc("/api/user-thread", SaveUserThreadHandler).Methods("POST")
     router.HandleFunc("/api/user-first-name", GetUserFirstNameHandler).Methods("GET")
+    router.HandleFunc("/api/save-assistant-message", SaveAssistantMessageHandler).Methods("POST")
 
     // Set up CORS headers
     corsHandler := handlers.CORS(
@@ -359,7 +361,7 @@ func getLast7DaysTodos(userID int, upToDayNumber int) ([]map[string]interface{},
 func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
     userID := 1 // Replace with the actual user ID from the request context/session
 
-    todos, newDay, err := getRecentTodosForUser(userID)
+    todos, newDay, newDayNumber, err := getRecentTodosForUser(userID)
     if err != nil {
         log.Printf("failed to get recent todos: %v", err)
         http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -367,8 +369,9 @@ func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     response := TodosResponse{
-        Todos:  todos,
-        NewDay: newDay,
+        Todos:        todos,
+        NewDay:       newDay,
+        NewDayNumber: newDayNumber,
     }
 
     w.Header().Set("Content-Type", "application/json")
@@ -486,6 +489,31 @@ func UpdateYesterdayTodo(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(todo)
+}
+
+func SaveAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
+    var input struct {
+        UserID    int    `json:"user_id"`
+        DayNumber int    `json:"day_number"`
+        Message   string `json:"message"`
+    }
+
+    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+        http.Error(w, err.Error(), http.StatusBadRequest)
+        return
+    }
+
+    _, err := db.Exec(`
+        INSERT INTO saved_assistant_messages (user_id, day_number, message, created_at)
+        VALUES (?, ?, ?, NOW())`,
+        input.UserID, input.DayNumber, input.Message)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to save assistant message: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Assistant message saved successfully"))
 }
 
 

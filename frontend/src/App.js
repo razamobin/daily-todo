@@ -15,16 +15,15 @@ function App() {
                 setTodos(response.data.todos);
                 if (true || response.data.new_day) {
                     console.log("new day!");
-                    fetchDailyMessage();
+                    fetchDailyMessage(response.data.new_day_number);
                 }
             })
             .catch((error) => console.error(error));
     }, []);
 
-    const fetchDailyMessage = () => {
+    const fetchDailyMessage = (newDayNumber) => {
         const eventSource = new EventSource(
-            "http://localhost:5001/api/daily-message?user_id=1&date=" +
-                new Date().toISOString().split("T")[0]
+            `http://localhost:5001/api/daily-message?user_id=1&new_day_number=${newDayNumber}`
         );
         /*
         const eventSource = new EventSource(
