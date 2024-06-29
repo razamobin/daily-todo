@@ -3,6 +3,9 @@ import axios from "axios";
 import AddTodo from "./components/AddTodo";
 import TodoList from "./components/TodoList";
 import ReactMarkdown from "react-markdown";
+import rehypeReact from "rehype-react";
+import remarkGfm from "remark-gfm"; // Optional: for GitHub flavored markdown
+import remarkBreaks from "remark-breaks"; // Plugin to convert newlines to <br>
 
 function App() {
     const [todos, setTodos] = useState([]);
@@ -13,10 +16,10 @@ function App() {
             .get("http://localhost:8080/api/todos")
             .then((response) => {
                 setTodos(response.data.todos);
-                if (true || response.data.new_day) {
+                if (response.data.new_day) {
                     console.log("new day!");
-                    fetchDailyMessage(response.data.new_day_number);
                 }
+                fetchDailyMessage(response.data.new_day_number);
             })
             .catch((error) => console.error(error));
     }, []);
@@ -32,8 +35,14 @@ function App() {
         */
 
         eventSource.onmessage = (event) => {
-            setDailyMessage((prevMessage) => prevMessage + event.data);
+            const unescapedMessage = event.data.replace(/\\n/g, "\n");
+            setDailyMessage((prevMessage) => prevMessage + unescapedMessage);
         };
+
+        eventSource.addEventListener("end", function (event) {
+            console.log("Stream ended");
+            eventSource.close();
+        });
 
         eventSource.onerror = (error) => {
             console.error("Error fetching daily message:", error);
@@ -54,7 +63,16 @@ function App() {
             <div className="main-container">
                 {dailyMessage && (
                     <div className="daily-message">
-                        <ReactMarkdown breaks>{dailyMessage}</ReactMarkdown>
+                        <ReactMarkdown
+                            children={dailyMessage}
+                            remarkPlugins={[remarkGfm, remarkBreaks]} // Optional: for GitHub flavored markdown
+                            rehypePlugins={[
+                                [
+                                    rehypeReact,
+                                    { createElement: React.createElement },
+                                ],
+                            ]}
+                        />
                     </div>
                 )}
                 <TodoList todos={todos} setTodos={setTodos} />

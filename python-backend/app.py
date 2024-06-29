@@ -187,7 +187,8 @@ def stream():
     return Response(generate(), content_type='text/event-stream')
 
 
-def get_completion_stream(client, message, agent, funcs, thread, q):
+def get_completion_stream(client, message, agent, funcs, thread, q,
+                          full_message_queue):
     #q.put("yield: Stream started.\n")
 
     message = client.beta.threads.messages.create(thread_id=thread.id,
@@ -196,7 +197,7 @@ def get_completion_stream(client, message, agent, funcs, thread, q):
 
     class EventHandler(AssistantEventHandler):
 
-        def __init__(self, thread_id, assistant_id, q):
+        def __init__(self, thread_id, assistant_id, q, full_message_queue):
             super().__init__()
             self.output = None
             self.tool_id = None
@@ -207,6 +208,7 @@ def get_completion_stream(client, message, agent, funcs, thread, q):
             self.function_name = ""
             self.arguments = ""
             self.q = q
+            self.full_message_queue = full_message_queue  # Store the full message queue
 
         @override
         def on_text_created(self, text) -> None:
@@ -214,7 +216,11 @@ def get_completion_stream(client, message, agent, funcs, thread, q):
 
         @override
         def on_text_delta(self, delta, snapshot):
-            self.q.put(f"{delta.value}\n")
+            # Print the delta value and its length
+            if delta.value:
+                print(
+                    f"Delta Value: {delta.value}, Length: {len(delta.value)}")
+            self.q.put(f"{delta.value}")
 
         @override
         def on_end(self, ):
@@ -238,6 +244,13 @@ def get_completion_stream(client, message, agent, funcs, thread, q):
             print(f"\nassistant on_message_done > {message}\n",
                   end="",
                   flush=True)
+            # Extract the text value from the message content
+            full_message = ''.join([
+                block.text.value for block in message.content
+                if block.type == 'text'
+            ])
+            # Put the full message into the full_message_queue
+            self.full_message_queue.put(full_message)
 
         @override
         def on_message_delta(self, delta: MessageDelta,
@@ -300,9 +313,9 @@ def get_completion_stream(client, message, agent, funcs, thread, q):
                             "tool_call_id": self.tool_id,
                             "output": self.output,
                         }],
-                        event_handler=EventHandler(self.thread_id,
-                                                   self.assistant_id,
-                                                   self.q)) as stream:
+                        event_handler=EventHandler(
+                            self.thread_id, self.assistant_id, self.q,
+                            self.full_message_queue)) as stream:
                     stream.until_done()
 
         @override
@@ -347,7 +360,8 @@ def get_completion_stream(client, message, agent, funcs, thread, q):
             assistant_id=agent.id,
             event_handler=EventHandler(thread_id=thread.id,
                                        assistant_id=agent.id,
-                                       q=q),
+                                       q=q,
+                                       full_message_queue=full_message_queue),
     ) as stream:
         stream.until_done()
 
@@ -372,6 +386,25 @@ def daily_message():
             new_day_number_str)  # Convert new_day_number to an integer
     except ValueError:
         return jsonify(error="new_day_number must be an integer"), 400
+
+    # Check if a message already exists for the given user_id and new_day_number
+    response = requests.get(
+        f'http://golang-backend:8080/api/get-saved-assistant-message?user_id={user_id}&day_number={new_day_number}'
+    )
+    if response.status_code == 200:
+        existing_message = response.json().get('message')
+        if existing_message:
+
+            @stream_with_context
+            def generate():
+                escaped_message = existing_message.replace('\n', '\\n')
+                yield f"data: {escaped_message}\n\n"
+                yield "event: end\ndata: END\n\n"
+
+            return Response(generate(), content_type='text/event-stream')
+    elif response.status_code != 404:
+        return jsonify(
+            error="Failed to check for existing message"), response.status_code
 
     # Fetch the user's first name
     response = requests.get(
@@ -430,25 +463,28 @@ def daily_message():
     eternal_optimist_tools = [GetUserMission]
 
     q = queue.Queue()
+    full_message_queue = queue.Queue()  # New queue for the full message
 
     completion_thread = threading.Thread(
         target=get_completion_stream,
         args=
         (client,
          f"send an encouraging message to the user with user_id = {user_id}. use tools to get the user's mission and recent daily todo history based on this user_id. finally, in your message addressing the user, please refer to them by their first name {first_name} :)",
-         assistant, eternal_optimist_tools, thread, q))
+         assistant, eternal_optimist_tools, thread, q, full_message_queue))
     completion_thread.start()
 
     @stream_with_context
     def generate():
-        full_message = ""
         while True:
             message = q.get(block=True)
             if "Stream ended." in message:
                 break
             else:
-                full_message += message
-                yield f"data: {message}\n\n"
+                escaped_message = message.replace('\n', '\\n')
+                yield f"data: {escaped_message}\n\n"
+
+        # Retrieve the full message from the full_message_queue
+        full_message = full_message_queue.get(block=True)
 
         # Save the full message to the database
         save_message_response = requests.post(
@@ -460,6 +496,9 @@ def daily_message():
             })
         if save_message_response.status_code != 200:
             print("Failed to save message to the database")
+
+        # Send a custom event to signal the end of the stream
+        yield "event: end\ndata: END\n\n"
 
     return Response(generate(), content_type='text/event-stream')
 

@@ -36,11 +36,21 @@
     dailytodo.ai
 ---
 
-    user-mission, return most recent 7 days of ai encouragement, so ai know what it said before and can come up w new shit
+    user-mission, return most recent 7 days of ai saved messages, so ai know what it said before and can come up w new shit
 
-    concept of "finalize" previous day
+    concept of "finalize" the current day or most recent previous day
         before ai get's today's message it asks you to make final edits to previous day and submit
             reflect on previous day. what you did good. what could be better. any speciali notes you have on the day. final edit of checkboxes, submit. then you get new AI message for today :)
+
+    why each thing relates to mission, why it's important to you
+
+    daily notes/caveats on each todo item
+
+    OR item - dsp or flush system, don't need both
+        this way you can get perfect days even if you didn't flush system
+            or could just write dsp/flush in 1 line
+            but you might want to track dsp vs flush. so better 2 checkboxes grouped
+                parent checkbox, 2 subs. if either checked or both check, parent is checked
 
 20240616
 ---

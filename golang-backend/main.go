@@ -187,6 +187,7 @@ func main() {
     router.HandleFunc("/api/user-thread", SaveUserThreadHandler).Methods("POST")
     router.HandleFunc("/api/user-first-name", GetUserFirstNameHandler).Methods("GET")
     router.HandleFunc("/api/save-assistant-message", SaveAssistantMessageHandler).Methods("POST")
+    router.HandleFunc("/api/get-saved-assistant-message", GetSavedAssistantMessageHandler).Methods("GET")
 
     // Set up CORS headers
     corsHandler := handlers.CORS(
@@ -514,6 +515,44 @@ func SaveAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
 
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("Assistant message saved successfully"))
+}
+
+func GetSavedAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
+    userIDStr := r.URL.Query().Get("user_id")
+    dayNumberStr := r.URL.Query().Get("day_number")
+
+    if userIDStr == "" || dayNumberStr == "" {
+        http.Error(w, "user_id and day_number are required", http.StatusBadRequest)
+        return
+    }
+
+    userID, err := strconv.Atoi(userIDStr)
+    if err != nil {
+        http.Error(w, "invalid user_id", http.StatusBadRequest)
+        return
+    }
+
+    dayNumber, err := strconv.Atoi(dayNumberStr)
+    if err != nil {
+        http.Error(w, "invalid day_number", http.StatusBadRequest)
+        return
+    }
+
+    var message string
+    err = db.QueryRow("SELECT message FROM saved_assistant_messages WHERE user_id = ? AND day_number = ?", userID, dayNumber).Scan(&message)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            http.Error(w, "message not found", http.StatusNotFound)
+            return
+        } else {
+            http.Error(w, fmt.Sprintf("Failed to fetch message: %v", err), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    response := map[string]string{"message": message}
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(response)
 }
 
 
