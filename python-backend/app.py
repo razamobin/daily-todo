@@ -216,10 +216,6 @@ def get_completion_stream(client, message, agent, funcs, thread, q,
 
         @override
         def on_text_delta(self, delta, snapshot):
-            # Print the delta value and its length
-            if delta.value:
-                print(
-                    f"Delta Value: {delta.value}, Length: {len(delta.value)}")
             self.q.put(f"{delta.value}")
 
         @override
