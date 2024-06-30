@@ -136,6 +136,20 @@ input[type="checkbox"] {
 
 .todo-title:hover {
     text-decoration: underline;
+    cursor: pointer;
+}
+
+.todo-title:hover::after {
+    margin-left: 5px;
+    content: "\f303"; /* Font Awesome pencil icon */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    /* position: absolute; */
+    /* right: -20px; */
+    /* top: 0; */
+    text-decoration: none;
+    display: inline-block;
+    /* cursor: pointer; */
 }
 
 /* Add these styles */

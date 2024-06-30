@@ -143,7 +143,11 @@ function TodoList({ todos, setTodos }) {
                                                                 {...provided.dragHandleProps}
                                                             >
                                                                 <p>
-                                                                    {todo.title}
+                                                                    <span className="todo-title">
+                                                                        {
+                                                                            todo.title
+                                                                        }
+                                                                    </span>
                                                                 </p>
                                                                 <section>
                                                                     {Array.from(
@@ -188,7 +192,9 @@ function TodoList({ todos, setTodos }) {
                             <ul>
                                 {groupedTodos[dayNumber].map((todo) => (
                                     <li key={todo.id}>
-                                        <p>{todo.title}</p>
+                                        <p>
+                                            <span>{todo.title}</span>
+                                        </p>
                                         <section>
                                             {Array.from({
                                                 length: todo.goal,
