@@ -11,9 +11,11 @@
         x make it not save newlines after every word, save clean text
         x make it save emojis correctly, not ? ? ?
 
-    allow drag n drop re-order
+    x allow drag n drop re-order
 
     edit mode - click edit link and a modal comes up. edit title, description for AI, # times per day goal. preview area. submit/cancel
+
+    add a delete button in red. to the right of cancel
 
     break 14 dd into 3 hours raza coding personal projects
         4 hours focused dd work 
@@ -21,8 +23,9 @@
         get 1hr dd before noon
         get 1hr raza coding afternoon/night before 10pm
 
-    make it so others can set it up from scratch and use it locally from their docker
+    *make it so others can set it up from scratch and use it locally from their docker
         create user - raza
+        user login sessions
         save your mission
         set open ai api key
         create assistant, save the assistant id (db might be better place)
@@ -32,32 +35,42 @@
 
     share on youtube. walkthrough the code, and how people can get it working locally
 
-    dailytodos.ai
-    dailytodo.ai
+    dailytodos.ai - main domain
+    dailytodo.ai - buy and it redirects
 
     make the AI better, more varied, lots of work here. dont repeat. better prompting, give it better data
 ---
+    Dad could use this to check off 3 meals a day of healthy eating. checkbox for no snacking too haha. like no snacking on bad foods like nuts or whatever.
+        put this in prod and let people register. AI is optional, depends if you are on a paid plan or not.
+
+    let other people comment on your days, todos. encouragement from your friends and family. coaches.
+
+    write software to help make people healthy, help keep them consistent with good healthy productive habits. social media will go crazy with AI, stay off it and stay focused on the actually important things in your life with daily todos. achieve your mission in life. have a daily system
 
     add security on all these golang endpoints. cant just post and edit other people's lists lol. or get other people's missions/data
+        login session cookie
 
     user-mission, return most recent 7 days of ai saved messages, so ai know what it said before and can come up w new shit
 
     concept of "finalize" the current day or most recent previous day
         before ai get's today's message it asks you to make final edits to previous day and submit
             reflect on previous day. what you did good. what could be better. any speciali notes you have on the day. final edit of checkboxes, submit. then you get new AI message for today :)
+        could just be a simple button below each day. finalize june 25th. add flag to db finalized or not. feed AI finalized days for context.
 
     why each thing relates to mission, why it's important to you
 
-    daily notes/caveats on each todo item
+    daily notes/caveats on each todo item - travel day, could't do as much focused coding time
+
+    AI window should be a chat. it gives you encouragement daily, but you can chat with it anytime and have a convo about your day
+
+    mobile app
+        check these things off from your phone, when you are not at laptop
 
     OR item - dsp or flush system, don't need both
         this way you can get perfect days even if you didn't flush system
             or could just write dsp/flush in 1 line
             but you might want to track dsp vs flush. so better 2 checkboxes grouped
                 parent checkbox, 2 subs. if either checked or both check, parent is checked
-
-    mobile app
-        check these things off from your phone, when you are not at laptop
 
     recommend a new motivational youtube video everyday, try to avoid repeats
         kobe, young kanye, naval, balajis, etc

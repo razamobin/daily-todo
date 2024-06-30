@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AddTodo from "./components/AddTodo";
+import UpdateTodo from "./components/UpdateTodo";
 import TodoList from "./components/TodoList";
 import ReactMarkdown from "react-markdown";
 import rehypeReact from "rehype-react";
@@ -11,6 +12,8 @@ import remarkBreaks from "remark-breaks"; // Plugin to convert newlines to <br>
 function App() {
     const [todos, setTodos] = useState([]);
     const [dailyMessage, setDailyMessage] = useState("");
+    const [isUpdateMode, setIsUpdateMode] = useState(false);
+    const [currentTodo, setCurrentTodo] = useState(null);
 
     useEffect(() => {
         axios
@@ -51,6 +54,16 @@ function App() {
         };
     };
 
+    const handleEditTodo = (todo) => {
+        setCurrentTodo(todo);
+        setIsUpdateMode(true);
+    };
+
+    const handleCancelUpdate = () => {
+        setIsUpdateMode(false);
+        setCurrentTodo(null);
+    };
+
     return (
         <>
             {/* <NumberList /> */}
@@ -60,7 +73,16 @@ function App() {
                         daily <span>todos</span>
                     </h1>
                 </header>
-                <AddTodo setTodos={setTodos} />
+                {isUpdateMode ? (
+                    <UpdateTodo
+                        key={currentTodo ? currentTodo.id : "new"}
+                        todo={currentTodo}
+                        setTodos={setTodos}
+                        onCancel={handleCancelUpdate}
+                    />
+                ) : (
+                    <AddTodo setTodos={setTodos} />
+                )}
             </div>
             <div className="main-container">
                 {dailyMessage && (
@@ -77,7 +99,11 @@ function App() {
                         />
                     </div>
                 )}
-                <TodoList todos={todos} setTodos={setTodos} />
+                <TodoList
+                    todos={todos}
+                    setTodos={setTodos}
+                    onEditTodo={handleEditTodo}
+                />
             </div>
         </>
     );

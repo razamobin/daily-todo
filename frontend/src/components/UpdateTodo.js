@@ -1,0 +1,66 @@
+import React, { useState } from "react";
+import axios from "axios";
+
+function UpdateTodo({ todo, setTodos, onCancel }) {
+    const [title, setTitle] = useState(todo.title);
+    const [goal, setGoal] = useState(todo.goal);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const updatedTodo = {
+            ...todo,
+            title,
+            goal: parseInt(goal, 10) || 1,
+        };
+        axios
+            .put(`http://localhost:8080/api/todos/${todo.id}`, updatedTodo)
+            .then((response) => {
+                setTodos((prevTodos) =>
+                    prevTodos.map((t) => (t.id === todo.id ? response.data : t))
+                );
+                onCancel(); // Close the form after update
+            })
+            .catch((error) => console.error(error));
+    };
+
+    return (
+        <section className="update-todo">
+            <form id="updateTodoForm" onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Edit Todo"
+                    required
+                />
+                <div className="goal-container">
+                    <select
+                        id="goal"
+                        value={goal}
+                        onChange={(e) => setGoal(parseInt(e.target.value, 10))}
+                        required
+                    >
+                        {Array.from({ length: 24 }, (_, i) => (
+                            <option key={i + 1} value={i + 1}>
+                                {i + 1}
+                            </option>
+                        ))}
+                    </select>
+                    <span className="goal-text">
+                        {goal === 1 ? "time per day" : "times per day"}
+                    </span>
+                </div>
+                <button type="submit">Update</button>
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="cancel-button"
+                >
+                    Cancel
+                </button>
+            </form>
+        </section>
+    );
+}
+
+export default UpdateTodo;

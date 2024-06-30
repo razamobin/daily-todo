@@ -457,7 +457,20 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err := db.Exec("UPDATE daily_todos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
+    // Fetch the current status and goal from the database
+    var currentStatus, currentGoal int
+    err := db.QueryRow("SELECT status, goal FROM daily_todos WHERE id = ?", id).Scan(&currentStatus, &currentGoal)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to fetch current todo: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    // If the goal is changing and the current status is greater than the new goal, update the status
+    if todo.Goal != currentGoal && currentStatus > todo.Goal {
+        todo.Status = todo.Goal
+    }
+
+    _, err = db.Exec("UPDATE daily_todos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return

@@ -2,7 +2,7 @@ import React from "react";
 import axios from "axios";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-function TodoList({ todos, setTodos }) {
+function TodoList({ todos, setTodos, onEditTodo }) {
     const handleQuantityChange = (todo, index) => {
         let newStatus;
         if (index < todo.status) {
@@ -143,7 +143,14 @@ function TodoList({ todos, setTodos }) {
                                                                 {...provided.dragHandleProps}
                                                             >
                                                                 <p>
-                                                                    <span className="todo-title">
+                                                                    <span
+                                                                        className="todo-title"
+                                                                        onClick={() =>
+                                                                            onEditTodo(
+                                                                                todo
+                                                                            )
+                                                                        }
+                                                                    >
                                                                         {
                                                                             todo.title
                                                                         }
