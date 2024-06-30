@@ -6,14 +6,14 @@
 
     x format the markdown
 
-    python save full response to db. react fetch from db, unless it's a new day, then generate a new message
-        react hit python if new day, else hit golang to get most recent saved message
-        make it not save newlines after every word, save clean text
-        make it save emojis correctly, not ? ? ?
-
-    edit mode - click edit link and a modal comes up. edit title, description for AI, # times per day goal. preview area. submit/cancel
+    x python save full response to db. react fetch from db, unless it's a new day, then generate a new message
+        x react hit python if new day, else hit golang to get most recent saved message
+        x make it not save newlines after every word, save clean text
+        x make it save emojis correctly, not ? ? ?
 
     allow drag n drop re-order
+
+    edit mode - click edit link and a modal comes up. edit title, description for AI, # times per day goal. preview area. submit/cancel
 
     break 14 dd into 3 hours raza coding personal projects
         4 hours focused dd work 
@@ -34,6 +34,8 @@
 
     dailytodos.ai
     dailytodo.ai
+
+    make the AI better, more varied, lots of work here. dont repeat. better prompting, give it better data
 ---
 
     user-mission, return most recent 7 days of ai saved messages, so ai know what it said before and can come up w new shit
@@ -51,6 +53,13 @@
             or could just write dsp/flush in 1 line
             but you might want to track dsp vs flush. so better 2 checkboxes grouped
                 parent checkbox, 2 subs. if either checked or both check, parent is checked
+
+    mobile app
+        check these things off from your phone, when you are not at laptop
+
+    recommend a new motivational youtube video everyday, try to avoid repeats
+        kobe, young kanye, naval, balajis, etc
+        yt search api tool
 
 20240616
 ---

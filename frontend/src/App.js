@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeReact from "rehype-react";
 import remarkGfm from "remark-gfm"; // Optional: for GitHub flavored markdown
 import remarkBreaks from "remark-breaks"; // Plugin to convert newlines to <br>
+// import NumberList from "./NumberList";
 
 function App() {
     const [todos, setTodos] = useState([]);
@@ -52,6 +53,7 @@ function App() {
 
     return (
         <>
+            {/* <NumberList /> */}
             <div className="header-container">
                 <header>
                     <h1>

@@ -120,12 +120,22 @@ input[type="checkbox"] {
     flex: 1;
     font-size: 12px;
     margin-right: 10px;
+    margin-left: 10px;
     font-weight: 400;
 }
 
 .todo-list input[type="checkbox"] {
     /* transform: scale(1.5); */
     margin-right: 10px;
+}
+
+.todo-item:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.todo-title:hover {
+    text-decoration: underline;
 }
 
 /* Add these styles */

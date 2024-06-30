@@ -30,6 +30,7 @@ type Todo struct {
     Goal      int       `json:"goal"`
     CreatedAt string    `json:"created_at"`
     UpdatedAt string    `json:"updated_at"`
+    SortIndex int       `json:"sort_index"`
 }
 
 type TodosResponse struct {
@@ -92,7 +93,7 @@ func getMostRecentDayNumberForUser(userID int) (int, error) {
 
 // Copy todos from the most recent day to the current day
 func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int) error {
-    rows, err := db.Query("SELECT title, goal FROM daily_todos WHERE user_id = ? AND day_number = ?", userID, recentDayNumber)
+    rows, err := db.Query("SELECT title, goal, sort_index FROM daily_todos WHERE user_id = ? AND day_number = ?", userID, recentDayNumber)
     if err != nil {
         return fmt.Errorf("failed to fetch recent todos: %w", err)
     }
@@ -100,13 +101,13 @@ func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int
 
     for rows.Next() {
         var title string
-        var goal int
-        if err := rows.Scan(&title, &goal); err != nil {
+        var goal, sortIndex int
+        if err := rows.Scan(&title, &goal, &sortIndex); err != nil {
             return fmt.Errorf("failed to scan todo: %w", err)
         }
 
-        _, err := db.Exec("INSERT INTO daily_todos (user_id, title, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW())",
-            userID, title, currentDayNumber, 0, goal)
+        _, err := db.Exec("INSERT INTO daily_todos (user_id, title, day_number, status, goal, sort_index, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
+            userID, title, currentDayNumber, 0, goal, sortIndex)
         if err != nil {
             return fmt.Errorf("failed to insert new todo: %w", err)
         }
@@ -148,7 +149,7 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, error) {
 
     sevenDaysAgo := currentDayNumber - 7
 
-    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM daily_todos WHERE user_id = ? AND day_number BETWEEN ? AND ? ORDER BY day_number DESC, ID ASC", userID, sevenDaysAgo, currentDayNumber)
+    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM daily_todos WHERE user_id = ? AND day_number BETWEEN ? AND ? ORDER BY day_number DESC, sort_index ASC", userID, sevenDaysAgo, currentDayNumber)
     if err != nil {
         return nil, false, 0, fmt.Errorf("failed to fetch recent todos: %w", err)
     }
@@ -180,8 +181,6 @@ func main() {
     router.HandleFunc("/api/todos", GetRecentTodosHandler).Methods("GET")
     router.HandleFunc("/api/todos", CreateOrUpdateTodayTodo).Methods("POST")
     router.HandleFunc("/api/todos/{id}", UpdateTodo).Methods("PUT")
-    router.HandleFunc("/api/todos/yesterday", GetYesterdayTodos).Methods("GET")
-    router.HandleFunc("/api/todos/yesterday/{id}", UpdateYesterdayTodo).Methods("PUT")
     router.HandleFunc("/api/latest-thread", GetLatestThreadIDHandler).Methods("GET")
     router.HandleFunc("/api/user-mission", GetUserMissionHandler).Methods("GET")
     router.HandleFunc("/api/user-thread", SaveUserThreadHandler).Methods("POST")
@@ -337,7 +336,7 @@ func getLast7DaysTodos(userID int, upToDayNumber int) ([]map[string]interface{},
         FROM daily_todos 
         WHERE user_id = ? 
         AND day_number BETWEEN ? AND ?
-        ORDER BY day_number DESC`, userID, upToDayNumber-6, upToDayNumber)
+        ORDER BY day_number DESC, sort_index ASC`, userID, upToDayNumber-6, upToDayNumber)
     if err != nil {
         return nil, fmt.Errorf("failed to fetch todos: %w", err)
     }
@@ -398,7 +397,17 @@ func CreateOrUpdateTodayTodo(w http.ResponseWriter, r *http.Request) {
     loc, _ := time.LoadLocation(userTimezone)
     todo.DayNumber = calculateDayNumber(currentTime.In(loc), userTimezone)
 
-    result, err := db.Exec("INSERT INTO daily_todos (user_id, title, day_number, status, goal, created_at, updated_at) VALUES (?, ?, ?, ?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE status = ?, goal = ?", todo.UserID, todo.Title, todo.DayNumber, todo.Status, todo.Goal, todo.Status, todo.Goal)
+    // Determine the next sort_index
+    var maxSortIndex int
+    err = db.QueryRow("SELECT COALESCE(MAX(sort_index), 0) FROM daily_todos WHERE user_id = ? AND day_number = ?", todo.UserID, todo.DayNumber).Scan(&maxSortIndex)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to determine sort_index: %v", err), http.StatusInternalServerError)
+        return
+    }
+    todo.SortIndex = maxSortIndex + 1
+
+    // TODO: there is no way for there to be a duplicate key!
+    result, err := db.Exec("INSERT INTO daily_todos (user_id, title, day_number, status, goal, sort_index, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW()) ON DUPLICATE KEY UPDATE status = ?, goal = ?", todo.UserID, todo.Title, todo.DayNumber, todo.Status, todo.Goal, todo.SortIndex, todo.Status, todo.Goal)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -418,61 +427,6 @@ func CreateOrUpdateTodayTodo(w http.ResponseWriter, r *http.Request) {
 
 // Handler to update a todo by ID
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {
-    vars := mux.Vars(r)
-    id := vars["id"]
-
-    var todo Todo
-    if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
-
-    _, err := db.Exec("UPDATE daily_todos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(todo)
-}
-
-// Handler to get yesterday's todos
-func GetYesterdayTodos(w http.ResponseWriter, r *http.Request) {
-    userID := 1 // Hardcoded for now, replace with actual user ID after authentication is added
-
-    userTimezone, currentTime, err := getUserTimezoneAndCurrentTime(userID)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-
-    loc, _ := time.LoadLocation(userTimezone)
-    yesterdayDayNumber := calculateDayNumber(currentTime.AddDate(0, 0, -1).In(loc), userTimezone)
-
-    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM daily_todos WHERE user_id = ? AND day_number = ?", userID, yesterdayDayNumber)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    defer rows.Close()
-
-    todos := []Todo{}
-    for rows.Next() {
-        var todo Todo
-        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &todo.CreatedAt, &todo.UpdatedAt); err != nil {
-            http.Error(w, err.Error(), http.StatusInternalServerError)
-            return
-        }
-        todos = append(todos, todo)
-    }
-
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(todos)
-}
-
-// Handler to update a todo from yesterday by ID
-func UpdateYesterdayTodo(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
     id := vars["id"]
 
@@ -554,6 +508,3 @@ func GetSavedAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
 }
-
-
-
