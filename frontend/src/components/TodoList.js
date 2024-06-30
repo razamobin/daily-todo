@@ -1,6 +1,6 @@
 import React from "react";
 import axios from "axios";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 function TodoList({ todos, setTodos }) {
     const handleQuantityChange = (todo, index) => {
