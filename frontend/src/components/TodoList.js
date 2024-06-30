@@ -55,6 +55,20 @@ function TodoList({ todos, setTodos }) {
 
         console.log(newTodos);
         setTodos(newTodos);
+
+        // Create the JSON object mapping todo id to new sort index
+        const sortIndexMap = reorderedTodos.reduce((acc, todo, index) => {
+            acc[todo.id] = index;
+            return acc;
+        }, {});
+
+        console.log(sortIndexMap);
+
+        // Save the new order to the backend
+        axios
+            .post("http://localhost:8080/api/update-sort-indexes", sortIndexMap)
+            .then((response) => console.log("Order saved:", response))
+            .catch((error) => console.error("Error saving order:", error));
     };
 
     const formatDayNumber = (dayNumber) => {
@@ -79,7 +93,7 @@ function TodoList({ todos, setTodos }) {
 
     return (
         <>
-            {sortedDayNumbers.map((dayNumber) => (
+            {sortedDayNumbers.map((dayNumber, index) => (
                 <React.Fragment key={dayNumber}>
                     <div className="day">
                         <div className="date-container">
@@ -100,71 +114,102 @@ function TodoList({ todos, setTodos }) {
                         </div>
                     </div>
                     <div key={dayNumber} className="todo-list">
-                        <DragDropContext onDragEnd={onDragEnd}>
-                            <Droppable
-                                key={dayNumber}
-                                droppableId={String(dayNumber)}
-                            >
-                                {(provided) => (
-                                    <ul
-                                        ref={provided.innerRef}
-                                        {...provided.droppableProps}
-                                    >
-                                        {groupedTodos[dayNumber].map(
-                                            (todo, index) => (
-                                                <Draggable
-                                                    key={todo.id}
-                                                    draggableId={String(
-                                                        todo.id
-                                                    )}
-                                                    index={index}
-                                                >
-                                                    {(provided) => (
-                                                        <li
-                                                            ref={
-                                                                provided.innerRef
-                                                            }
-                                                            {...provided.draggableProps}
-                                                            {...provided.dragHandleProps}
-                                                        >
-                                                            <p>{todo.title}</p>
-                                                            <section>
-                                                                {Array.from({
-                                                                    length: todo.goal,
-                                                                }).map(
-                                                                    (
-                                                                        _,
-                                                                        idx
-                                                                    ) => (
-                                                                        <input
-                                                                            key={
-                                                                                idx
-                                                                            }
-                                                                            type="checkbox"
-                                                                            checked={
-                                                                                idx <
-                                                                                todo.status
-                                                                            }
-                                                                            onChange={() =>
-                                                                                handleQuantityChange(
-                                                                                    todo,
+                        {index === 0 ? ( // Only allow drag and drop for the most recent day
+                            <DragDropContext onDragEnd={onDragEnd}>
+                                <Droppable
+                                    key={dayNumber}
+                                    droppableId={String(dayNumber)}
+                                >
+                                    {(provided) => (
+                                        <ul
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                        >
+                                            {groupedTodos[dayNumber].map(
+                                                (todo, index) => (
+                                                    <Draggable
+                                                        key={todo.id}
+                                                        draggableId={String(
+                                                            todo.id
+                                                        )}
+                                                        index={index}
+                                                    >
+                                                        {(provided) => (
+                                                            <li
+                                                                ref={
+                                                                    provided.innerRef
+                                                                }
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                            >
+                                                                <p>
+                                                                    {todo.title}
+                                                                </p>
+                                                                <section>
+                                                                    {Array.from(
+                                                                        {
+                                                                            length: todo.goal,
+                                                                        }
+                                                                    ).map(
+                                                                        (
+                                                                            _,
+                                                                            idx
+                                                                        ) => (
+                                                                            <input
+                                                                                key={
                                                                                     idx
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    )
-                                                                )}
-                                                            </section>
-                                                        </li>
-                                                    )}
-                                                </Draggable>
-                                            )
-                                        )}
-                                        {provided.placeholder}
-                                    </ul>
-                                )}
-                            </Droppable>
-                        </DragDropContext>
+                                                                                }
+                                                                                type="checkbox"
+                                                                                checked={
+                                                                                    idx <
+                                                                                    todo.status
+                                                                                }
+                                                                                onChange={() =>
+                                                                                    handleQuantityChange(
+                                                                                        todo,
+                                                                                        idx
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                        )
+                                                                    )}
+                                                                </section>
+                                                            </li>
+                                                        )}
+                                                    </Draggable>
+                                                )
+                                            )}
+                                            {provided.placeholder}
+                                        </ul>
+                                    )}
+                                </Droppable>
+                            </DragDropContext>
+                        ) : (
+                            <ul>
+                                {groupedTodos[dayNumber].map((todo) => (
+                                    <li key={todo.id}>
+                                        <p>{todo.title}</p>
+                                        <section>
+                                            {Array.from({
+                                                length: todo.goal,
+                                            }).map((_, idx) => (
+                                                <input
+                                                    key={idx}
+                                                    type="checkbox"
+                                                    checked={idx < todo.status}
+                                                    onChange={() =>
+                                                        handleQuantityChange(
+                                                            todo,
+                                                            idx
+                                                        )
+                                                    }
+                                                />
+                                            ))}
+                                        </section>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </div>
                 </React.Fragment>
             ))}

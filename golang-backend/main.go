@@ -187,6 +187,7 @@ func main() {
     router.HandleFunc("/api/user-first-name", GetUserFirstNameHandler).Methods("GET")
     router.HandleFunc("/api/save-assistant-message", SaveAssistantMessageHandler).Methods("POST")
     router.HandleFunc("/api/get-saved-assistant-message", GetSavedAssistantMessageHandler).Methods("GET")
+    router.HandleFunc("/api/update-sort-indexes", UpdateSortIndexesHandler).Methods("POST")
 
     // Set up CORS headers
     corsHandler := handlers.CORS(
@@ -198,6 +199,26 @@ func main() {
     fmt.Println("Starting server on :8080")
     log.Fatal(http.ListenAndServe(":8080", corsHandler(router)))
 }
+
+func UpdateSortIndexesHandler(w http.ResponseWriter, r *http.Request) {
+    var updates map[int]int // Maps daily_todo ID to new sort_index
+    if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    for id, newIndex := range updates {
+        _, err := db.Exec("UPDATE daily_todos SET sort_index = ? WHERE id = ?", newIndex, id)
+        if err != nil {
+            http.Error(w, fmt.Sprintf("Failed to update sort_index for todo ID %d: %v", id, err), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Sort indexes updated successfully"))
+}
+
 
 func GetUserFirstNameHandler(w http.ResponseWriter, r *http.Request) {
     userIDStr := r.URL.Query().Get("user_id")

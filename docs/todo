@@ -38,6 +38,8 @@
     make the AI better, more varied, lots of work here. dont repeat. better prompting, give it better data
 ---
 
+    add security on all these golang endpoints. cant just post and edit other people's lists lol. or get other people's missions/data
+
     user-mission, return most recent 7 days of ai saved messages, so ai know what it said before and can come up w new shit
 
     concept of "finalize" the current day or most recent previous day
