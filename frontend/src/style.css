@@ -223,3 +223,53 @@ input[type="checkbox"] {
 #updateTodoForm .delete-button:hover {
     background-color: darkred; /* Slightly darker red on hover */
 }
+
+#updateTodoForm {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 8px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px; /* Add space between form elements */
+}
+
+#updateTodoForm .form-row {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Add space between form elements */
+}
+
+#updateTodoForm .cancel-button {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+}
+
+#updateTodoForm .cancel-button:hover {
+    background-color: #f0f0f0; /* Slightly darker white on hover */
+}
+
+#updateTodoForm .update-button {
+    margin-left: auto; /* Align the update button to the right */
+}
+
+#updateTodoForm .action-buttons {
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 8px; /* Add space between buttons */
+}
+
+#updateTodoForm .delete-button {
+    background-color: red;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px; /* Smaller font size */
+}
+
+#updateTodoForm .delete-button:hover {
+    background-color: darkred; /* Slightly darker red on hover */
+}

@@ -32,18 +32,12 @@ function TodoList({ todos, setTodos, onEditTodo }) {
 
     const onDragEnd = (result) => {
         if (!result.destination) return;
-        console.log("src " + result.source.index);
-        console.log("dest " + result.destination.index);
 
         const dayNumber = parseInt(result.source.droppableId, 10);
-        console.log("on drag end, day number = " + dayNumber);
         const reorderedTodos = Array.from(groupedTodos[dayNumber]);
         // in the new order
-        console.log(reorderedTodos);
         const [removed] = reorderedTodos.splice(result.source.index, 1);
-        console.log(removed);
         reorderedTodos.splice(result.destination.index, 0, removed);
-        console.log(reorderedTodos);
 
         // Update the state with the reordered todos
         const newTodos = todos.map((todo, index) => {
@@ -53,7 +47,6 @@ function TodoList({ todos, setTodos, onEditTodo }) {
             return todo;
         });
 
-        console.log(newTodos);
         setTodos(newTodos);
 
         // Create the JSON object mapping todo id to new sort index
