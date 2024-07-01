@@ -83,7 +83,7 @@ func getUserTimezoneAndCurrentTime(userID int) (string, time.Time, error) {
 // Fetch the most recent day_number from daily_todos for the user
 func getMostRecentDayNumberForUser(userID int) (int, error) {
     var recentDayNumber int
-    err := db.QueryRow("SELECT MAX(day_number) FROM daily_todos WHERE user_id = ?", userID).Scan(&recentDayNumber)
+    err := db.QueryRow("SELECT MAX(day_number) FROM daily_todos WHERE user_id = ? and deleted = 0", userID).Scan(&recentDayNumber)
     if err != nil {
         return 0, fmt.Errorf("failed to fetch most recent day_number: %w", err)
     }
@@ -93,7 +93,7 @@ func getMostRecentDayNumberForUser(userID int) (int, error) {
 
 // Copy todos from the most recent day to the current day
 func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int) error {
-    rows, err := db.Query("SELECT title, goal, sort_index FROM daily_todos WHERE user_id = ? AND day_number = ?", userID, recentDayNumber)
+    rows, err := db.Query("SELECT title, goal, sort_index FROM daily_todos WHERE user_id = ? AND day_number = ? AND deleted = 0", userID, recentDayNumber)
     if err != nil {
         return fmt.Errorf("failed to fetch recent todos: %w", err)
     }
@@ -149,7 +149,7 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, error) {
 
     sevenDaysAgo := currentDayNumber - 7
 
-    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM daily_todos WHERE user_id = ? AND day_number BETWEEN ? AND ? ORDER BY day_number DESC, sort_index ASC", userID, sevenDaysAgo, currentDayNumber)
+    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM daily_todos WHERE user_id = ? AND day_number BETWEEN ? AND ? AND deleted = 0 ORDER BY day_number DESC, sort_index ASC", userID, sevenDaysAgo, currentDayNumber)
     if err != nil {
         return nil, false, 0, fmt.Errorf("failed to fetch recent todos: %w", err)
     }
@@ -181,6 +181,7 @@ func main() {
     router.HandleFunc("/api/todos", GetRecentTodosHandler).Methods("GET")
     router.HandleFunc("/api/todos", CreateOrUpdateTodayTodo).Methods("POST")
     router.HandleFunc("/api/todos/{id}", UpdateTodo).Methods("PUT")
+    router.HandleFunc("/api/todos/{id}", DeleteTodoHandler).Methods("DELETE")
     router.HandleFunc("/api/latest-thread", GetLatestThreadIDHandler).Methods("GET")
     router.HandleFunc("/api/user-mission", GetUserMissionHandler).Methods("GET")
     router.HandleFunc("/api/user-thread", SaveUserThreadHandler).Methods("POST")
@@ -357,6 +358,7 @@ func getLast7DaysTodos(userID int, upToDayNumber int) ([]map[string]interface{},
         FROM daily_todos 
         WHERE user_id = ? 
         AND day_number BETWEEN ? AND ?
+        AND deleted = 0
         ORDER BY day_number DESC, sort_index ASC`, userID, upToDayNumber-6, upToDayNumber)
     if err != nil {
         return nil, fmt.Errorf("failed to fetch todos: %w", err)
@@ -420,7 +422,7 @@ func CreateOrUpdateTodayTodo(w http.ResponseWriter, r *http.Request) {
 
     // Determine the next sort_index
     var maxSortIndex int
-    err = db.QueryRow("SELECT COALESCE(MAX(sort_index), 0) FROM daily_todos WHERE user_id = ? AND day_number = ?", todo.UserID, todo.DayNumber).Scan(&maxSortIndex)
+    err = db.QueryRow("SELECT COALESCE(MAX(sort_index), 0) FROM daily_todos WHERE user_id = ? AND day_number = ? AND deleted = 0", todo.UserID, todo.DayNumber).Scan(&maxSortIndex)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to determine sort_index: %v", err), http.StatusInternalServerError)
         return
@@ -446,6 +448,21 @@ func CreateOrUpdateTodayTodo(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(todo)
 }
 
+// Handler to delete a todo by ID (soft delete)
+func DeleteTodoHandler(w http.ResponseWriter, r *http.Request) {
+    vars := mux.Vars(r)
+    id := vars["id"]
+
+    _, err := db.Exec("UPDATE daily_todos SET deleted = TRUE WHERE id = ?", id)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to delete todo: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Todo deleted successfully"))
+}
+
 // Handler to update a todo by ID
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
@@ -459,7 +476,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 
     // Fetch the current status and goal from the database
     var currentStatus, currentGoal int
-    err := db.QueryRow("SELECT status, goal FROM daily_todos WHERE id = ?", id).Scan(&currentStatus, &currentGoal)
+    err := db.QueryRow("SELECT status, goal FROM daily_todos WHERE id = ? AND deleted = 0", id).Scan(&currentStatus, &currentGoal)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to fetch current todo: %v", err), http.StatusInternalServerError)
         return

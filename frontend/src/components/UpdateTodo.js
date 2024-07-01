@@ -23,6 +23,18 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
             .catch((error) => console.error(error));
     };
 
+    const handleDelete = () => {
+        axios
+            .delete(`http://localhost:8080/api/todos/${todo.id}`)
+            .then(() => {
+                setTodos((prevTodos) =>
+                    prevTodos.filter((t) => t.id !== todo.id)
+                );
+                onCancel(); // Close the form after delete
+            })
+            .catch((error) => console.error(error));
+    };
+
     return (
         <section className="update-todo">
             <form id="updateTodoForm" onSubmit={handleSubmit}>
@@ -57,6 +69,13 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                     className="cancel-button"
                 >
                     Cancel
+                </button>
+                <button
+                    type="button"
+                    onClick={handleDelete}
+                    className="delete-button"
+                >
+                    Delete
                 </button>
             </form>
         </section>
