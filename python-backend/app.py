@@ -60,84 +60,6 @@ def wprint(*args, width=70, **kwargs):
     builtins.print(*wrapped_args, **kwargs)
 
 
-# makes new openai assistants api look like old completions api
-def get_completion(client, message, agent, funcs, thread):
-    """
-    Executes a thread based on a provided message and retrieves the completion result.
-
-    This function submits a message to a specified thread, triggering the execution of an array of functions
-    defined within a func parameter. Each function in the array must implement a `run()` method that returns the outputs.
-
-    Parameters:
-    - message (str): The input message to be processed.
-    - agent (OpenAI Assistant): The agent instance that will process the message.
-    - funcs (list): A list of function objects, defined with the instructor library.
-    - thread (Thread): The OpenAI Assistants API thread responsible for managing the execution flow.
-
-    Returns:
-    - str: The completion output as a string, obtained from the agent following the execution of input message and functions.
-    """
-
-    # create new message in the thread
-    message = client.beta.threads.messages.create(thread_id=thread.id,
-                                                  role="user",
-                                                  content=message)
-
-    # run this thread
-    run = client.beta.threads.runs.create(
-        thread_id=thread.id,
-        assistant_id=agent.id,
-    )
-
-    while True:
-        # wait until run completes
-        while run.status in ['queued', 'in_progress']:
-            run = client.beta.threads.runs.retrieve(thread_id=thread.id,
-                                                    run_id=run.id)
-            time.sleep(1)
-
-        # function execution
-        if run.status == "requires_action":
-            tool_calls = run.required_action.submit_tool_outputs.tool_calls
-            tool_outputs = []
-            for tool_call in tool_calls:
-                wprint('\033[31m' + str(tool_call.function), '\033[0m')
-                # find the tool to be executed
-                func = next(
-                    iter([
-                        func for func in funcs
-                        if func.__name__ == tool_call.function.name
-                    ]))
-
-                try:
-                    # init tool
-                    func = func(**eval(tool_call.function.arguments))
-                    # get outputs from the tool
-                    output = func.run()
-                except Exception as e:
-                    output = "Error: " + str(e)
-
-                wprint(f"\033[33m{tool_call.function.name}: ", output,
-                       '\033[0m')
-                tool_outputs.append({
-                    "tool_call_id": tool_call.id,
-                    "output": output
-                })
-
-            # submit tool outputs
-            run = client.beta.threads.runs.submit_tool_outputs(
-                thread_id=thread.id, run_id=run.id, tool_outputs=tool_outputs)
-        # error
-        elif run.status == "failed":
-            raise Exception("Run Failed. Error: ", run.last_error)
-        # return assistant message
-        else:
-            messages = client.beta.threads.messages.list(thread_id=thread.id)
-            for message in messages.data[0].content:
-                yield message.text.value
-            break
-
-
 app = Flask(__name__)
 CORS(app)
 
@@ -145,46 +67,6 @@ CORS(app)
 @app.route('/')
 def home():
     return jsonify(message="Hello from the Python backend!")
-
-
-class MessageGenerator:
-
-    def __init__(self, count):
-        self.count = count
-
-    def generate_messages(self):
-        yield "Starting stream from MessageGenerator...\n"
-        for i in range(self.count):
-            yield f"Message {i} from MessageGenerator\n"
-            time.sleep(1)  # Simulating a delay in generating messages
-        yield "Stream ended from MessageGenerator.\n"
-
-
-def generate_messages_from_object(generator):
-    for message in generator.generate_messages():
-        yield message
-
-
-def generate_messages():
-    yield "Starting stream...\n"
-    for i in range(5):
-        yield f"Message {i}\n"
-        time.sleep(1)  # Simulating a delay in generating messages
-    yield from generate_messages_from_object(MessageGenerator(5))
-    yield "Stream ended.\n"
-
-
-@app.route('/api/stream-test', methods=['GET'])
-def stream():
-
-    @stream_with_context
-    def generate():
-        for message in generate_messages():
-            yield f"data: {message}\n\n"
-            import sys
-            sys.stdout.flush()
-
-    return Response(generate(), content_type='text/event-stream')
 
 
 def get_completion_stream(client, message, agent, funcs, thread, q,
@@ -446,13 +328,17 @@ def daily_message():
                            ), save_thread_response.status_code
 
     # get openai assistant
-    assistant_id: str = os.getenv('ASSISTANT_ID', '')
-    if assistant_id == '':
+    response = requests.get('http://golang-backend:8080/api/assistant-id')
+    if response.status_code != 200:
         return jsonify(
-            error="ASSISTANT_ID environment variable is not set"), 500
+            error="Failed to fetch assistant ID"), response.status_code
+
+    assistant_id = response.json().get('assistant_id')
+    if not assistant_id:
+        return jsonify(error="Assistant ID not found"), 404
 
     assistant = client.beta.assistants.retrieve(assistant_id)
-    print(assistant)
+    #print(assistant)
 
     # start a thread with the assistant. new thread or existing if found in the db for this user
     # add a message to the thread "send an encouraging message"
@@ -499,41 +385,32 @@ def daily_message():
     return Response(generate(), content_type='text/event-stream')
 
 
-"""
-    message_generator = get_completion(
-        client=client,
-        message=
-        f"send an encouraging message to user {user_id}. use tools to get the user's mission and recent daily todo history :)",
-        agent=assistant,
-        funcs=eternal_optimist_tools,
-        thread=thread)
-
-    @stream_with_context
-    def generate():
-        full_message = ""
-        for message in message_generator:
-            full_message += message
-            yield f"data: {message}\n\n"
-            import sys
-            sys.stdout.flush()
-
-        # Save the full message to the database
-        save_message_response = requests.post(
-            'http://golang-backend:8080/api/save-message',
-            json={
-                'user_id': user_id,
-                'thread_id': thread_id,
-                'message': full_message
-            })
-        if save_message_response.status_code != 200:
-            print("Failed to save message to the database")
-
-    return Response(generate(), content_type='text/event-stream')
-"""
-
-
 @app.route('/api/create-assistant', methods=['POST'])
 def create_assistant():
+
+    # Check if an assistant already exists in the database
+    response = requests.get('http://golang-backend:8080/api/assistant-id')
+    if response.status_code == 200:
+        assistant_id = response.json().get('assistant_id')
+        if assistant_id:
+            # Check if the assistant exists in OpenAI
+            client = Client(api_key=os.getenv('OPENAI_API_KEY'))
+            try:
+                assistant = client.beta.assistants.retrieve(assistant_id)
+                print('found assistant in openai')
+                print(assistant)
+                return jsonify(message="Assistant already exists 2",
+                               assistant_id=assistant_id), 200
+            except Exception as e:
+                print('exception trying to get assistant in openai')
+                print(e)
+                # If the assistant does not exist in OpenAI, proceed to create a new one
+                pass
+    elif response.status_code != 404:
+        return jsonify(error="Failed to check for existing assistant"
+                       ), response.status_code
+
+    # Proceed with creating a new assistant
     client = Client(api_key=os.getenv('OPENAI_API_KEY'))
 
     eternal_optimist = client.beta.assistants.create(
@@ -555,6 +432,15 @@ def create_assistant():
         ],
     )
     assistant_id = eternal_optimist.id
+
+    # Save the assistant_id to the MySQL database
+    response = requests.post(
+        'http://golang-backend:8080/api/save-assistant-id',
+        json={'assistant_id': assistant_id})
+    if response.status_code != 200:
+        return jsonify(
+            error="Failed to save assistant ID"), response.status_code
+
     return jsonify(message="Assistant created successfully",
                    assistant_id=assistant_id)
 

@@ -15,58 +15,144 @@
 
     x edit mode - click edit link and a modal comes up. edit title, description for AI, # times per day goal. preview area. submit/cancel
 
-    add a delete button in red. to the right of cancel
-
-    break 14 dd into 3 hours raza coding personal projects
-        4 hours focused dd work 
-        get 1hr 1st thing in the morning.
-        get 1hr dd before noon
-        get 1hr raza coding afternoon/night before 10pm
+    x add a delete button in red. to the right of cancel
 
     *make it so others can set it up from scratch and use it locally from their docker
+        README
+        1. *set open ai api key in .env
+        2. start server
+        3. hit /create-assistant
+            curl -X POST http://localhost:5001/api/create-assistant
+        *create assistant under your open ai account, save the assistant id to new db table
+            hit endpoint and it checks if there is assistant already, if not creates it and saves assistant id to db
+                wget/curl the endpoint
+
+        1. clone the repo
+        2. create your .env with your openai api key
+        3. run docker-compose up --build to build and start the app
+        4. hit create assistant in your browser
+            x if .env not working / no openai key, tell the user, return
+            x it will check if an assistant id is aready in the db, if so fetch it from openai and make sure it matches name/spec/etc
+            x if not in db or doesn't match name/spec, it will create one, and save assistant id to db
+        5. create a new user, since there are no accounts yet
+            enter email, display name, timezone, mission/goals
+            password?
+            we send you link in email, click to create account officially/login
+        6. you can add todos for today. it's all you can do i think on blank state
+        7. check off todos as you do them
+        8. come tomorrow - new set of todos are copied from previous day and ready to be checked off
+            you should finalize previous day - check any items you did but didn't check, click finalize
+        9. once you have a finalized day, Ai will come up with a message for you!
+        10. repeat forever and do the most important things every day for the rest of your life :D
+
         create user - raza
         user login sessions
-        save your mission
-        set open ai api key
-        create assistant, save the assistant id (db might be better place)
-        start adding todos and enjoy!
+        enter your mission, we'll save it
+        start adding todos
+            test blank slate experience, make sure it's intuitive
+
+    *make it live in prod
+        user sign up. enter display name, email, password, select timezone
+
+        user login
+
+        logout
+
+        *profile page or modal to edit info/timezone
+
+        user login sessions
+
+        domains
+            dailytodos.ai - main domain
+            dailytodo.ai - buy and it redirects
+
+        add security on all these golang endpoints. cant just post and edit other people's lists lol. or get other people's missions/data
+            login session cookie
+
+    let anon users fill in all their info
+        create a temp user in db, tmp user login session
+        create their todos
+        check off their todos
+        display name
+        their mission
+        email
+        password
+
+        create a skool login link. has tasks there. could be my tasks i would do at skool lol. very clever. hey skool, my name is raza, i build this todo app for myself. backend engineer 16 years. using ai to buld full stack. shows my appraoch to coding and ui/ux. here's the source. ai integration. would love to chat more if you think i'd be a good fit.
+
+            hypothetical skool todo list for raza
+                design real time chat for skool communities. web sockets
+                1 hour ai study to improve dev productivity
+                fix bug with ...
+                improve stats calculation speed
+                redesign notifications system
+            always do your homework
+
+    *concept of "finalize" the current day or most recent previous day
+        before ai get's today's message it asks you to make final edits to previous day and submit
+            reflect on previous day. what you did good. what could be better. any special notes you have on the day. final edit of checkboxes, submit. then you get new AI message for today :)
+            reflect on it. what was good, what could be improved
+
+            check anything you did but didn't check day before
+            click finalize
+            can always enter
+                what was good
+                what could be improved
+                any other notes on the day
+
+        could just be a simple button below each day. finalize june 25th. add flag to db finalized or not. feed AI finalized days for context.
+            need concept of finalize so that the ai doesn't base comments in incomplete days. like even next morning, it doesnt see your final checks like 11pm laptop, breathing etc.
+
+    *editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
+
+    *put edit form inline
+
+    *allow edit form to add today's notes - open by default. also add why is this todo important to your mission/goals (this can be hidden with that arrow open close UI thing)
+        why each thing relates to mission, why it's important to you
+        daily notes/caveats on each todo item - travel day, could't do as much focused coding time
+        send the info to AI to help it understand you better
+
+    *warning modal upon clicking delete. cancel, delete, this cannot be undone
+
+    use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
 
     share on skool. people will like this hist
 
     share on youtube. walkthrough the code, and how people can get it working locally
 
-    dailytodos.ai - main domain
-    dailytodo.ai - buy and it redirects
+---
+    needs automated tests for various db interactions, sequences
+
+    maybe you just want to chat with someone daily about your mission/goals, what you did that day to further your mission/goals, challenges. hash out your thinking. etc. bounce ideas.
+        and the ai sees you putting in work, knows you, your mission, your daily habits, what you did every day, what you couldn't fit it, obstacles etc.
+        ai's mission is to be an unrelenting optimistic force in Raza's life to help him achieve his mission and goals. live healthy forever, and do focused creative work for 6 hours a day forever.
+        AI window should be a chat. it gives you encouragement daily, but you can chat with it anytime and have a convo about your day
 
     make the AI better, more varied, lots of work here. dont repeat. better prompting, give it better data
 
----
-    Dad could use this to check off 3 meals a day of healthy eating. checkbox for no snacking too haha. like no snacking on bad foods like nuts or whatever.
-        put this in prod and let people register. AI is optional, depends if you are on a paid plan or not.
-
-    add security on all these golang endpoints. cant just post and edit other people's lists lol. or get other people's missions/data
-        login session cookie
-
     with user-mission, return most recent 7 days of ai saved messages, so ai know what it said before and can come up w new shit
-
-    why each thing relates to mission, why it's important to you
-
-    daily notes/caveats on each todo item - travel day, could't do as much focused coding time
----
-    let other people comment on your days, todos. encouragement from your friends and family. coaches.
-
-    concept of "finalize" the current day or most recent previous day
-        before ai get's today's message it asks you to make final edits to previous day and submit
-            reflect on previous day. what you did good. what could be better. any speciali notes you have on the day. final edit of checkboxes, submit. then you get new AI message for today :)
-        could just be a simple button below each day. finalize june 25th. add flag to db finalized or not. feed AI finalized days for context.
-
-    AI window should be a chat. it gives you encouragement daily, but you can chat with it anytime and have a convo about your day
-
-    mobile app
 
     store checked checkboxes as a binary number 101111. then you can accurately save what the user did.
         check these things off from your phone, when you are not at laptop
 
+    mobile app
+---
+
+    hello raza greeting, it's 10:51pm. for any time related things, show a message. close your laptop in 10 min :)
+        every time you hit the site, AI has something for you :D
+            sees your progress every hour and encourages you throughout the day
+            knows your goals, knows your past days activities, knows your actions today
+            has memory of notable events, and references them
+
+    cron tasks, specific schedule, not daily
+        monday to friday add dd coding todo
+        once a week on sunday at chicken soup todo
+
+    let other people comment on your days, todos. encouragement from your friends and family. coaches.
+
+    let other people view-only your todos. accountability
+
+---
     OR item - dsp or flush system, don't need both
         this way you can get perfect days even if you didn't flush system
             or could just write dsp/flush in 1 line
@@ -134,17 +220,17 @@ profile page
     enter your mission
     logout
 
-each todo is a link, and pops up a modal
+x each todo is a link, and pops up a modal
     show context - is this editing just this 1 todo for this day? or all todos?
     edit why this is important to your mission
     delete
     edit title
     edit goal number
 
-bg info - why each todo is relevant to your goals, mission, vision
+xabove bg info - why each todo is relevant to your goals, mission, vision
     ai can use this
 
-enter notes next to todo items, like oh flying day couldn't hit gym. eid day couldn't do gym. etc
+xabove enter notes next to todo items, like oh flying day couldn't hit gym. eid day couldn't do gym. etc
 
 every user gets their own ai agent
     ai encouragement daily
@@ -156,10 +242,6 @@ every user gets their own ai agent
         youtube api app to find you cool videos relevant to you
 
     ai suggests new todos for you. whatever daily habits it thinks will help you achieve your mission in life.
-
-maybe you just want to chat with someone daily about your mission/goals, what you did that day to further your mission/goals, challenges. hash out your thinking. etc. bounce ideas.
-    and the ai sees you putting in work, knows you, your mission, your daily habits, what you did every day, what you couldn't fit it, obstacles etc.
-    ai's mission is to be an unrelenting optimistic force in Raza's life to help him achieve his mission and goals. live healthy forever, and do focused creative work for 6 hours a day forever.
 
 tell agent you want a new kanye quote daily. hormozi quote daily. new motivational yt vid daily.
 
@@ -180,9 +262,9 @@ NEXT june 26th 2024
 
     x react put it in 3rd column
 
-    python save full response to db. react fetch from db, unless it's a new day, then generate a new message
+    x python save full response to db. react fetch from db, unless it's a new day, then generate a new message
 
-    user-mission, return most recent 7 days of ai encouragement, so ai know what it said before and can come up w new shit
+    xabove user-mission, return most recent 7 days of ai encouragement, so ai know what it said before and can come up w new shit
     
     x make user-mission only return days before current day, otherwise ai is critiquing day that just started - annoying.
 
@@ -194,25 +276,25 @@ NEXT june 26th 2024
         reflect on it. what was good, what could be improved
 ---
 
-edit todos - like change meds 1 to quantity with goal 3
+x edit todos - like change meds 1 to quantity with goal 3
     only current day
 
-delete a todo
+x delete a todo
     only current day
 
 easier way to increment/decrement a todo? checkboxes can be small and hard to hit sometimes
 
 functions
-    edit the todo 
-        title text
-        goal # per day
-    delete the todo
+    x edit the todo 
+        x title text
+        x goal # per day
+    x delete the todo
     increment the todo (check next checkbox)
     decrement the todo (uncheck the latest checkbox)
     edit why it's relevant to mission/goals (high level)
     edit current day's notes on that todo (low level day to day)
 
-hover over a todo - then you can edit
+x hover over a todo - then you can edit
     name
     relevance to mission/goals
 
@@ -231,8 +313,13 @@ can update yday, but not before yday
 
 ---
 
-allow user to reorder their todo list as they like, save that state and keep it on copy
+x allow user to reorder their todo list as they like, save that state and keep it on copy
 
+xno break 14 dd into 3 hours raza coding personal projects
+    4 hours focused dd work 
+    get 1hr 1st thing in the morning.
+    get 1hr dd before noon
+    get 1hr raza coding afternoon/night before 10pm
 ---
 
 reflect on the day - good, could improve upon. what are you grateful for.
@@ -246,11 +333,6 @@ reflect on the day - good, could improve upon. what are you grateful for.
 morning - how was your sleep?
     6 hr straight, deep
     enema last night, and kinda diareah stomach discomfort 2-3 hrs after dinner
-
-hello raza greeting, it's 10:51pm. for any time related things, show a message. close your laptop in 10 min :)
-    every time you hit the site, AI has something for you :D
-        knows your goals, knows your past days activities, knows your actions today
-        has memory of notable events, and references them
 
 labels for each todo 0 / 1, 3 / 12
     color code 1 / 1 is green. 0 / 1 red. 2 / 3 yellow. etc.
@@ -294,15 +376,17 @@ deploy to prod
 
 better logging of python, ai steps. centralized logging
 
-add user signup/login
-
 add public viewing of my daily todos and what ai said to me. so save ai stuff to my db. we can surface w/o making api call
     convo history is with open ai?
     can share public url with skool
     allow skool to add daily todos as a sandbox user save by cookie, that's a user
 
----
+===
 my life's mission is to do creative work 6 hours a day and live healthy forever
     put that at the top of your todo page
 
-i write software to help make people healthy, help keep them consistent with good healthy productive habits. social media will go crazy with AI, stay off it and stay focused on the actually important things in your life with daily todos. achieve your mission in life. have a daily system. family, your health, your creative work.
+i write software to help make people healthy, help keep them consistent with good healthy productive habits. social media will go crazy with AI, stay off it and stay focused on the actually important things in your life with daily todos. achieve your mission in life. have a daily system. focus family, your health, your creative work.
+
+Dad could use this to check off 3 meals a day of healthy eating. checkbox for no snacking too haha. like no snacking on bad foods like nuts or whatever.
+    put this in prod and let people register. AI is optional, depends if you are on a paid plan or not.
+

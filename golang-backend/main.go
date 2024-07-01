@@ -189,6 +189,8 @@ func main() {
     router.HandleFunc("/api/save-assistant-message", SaveAssistantMessageHandler).Methods("POST")
     router.HandleFunc("/api/get-saved-assistant-message", GetSavedAssistantMessageHandler).Methods("GET")
     router.HandleFunc("/api/update-sort-indexes", UpdateSortIndexesHandler).Methods("POST")
+    router.HandleFunc("/api/assistant-id", GetAssistantIDHandler).Methods("GET")
+    router.HandleFunc("/api/save-assistant-id", SaveAssistantIDHandler).Methods("POST")
 
     // Set up CORS headers
     corsHandler := handlers.CORS(
@@ -558,4 +560,45 @@ func GetSavedAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
     response := map[string]string{"message": message}
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
+}
+
+func GetAssistantIDHandler(w http.ResponseWriter, r *http.Request) {
+    var assistantID string
+    err := db.QueryRow("SELECT assistant_id FROM assistants ORDER BY created_at DESC LIMIT 1").Scan(&assistantID)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            http.Error(w, "assistant not found", http.StatusNotFound)
+            return
+        } else {
+            http.Error(w, fmt.Sprintf("Failed to fetch assistant ID: %v", err), http.StatusInternalServerError)
+            return
+        }
+    }
+
+    response := map[string]string{"assistant_id": assistantID}
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(response)
+}
+
+func SaveAssistantIDHandler(w http.ResponseWriter, r *http.Request) {
+    var input struct {
+        AssistantID string `json:"assistant_id"`
+    }
+
+    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    _, err := db.Exec(`
+        INSERT INTO assistants (assistant_id, created_at, updated_at)
+        VALUES (?, NOW(), NOW())`,
+        input.AssistantID)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to save assistant ID: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Assistant ID saved successfully"))
 }
