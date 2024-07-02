@@ -293,7 +293,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     var user User
-    err := db.QueryRow("SELECT id, email, password_hash FROM users WHERE email = ?", credentials.Email).Scan(&user.ID, &user.Email, &user.Password)
+    err := db.QueryRow("SELECT id, email, password_hash, timezone, username FROM users WHERE email = ?", credentials.Email).Scan(&user.ID, &user.Email, &user.Password, &user.Timezone, &user.Username)
     if err != nil {
         if err == sql.ErrNoRows {
             http.Error(w, "Invalid email or password", http.StatusUnauthorized)
@@ -310,8 +310,10 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
     sessionManager.Put(r.Context(), "userID", user.ID)
 
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("User logged in successfully"))
+    user.Password = ""
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(user)
 }
 
 func LogoutHandler(w http.ResponseWriter, r *http.Request) {

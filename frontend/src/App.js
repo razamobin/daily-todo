@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from "./context/AuthProvider";
 import axios from "axios";
 import AddTodo from "./components/AddTodo";
 import UpdateTodo from "./components/UpdateTodo";
@@ -10,6 +11,7 @@ import remarkBreaks from "remark-breaks"; // Plugin to convert newlines to <br>
 // import NumberList from "./NumberList";
 
 function App() {
+    const { user, login, logout } = useContext(AuthContext);
     const [todos, setTodos] = useState([]);
     const [dailyMessage, setDailyMessage] = useState("");
     const [isUpdateMode, setIsUpdateMode] = useState(false);
@@ -32,11 +34,6 @@ function App() {
         const eventSource = new EventSource(
             `http://localhost:5001/api/daily-message?user_id=1&new_day_number=${newDayNumber}`
         );
-        /*
-        const eventSource = new EventSource(
-            "http://localhost:5001/api/stream-test"
-        );
-        */
 
         eventSource.onmessage = (event) => {
             const unescapedMessage = event.data.replace(/\\n/g, "\n");
@@ -73,15 +70,32 @@ function App() {
                         daily <span>todos</span>
                     </h1>
                 </header>
-                {isUpdateMode ? (
-                    <UpdateTodo
-                        key={currentTodo ? currentTodo.id : "new"}
-                        todo={currentTodo}
-                        setTodos={setTodos}
-                        onCancel={handleCancelUpdate}
-                    />
+                {user ? (
+                    <>
+                        <p>Hello, {user.username}</p>
+                        {isUpdateMode ? (
+                            <UpdateTodo
+                                key={currentTodo ? currentTodo.id : "new"}
+                                todo={currentTodo}
+                                setTodos={setTodos}
+                                onCancel={handleCancelUpdate}
+                            />
+                        ) : (
+                            <AddTodo setTodos={setTodos} />
+                        )}
+                        <button onClick={logout}>Logout</button>
+                    </>
                 ) : (
-                    <AddTodo setTodos={setTodos} />
+                    <button
+                        onClick={() =>
+                            login(
+                                "raza.mobin@gmail.com",
+                                "kJNQ9rCFYgpR28vh3GzfMe"
+                            )
+                        }
+                    >
+                        Login
+                    </button>
                 )}
             </div>
             <div className="main-container">
