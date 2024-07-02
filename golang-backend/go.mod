@@ -10,5 +10,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/alexedwards/scs/v2 v2.8.0 // indirect
 	github.com/felixge/httpsnoop v1.0.3 // indirect
+	golang.org/x/crypto v0.24.0 // indirect
 )

@@ -18,19 +18,13 @@
     x add a delete button in red. to the right of cancel
 
     *make it so others can set it up from scratch and use it locally from their docker
-        README
-        1. *set open ai api key in .env
-        2. start server
-        3. hit /create-assistant
-            curl -X POST http://localhost:5001/api/create-assistant
-        *create assistant under your open ai account, save the assistant id to new db table
-            hit endpoint and it checks if there is assistant already, if not creates it and saves assistant id to db
-                wget/curl the endpoint
 
+        README
         1. clone the repo
         2. create your .env with your openai api key
         3. run docker-compose up --build to build and start the app
-        4. hit create assistant in your browser
+        4. hit create assistant w curl / wget
+            curl -X POST http://localhost:5001/api/create-assistant
             x if .env not working / no openai key, tell the user, return
             x it will check if an assistant id is aready in the db, if so fetch it from openai and make sure it matches name/spec/etc
             x if not in db or doesn't match name/spec, it will create one, and save assistant id to db
@@ -47,6 +41,8 @@
 
         create user - raza
         user login sessions
+            if logged in, show your todos page. allow you to go to your profile page. allow logout
+            if you are logged out, you can sign up, you can read-only someone elses page. you can play in a sandbox, add todos etc. react only i guess. no backend saving
         enter your mission, we'll save it
         start adding todos
             test blank slate experience, make sure it's intuitive
@@ -58,7 +54,7 @@
 
         logout
 
-        *profile page or modal to edit info/timezone
+        *profile page or modal to edit info/timezone/mission
 
         user login sessions
 
@@ -381,6 +377,24 @@ add public viewing of my daily todos and what ai said to me. so save ai stuff to
     can share public url with skool
     allow skool to add daily todos as a sandbox user save by cookie, that's a user
 
+===
+curl -X POST http://localhost:8080/api/signup \
+     -H "Content-Type: application/json" \
+     -d '{
+           "email": "raza.mobin@gmail.com",
+           "password": "kJNQ9rCFYgpR28vh3GzfMe",
+           "timezone": "America/Los_Angeles"
+         }'
+
+
+curl -X POST http://localhost:8080/api/login \
+     -H "Content-Type: application/json" \
+     -d '{
+           "email": "raza.mobin@gmail.com",
+           "password": "kJNQ9rCFYgpR28vh3GzfMe"
+         }'
+
+curl -X GET http://localhost:8080/api/logged-in-user
 ===
 my life's mission is to do creative work 6 hours a day and live healthy forever
     put that at the top of your todo page

@@ -7,18 +7,26 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
+	"golang.org/x/crypto/bcrypt"
+
+	"github.com/alexedwards/scs/v2"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
 var db *sql.DB
+var sessionManager *scs.SessionManager
 
 type User struct {
-    ID       int
-    Timezone string
+    ID       int    `json:"id"`
+    Email    string `json:"email"`
+    Password string `json:"password,omitempty"`
+    Timezone string `json:"timezone"`
+    Username string `json:"username"`
 }
 
 type Todo struct {
@@ -177,7 +185,20 @@ func main() {
         log.Fatal(err)
     }
 
+    // init session manager
+    sessionManager = scs.New()
+    sessionManager.Lifetime = 24 * time.Hour
+    sessionManager.IdleTimeout = 20 * time.Minute
+    sessionManager.Cookie.Name = "session_id"
+    sessionManager.Cookie.HttpOnly = true
+    sessionManager.Cookie.Secure = true
+    sessionManager.Cookie.SameSite = http.SameSiteStrictMode
+
     router := mux.NewRouter()
+    router.HandleFunc("/api/signup", SignUpHandler).Methods("POST")
+    router.HandleFunc("/api/login", LoginHandler).Methods("POST")
+    router.HandleFunc("/api/logout", LogoutHandler).Methods("POST")
+    router.HandleFunc("/api/logged-in-user", LoggedInUserHandler).Methods("GET")
     router.HandleFunc("/api/todos", GetRecentTodosHandler).Methods("GET")
     router.HandleFunc("/api/todos", CreateOrUpdateTodayTodo).Methods("POST")
     router.HandleFunc("/api/todos/{id}", UpdateTodo).Methods("PUT")
@@ -192,6 +213,8 @@ func main() {
     router.HandleFunc("/api/assistant-id", GetAssistantIDHandler).Methods("GET")
     router.HandleFunc("/api/save-assistant-id", SaveAssistantIDHandler).Methods("POST")
 
+    sessionRouter := sessionManager.LoadAndSave(router)
+
     // Set up CORS headers
     corsHandler := handlers.CORS(
         handlers.AllowedOrigins([]string{"http://localhost:3000"}),
@@ -200,7 +223,152 @@ func main() {
     )
 
     fmt.Println("Starting server on :8080")
-    log.Fatal(http.ListenAndServe(":8080", corsHandler(router)))
+    log.Fatal(http.ListenAndServe(":8080", corsHandler(sessionRouter)))
+}
+
+func SignUpHandler(w http.ResponseWriter, r *http.Request) {
+    var credentials struct {
+        Email    string `json:"email"`
+        Password string `json:"password"`
+        Timezone string `json:"timezone"`
+    }
+
+    if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    // Validate email
+    atIndex := strings.Index(credentials.Email, "@")
+    if atIndex == -1 {
+        http.Error(w, "Invalid email address", http.StatusBadRequest)
+        return
+    }
+
+    // Generate username from email
+    username := credentials.Email[:atIndex]
+
+    // Hash the password
+    hashedPassword, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), bcrypt.DefaultCost)
+    if err != nil {
+        http.Error(w, "Failed to hash password", http.StatusInternalServerError)
+        return
+    }
+
+    // Insert the new user into the database
+    result, err := db.Exec("INSERT INTO users (email, password_hash, timezone, username) VALUES (?, ?, ?, ?)",
+        credentials.Email, string(hashedPassword), credentials.Timezone, username)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to create user: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    userID, err := result.LastInsertId()
+    if err != nil {
+        http.Error(w, "Failed to retrieve user ID", http.StatusInternalServerError)
+        return
+    }
+
+    // Create the user object to return
+    user := User{
+        ID:       int(userID),
+        Email:    credentials.Email,
+        Timezone: credentials.Timezone,
+        Username: username,
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(user)
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+    var credentials struct {
+        Email    string `json:"email"`
+        Password string `json:"password"`
+    }
+
+    if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    var user User
+    err := db.QueryRow("SELECT id, email, password_hash FROM users WHERE email = ?", credentials.Email).Scan(&user.ID, &user.Email, &user.Password)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+        } else {
+            http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+        }
+        return
+    }
+
+    if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(credentials.Password)); err != nil {
+        http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+        return
+    }
+
+    sessionManager.Put(r.Context(), "userID", user.ID)
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("User logged in successfully"))
+}
+
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+    err := sessionManager.Destroy(r.Context())
+    if err != nil {
+        http.Error(w, "Failed to destroy session", http.StatusInternalServerError)
+        return
+    }
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("User logged out successfully"))
+}
+
+func LoggedInUserHandler(w http.ResponseWriter, r *http.Request) {
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        // Return a mock user if not logged in
+        anonymousUser := User{
+            ID:       0,
+            Email:    "anonymoususer@mailinator.com",
+            Timezone: "America/Los_Angeles",
+            Username: "anonymoususer",
+        }
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(anonymousUser)
+        return
+    }
+
+    var user User
+    err = db.QueryRow("SELECT id, email, timezone, username FROM users WHERE id = ?", userID).Scan(&user.ID, &user.Email, &user.Timezone, &user.Username)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            http.Error(w, "User not found", http.StatusNotFound)
+        } else {
+            http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+        }
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(user)
+}
+
+// Example handler to get a session value
+func GetUserIDFromSession(r *http.Request) (int, error) {
+    /*
+    how to use
+        userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
+    */
+    userID, ok := sessionManager.Get(r.Context(), "userID").(int)
+    if !ok {
+        return 0, fmt.Errorf("no user ID in session")
+    }
+    return userID, nil
 }
 
 func UpdateSortIndexesHandler(w http.ResponseWriter, r *http.Request) {
