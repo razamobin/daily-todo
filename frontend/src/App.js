@@ -8,10 +8,10 @@ import ReactMarkdown from "react-markdown";
 import rehypeReact from "rehype-react";
 import remarkGfm from "remark-gfm"; // Optional: for GitHub flavored markdown
 import remarkBreaks from "remark-breaks"; // Plugin to convert newlines to <br>
-// import NumberList from "./NumberList";
+import AuthForm from "./components/AuthForm";
 
 function App() {
-    const { user, login, logout } = useContext(AuthContext);
+    const { user, logout } = useContext(AuthContext);
     const [todos, setTodos] = useState([]);
     const [dailyMessage, setDailyMessage] = useState("");
     const [isUpdateMode, setIsUpdateMode] = useState(false);
@@ -63,7 +63,6 @@ function App() {
 
     return (
         <>
-            {/* <NumberList /> */}
             <div className="header-container">
                 <header>
                     <h1>
@@ -86,38 +85,38 @@ function App() {
                         <button onClick={logout}>Logout</button>
                     </>
                 ) : (
-                    <button
-                        onClick={() =>
-                            login(
-                                "raza.mobin@gmail.com",
-                                "kJNQ9rCFYgpR28vh3GzfMe"
-                            )
-                        }
-                    >
-                        Login
-                    </button>
+                    <AuthForm />
                 )}
             </div>
             <div className="main-container">
-                {dailyMessage && (
-                    <div className="daily-message">
-                        <ReactMarkdown
-                            children={dailyMessage}
-                            remarkPlugins={[remarkGfm, remarkBreaks]} // Optional: for GitHub flavored markdown
-                            rehypePlugins={[
-                                [
-                                    rehypeReact,
-                                    { createElement: React.createElement },
-                                ],
-                            ]}
+                {user ? (
+                    <>
+                        {dailyMessage && (
+                            <div className="daily-message">
+                                <ReactMarkdown
+                                    children={dailyMessage}
+                                    remarkPlugins={[remarkGfm, remarkBreaks]} // Optional: for GitHub flavored markdown
+                                    rehypePlugins={[
+                                        [
+                                            rehypeReact,
+                                            {
+                                                createElement:
+                                                    React.createElement,
+                                            },
+                                        ],
+                                    ]}
+                                />
+                            </div>
+                        )}
+                        <TodoList
+                            todos={todos}
+                            setTodos={setTodos}
+                            onEditTodo={handleEditTodo}
                         />
-                    </div>
+                    </>
+                ) : (
+                    <></>
                 )}
-                <TodoList
-                    todos={todos}
-                    setTodos={setTodos}
-                    onEditTodo={handleEditTodo}
-                />
             </div>
         </>
     );

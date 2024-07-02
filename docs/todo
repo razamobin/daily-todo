@@ -128,6 +128,10 @@ NEXT JULY 2 2024
     share on youtube. walkthrough the code, and how people can get it working locally
 
 ---
+    unique key email in users table
+
+    instead of user = null in react, user.email = 'anonymoususer@mailinator.com'
+
     needs automated tests for various db interactions, sequences
 
     maybe you just want to chat with someone daily about your mission/goals, what you did that day to further your mission/goals, challenges. hash out your thinking. etc. bounce ideas.
