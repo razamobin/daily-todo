@@ -10,7 +10,7 @@
 7. check off todos as you do them
 8. come tomorrow - new set of todos are copied from previous day and ready to be checked off
 9. since yesterday is done, AI will come up with an encouraging message for you!
-10. repeat forever and do the most important things every day for the rest of your life :D
+10. repeat forever and do the most important things every day for the rest of your life :D (and don't get distracted by social media and AI driven distractions)
 
 docker-compose up --build
 
