@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 
 function AddTodo({ setTodos }) {
     const [title, setTitle] = useState("");

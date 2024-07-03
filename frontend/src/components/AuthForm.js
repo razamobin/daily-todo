@@ -1,12 +1,13 @@
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
+import TimezoneSelect from "react-timezone-select";
 
 const AuthForm = () => {
-    const { login } = useContext(AuthContext);
+    const { login, signup } = useContext(AuthContext);
     const [isLoginForm, setIsLoginForm] = useState(true);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [timezone, setTimezone] = useState("");
+    const [timezone, setTimezone] = useState({});
     const [error, setError] = useState("");
 
     const handleToggleForm = () => {
@@ -28,9 +29,31 @@ const AuthForm = () => {
         }
     };
 
-    const handleSignUp = (e) => {
+    const handleSignUp = async (e) => {
         e.preventDefault();
-        // Add sign-up logic here
+        if (password.length < 6) {
+            setError("Signup failed: Password must be at least 6 characters.");
+            return;
+        }
+        try {
+            const timezoneValue = timezone.value || ""; // Extract the value property
+            await signup(email, password, timezoneValue);
+        } catch (error) {
+            console.log(error);
+            if (error.response) {
+                if (error.response.status === 409) {
+                    setError("Signup failed: Email already exists.");
+                } else if (error.response.status === 400) {
+                    setError(
+                        "Signup failed: Invalid email address or password."
+                    );
+                } else {
+                    setError("Signup failed: An unexpected error occurred.");
+                }
+            } else {
+                setError("Signup failed: An unexpected error occurred.");
+            }
+        }
     };
 
     return (
@@ -71,13 +94,11 @@ const AuthForm = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <select
+                    <TimezoneSelect
                         value={timezone}
-                        onChange={(e) => setTimezone(e.target.value)}
-                    >
-                        <option value="">Select Timezone</option>
-                        {/* Add timezone options here */}
-                    </select>
+                        onChange={(timezone) => setTimezone(timezone)}
+                    />
+                    {error && <div style={{ color: "red" }}>{error}</div>}
                     <button type="submit">Sign Up</button>
                 </form>
             )}

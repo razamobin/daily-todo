@@ -90,13 +90,17 @@ func getUserTimezoneAndCurrentTime(userID int) (string, time.Time, error) {
 
 // Fetch the most recent day_number from daily_todos for the user
 func getMostRecentDayNumberForUser(userID int) (int, error) {
-    var recentDayNumber int
-    err := db.QueryRow("SELECT MAX(day_number) FROM daily_todos WHERE user_id = ? and deleted = 0", userID).Scan(&recentDayNumber)
+    var recentDayNumber sql.NullInt64
+    err := db.QueryRow("SELECT COALESCE(MAX(day_number), 0) FROM daily_todos WHERE user_id = ? and deleted = 0", userID).Scan(&recentDayNumber)
     if err != nil {
         return 0, fmt.Errorf("failed to fetch most recent day_number: %w", err)
     }
 
-    return recentDayNumber, nil
+    if !recentDayNumber.Valid {
+        return 0, nil
+    }
+
+    return int(recentDayNumber.Int64), nil
 }
 
 // Copy todos from the most recent day to the current day
@@ -137,6 +141,11 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, error) {
     recentDayNumber, err := getMostRecentDayNumberForUser(userID)
     if err != nil {
         return nil, false, 0, err
+    }
+
+    if recentDayNumber == 0 {
+        // No todos found for the user, return empty list
+        return []Todo{}, false, 0, nil
     }
 
     currentDayNumber := calculateDayNumber(currentTime, userTimezone)
@@ -191,8 +200,8 @@ func main() {
     sessionManager.IdleTimeout = 20 * time.Minute
     sessionManager.Cookie.Name = "session_id"
     sessionManager.Cookie.HttpOnly = true
-    sessionManager.Cookie.Secure = true
-    sessionManager.Cookie.SameSite = http.SameSiteStrictMode
+    sessionManager.Cookie.Secure = false // Set to true in production
+    sessionManager.Cookie.SameSite = http.SameSiteLaxMode // set to strict mode in prod
 
     router := mux.NewRouter()
     router.HandleFunc("/api/signup", SignUpHandler).Methods("POST")
@@ -213,6 +222,10 @@ func main() {
     router.HandleFunc("/api/assistant-id", GetAssistantIDHandler).Methods("GET")
     router.HandleFunc("/api/save-assistant-id", SaveAssistantIDHandler).Methods("POST")
 
+    // New test endpoints
+    router.HandleFunc("/api/save-test", SaveTestHandler).Methods("GET")
+    router.HandleFunc("/api/read-test", ReadTestHandler).Methods("GET")
+
     sessionRouter := sessionManager.LoadAndSave(router)
 
     // Set up CORS headers
@@ -220,6 +233,7 @@ func main() {
         handlers.AllowedOrigins([]string{"http://localhost:3000"}),
         handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
         handlers.AllowedHeaders([]string{"Content-Type"}),
+        handlers.AllowCredentials(), // Allow credentials to be sent
     )
 
     fmt.Println("Starting server on :8080")
@@ -244,9 +258,20 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Invalid email address", http.StatusBadRequest)
         return
     }
-
     // Generate username from email
     username := credentials.Email[:atIndex]
+
+    // Check password length
+    if len(credentials.Password) < 6 {
+        http.Error(w, "Password must be at least 6 characters long", http.StatusBadRequest)
+        return
+    }
+
+    // Validate timezone
+    if _, err := time.LoadLocation(credentials.Timezone); err != nil {
+        http.Error(w, "Invalid timezone", http.StatusBadRequest)
+        return
+    }
 
     // Hash the password
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), bcrypt.DefaultCost)
@@ -268,6 +293,10 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "Failed to retrieve user ID", http.StatusInternalServerError)
         return
     }
+
+    // Set userID in the session
+    sessionManager.Put(r.Context(), "userID", int(userID))
+    log.Printf("User ID %d set in session", userID)
 
     // Create the user object to return
     user := User{
@@ -309,6 +338,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     sessionManager.Put(r.Context(), "userID", user.ID)
+    log.Printf("User ID %d set in session", user.ID)
 
     user.Password = ""
 
@@ -358,18 +388,12 @@ func LoggedInUserHandler(w http.ResponseWriter, r *http.Request) {
 
 // Example handler to get a session value
 func GetUserIDFromSession(r *http.Request) (int, error) {
-    /*
-    how to use
-        userID, err := GetUserIDFromSession(r)
-    if err != nil {
-        http.Error(w, "Unauthorized", http.StatusUnauthorized)
-        return
-    }
-    */
     userID, ok := sessionManager.Get(r.Context(), "userID").(int)
     if !ok {
+        log.Println("No user ID in session")
         return 0, fmt.Errorf("no user ID in session")
     }
+    log.Printf("Retrieved user ID %d from session", userID)
     return userID, nil
 }
 
@@ -554,7 +578,11 @@ func getLast7DaysTodos(userID int, upToDayNumber int) ([]map[string]interface{},
 }
 
 func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
-    userID := 1 // Replace with the actual user ID from the request context/session
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
 
     todos, newDay, newDayNumber, err := getRecentTodosForUser(userID)
     if err != nil {
@@ -581,7 +609,13 @@ func CreateOrUpdateTodayTodo(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    todo.UserID = 1 // Hardcoded for now, replace with actual user ID after authentication is added
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
+    todo.UserID = userID
 
     userTimezone, currentTime, err := getUserTimezoneAndCurrentTime(todo.UserID)
     if err != nil {
@@ -771,4 +805,24 @@ func SaveAssistantIDHandler(w http.ResponseWriter, r *http.Request) {
 
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("Assistant ID saved successfully"))
+}
+
+// New test endpoints
+func SaveTestHandler(w http.ResponseWriter, r *http.Request) {
+    sessionManager.Put(r.Context(), "test", "raza")
+    log.Println("Saved 'test' = 'raza' in session")
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Saved 'test' = 'raza' in session"))
+}
+
+func ReadTestHandler(w http.ResponseWriter, r *http.Request) {
+    testValue, ok := sessionManager.Get(r.Context(), "test").(string)
+    if !ok {
+        log.Println("No 'test' value found in session")
+        http.Error(w, "No 'test' value found in session", http.StatusNotFound)
+        return
+    }
+    log.Printf("Retrieved 'test' = '%s' from session", testValue)
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte(fmt.Sprintf("Retrieved 'test' = '%s' from session", testValue)))
 }

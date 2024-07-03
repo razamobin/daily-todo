@@ -48,11 +48,11 @@
             test blank slate experience, make sure it's intuitive
 
 NEXT JULY 2 2024
-    decide on react side what we should show when logged in. what to show when logged out
+    x decide on react side what we should show when logged in. what to show when logged out
     sign up form
     login form
     edit golang to do the correct thing or block depending on who the session logged in user is. look at every endpoint. get help from ai. can't edit todos that aren't yours.
-    profile page - username, email, password, timezone, user mission
+    profile page - username, email, update password, change timezone, add/edit user mission
     save sessions to redis!!!
         https://github.com/alexedwards/scs?tab=readme-ov-file
         https://github.com/alexedwards/scs/tree/master/redisstore
@@ -127,8 +127,12 @@ NEXT JULY 2 2024
 
     share on youtube. walkthrough the code, and how people can get it working locally
 
----
     unique key email in users table
+---
+    golang endpoint, get daily message from previous day. show most recent finalized day with date. ask user to finalize any day after that to get the new encouragement.
+
+    could ditch threads and start convo fresh daily, with the state latest of the checkboxes. so it reacts to what is there. it needs to understand that the state changes over the course of the day. and when the day is over, not much more will be checked, just a few nightime things. AI needs to be smarter / be prompted better
+        
 
     instead of user = null in react, user.email = 'anonymoususer@mailinator.com'
 

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 
 const AuthContext = createContext();
 
@@ -51,8 +51,23 @@ const AuthProvider = ({ children }) => {
         }
     };
 
+    const signup = async (email, password, timezone) => {
+        try {
+            const response = await axios.post(
+                "http://localhost:8080/api/signup",
+                { email, password, timezone }
+            );
+            const userData = response.data;
+            setUser(userData);
+            localStorage.setItem("user", JSON.stringify(userData));
+        } catch (error) {
+            console.error("Signup failed:", error);
+            throw error; // Rethrow the error to be caught by the calling function
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, logout }}>
+        <AuthContext.Provider value={{ user, login, logout, signup }}>
             {children}
         </AuthContext.Provider>
     );

@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import axios from "../axiosConfig";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 function TodoList({ todos, setTodos, onEditTodo }) {

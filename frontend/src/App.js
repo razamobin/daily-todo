@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "./context/AuthProvider";
-import axios from "axios";
+import axios from "./axiosConfig";
 import AddTodo from "./components/AddTodo";
 import UpdateTodo from "./components/UpdateTodo";
 import TodoList from "./components/TodoList";
