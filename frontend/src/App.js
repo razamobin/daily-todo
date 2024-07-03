@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { AuthContext } from "./context/AuthProvider";
+import { AppStateContext } from "./context/AppStateContext";
 import axios from "./axiosConfig";
 import AddTodo from "./components/AddTodo";
 import UpdateTodo from "./components/UpdateTodo";
@@ -12,10 +13,16 @@ import AuthForm from "./components/AuthForm";
 
 function App() {
     const { user, logout } = useContext(AuthContext);
-    const [todos, setTodos] = useState([]);
-    const [dailyMessage, setDailyMessage] = useState("");
-    const [isUpdateMode, setIsUpdateMode] = useState(false);
-    const [currentTodo, setCurrentTodo] = useState(null);
+    const {
+        todos,
+        setTodos,
+        dailyMessage,
+        setDailyMessage,
+        isUpdateMode,
+        setIsUpdateMode,
+        currentTodo,
+        setCurrentTodo,
+    } = useContext(AppStateContext);
 
     useEffect(() => {
         if (!user) return;
@@ -53,7 +60,7 @@ function App() {
                 fetchDailyMessage(response.data.new_day_number);
             })
             .catch((error) => console.error(error));
-    }, [user]);
+    }, [user, setTodos, setDailyMessage]);
 
     const handleEditTodo = (todo) => {
         setCurrentTodo(todo);

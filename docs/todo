@@ -59,9 +59,9 @@
     x add unique email key to db, error if try a dup
 
 NEXT July 3 2024
-    global state rest - have to reset daily message upon logout (or maybe login)
-        pick a good solution to this
-        reset todo list state, daily message state, add/update todo state, sign in form state, profile page state
+    x global state rest - have to reset daily message upon logout (or maybe login)
+        x pick a good solution to this
+        x reset todo list state, daily message state, add/update todo state, sign in form state, profile page state
 
     test sign up form for all the cases i put in my notes
 
@@ -76,6 +76,9 @@ NEXT July 3 2024
     more react edits - make call don't make backend call, depends if user logged in or not. send correct user id, not just 1 everytime
 
     edit golang to do the correct thing or block depending on who the session logged in user is. look at every endpoint. get help from ai. can't edit todos that aren't yours, etc
+
+    why is markdown creating big text for no reason in the middle of the paragraph
+        also skipped #. ask it to escape? # is why text got big, how to fix?
 
 ---
     sign up form - style

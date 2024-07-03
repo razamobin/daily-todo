@@ -1,5 +1,6 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 import axios from "../axiosConfig";
+import { AppStateContext } from "./AppStateContext";
 
 const AuthContext = createContext();
 
@@ -7,6 +8,7 @@ let globalLogout; // Define a top-level variable to hold the logout function
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const { resetAppState } = useContext(AppStateContext);
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -47,6 +49,7 @@ const AuthProvider = ({ children }) => {
         try {
             await axios.post("http://localhost:8080/api/logout");
             setUser(null);
+            resetAppState();
             localStorage.removeItem("user");
         } catch (error) {
             console.error("Logout failed:", error);
