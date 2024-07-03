@@ -1,6 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthProvider";
-import TimezoneSelect from "react-timezone-select";
+import { getTimeZones } from "@vvo/tzdb";
 
 const AuthForm = () => {
     const { login, signup } = useContext(AuthContext);
@@ -9,6 +9,13 @@ const AuthForm = () => {
     const [password, setPassword] = useState("");
     const [timezone, setTimezone] = useState({});
     const [error, setError] = useState("");
+
+    const timeZones = getTimeZones();
+
+    useEffect(() => {
+        const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        setTimezone(userTimeZone);
+    }, []);
 
     const handleToggleForm = () => {
         setIsLoginForm(!isLoginForm);
@@ -36,8 +43,7 @@ const AuthForm = () => {
             return;
         }
         try {
-            const timezoneValue = timezone.value || ""; // Extract the value property
-            await signup(email, password, timezoneValue);
+            await signup(email, password, timezone);
         } catch (error) {
             console.log(error);
             if (error.response) {
@@ -94,10 +100,19 @@ const AuthForm = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <TimezoneSelect
+                    <select
                         value={timezone}
-                        onChange={(timezone) => setTimezone(timezone)}
-                    />
+                        onChange={(e) => setTimezone(e.target.value)}
+                    >
+                        <option value="" disabled>
+                            Select Timezone
+                        </option>
+                        {timeZones.map((tz) => (
+                            <option key={tz.name} value={tz.name}>
+                                {tz.currentTimeFormat}
+                            </option>
+                        ))}
+                    </select>
                     {error && <div style={{ color: "red" }}>{error}</div>}
                     <button type="submit">Sign Up</button>
                 </form>

@@ -63,22 +63,23 @@ NEXT July 3 2024
         x pick a good solution to this
         x reset todo list state, daily message state, add/update todo state, sign in form state, profile page state
 
-    test sign up form for all the cases i put in my notes
+    x test sign up form for all the cases i put in my notes
 
     block sign up if no timezone selected!
         cannot be null / empty in db
         or save a default
+        or make it on a default - detect or just put LA pacific / New York
+
+    why is markdown creating big text for no reason in the middle of the paragraph
+        also skipped #. ask it to escape? # is why text got big, how to fix?
 
     save sessions to redis!!!
         https://github.com/alexedwards/scs?tab=readme-ov-file
         https://github.com/alexedwards/scs/tree/master/redisstore
 
-    more react edits - make call don't make backend call, depends if user logged in or not. send correct user id, not just 1 everytime
-
     edit golang to do the correct thing or block depending on who the session logged in user is. look at every endpoint. get help from ai. can't edit todos that aren't yours, etc
 
-    why is markdown creating big text for no reason in the middle of the paragraph
-        also skipped #. ask it to escape? # is why text got big, how to fix?
+    more react edits - make call don't make backend call, depends if user logged in or not. send correct user id, not just 1 everytime
 
 ---
     sign up form - style
