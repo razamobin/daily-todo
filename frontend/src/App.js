@@ -18,6 +18,31 @@ function App() {
     const [currentTodo, setCurrentTodo] = useState(null);
 
     useEffect(() => {
+        if (!user) return;
+        const fetchDailyMessage = (newDayNumber) => {
+            if (!user) return;
+            const eventSource = new EventSource(
+                `http://localhost:5001/api/daily-message?user_id=${user.id}&new_day_number=${newDayNumber}`
+            );
+
+            eventSource.onmessage = (event) => {
+                const unescapedMessage = event.data.replace(/\\n/g, "\n");
+                setDailyMessage(
+                    (prevMessage) => prevMessage + unescapedMessage
+                );
+            };
+
+            eventSource.addEventListener("end", function (event) {
+                console.log("Stream ended");
+                eventSource.close();
+            });
+
+            eventSource.onerror = (error) => {
+                console.error("Error fetching daily message:", error);
+                eventSource.close();
+            };
+        };
+
         axios
             .get("http://localhost:8080/api/todos")
             .then((response) => {
@@ -28,28 +53,7 @@ function App() {
                 fetchDailyMessage(response.data.new_day_number);
             })
             .catch((error) => console.error(error));
-    }, []);
-
-    const fetchDailyMessage = (newDayNumber) => {
-        const eventSource = new EventSource(
-            `http://localhost:5001/api/daily-message?user_id=1&new_day_number=${newDayNumber}`
-        );
-
-        eventSource.onmessage = (event) => {
-            const unescapedMessage = event.data.replace(/\\n/g, "\n");
-            setDailyMessage((prevMessage) => prevMessage + unescapedMessage);
-        };
-
-        eventSource.addEventListener("end", function (event) {
-            console.log("Stream ended");
-            eventSource.close();
-        });
-
-        eventSource.onerror = (error) => {
-            console.error("Error fetching daily message:", error);
-            eventSource.close();
-        };
-    };
+    }, [user]);
 
     const handleEditTodo = (todo) => {
         setCurrentTodo(todo);

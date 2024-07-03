@@ -197,7 +197,7 @@ func main() {
     // init session manager
     sessionManager = scs.New()
     sessionManager.Lifetime = 24 * time.Hour
-    sessionManager.IdleTimeout = 20 * time.Minute
+    sessionManager.IdleTimeout = 12 * time.Hour
     sessionManager.Cookie.Name = "session_id"
     sessionManager.Cookie.HttpOnly = true
     sessionManager.Cookie.Secure = false // Set to true in production

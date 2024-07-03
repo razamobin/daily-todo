@@ -3,6 +3,8 @@ import axios from "../axiosConfig";
 
 const AuthContext = createContext();
 
+let globalLogout; // Define a top-level variable to hold the logout function
+
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
@@ -51,6 +53,9 @@ const AuthProvider = ({ children }) => {
         }
     };
 
+    // Assign the logout function to the top-level variable
+    globalLogout = logout;
+
     const signup = async (email, password, timezone) => {
         try {
             const response = await axios.post(
@@ -73,4 +78,11 @@ const AuthProvider = ({ children }) => {
     );
 };
 
-export { AuthContext, AuthProvider };
+// Define a top-level logout function that calls the globalLogout function
+const topLevelLogout = () => {
+    if (globalLogout) {
+        globalLogout();
+    }
+};
+
+export { AuthContext, AuthProvider, topLevelLogout as logout };
