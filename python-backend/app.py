@@ -33,11 +33,13 @@ class GetUserMission(OpenAISchema):
     )
 
     def run(self):
+        token = os.getenv('BEARER_TOKEN', '')
+        headers = {'Authorization': f'Bearer {token}'}
         response = requests.get(
-            f'http://golang-backend:8080/api/user-mission?user_id={self.user_id}'
-        )
+            f'http://golang-backend:8080/api/user-mission?user_id={self.user_id}',
+            headers=headers)
         if response.status_code != 200:
-            return f"Error: Failed to fetch latest thread ID, Status Code: {response.status_code}"
+            return f"Error: Failed to fetch the user mission, Status Code: {response.status_code}"
         else:
             return json.dumps(response.json())
 

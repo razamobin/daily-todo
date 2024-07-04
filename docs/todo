@@ -192,6 +192,8 @@ NEXT July 3 2024
         GetAssistantIDHandler, SaveAssistantIDHandler -> i think only python hits these, need some authentication so that random people cannot hit them
             could make create assistant a one off script instead of an endpoint. get assistant, fine anyone can get it lol. no one cares
 
+        make a .env.example
+
 ---
 
     the AI assistant guides you to using the site

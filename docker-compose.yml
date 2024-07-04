@@ -1,92 +1,95 @@
 services:
-  mysql:
-    build: ./mysql
-    container_name: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: todo_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./mysql/conf.d:/etc/mysql/conf.d  # Mount custom MySQL configuration
-    networks:
-      - todo-net
+    mysql:
+        build: ./mysql
+        container_name: mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: rootpassword
+            MYSQL_DATABASE: todo_db
+            MYSQL_USER: user
+            MYSQL_PASSWORD: password
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+            - ./mysql/conf.d:/etc/mysql/conf.d # Mount custom MySQL configuration
+        networks:
+            - todo-net
 
-  golang-backend:
-    build: ./golang-backend
-    container_name: golang-backend
-    ports:
-      - "8080:8080"
-    depends_on:
-      - mysql
-      - redis
-    networks:
-      - todo-net
-    environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+    golang-backend:
+        build: ./golang-backend
+        container_name: golang-backend
+        ports:
+            - "8080:8080"
+        depends_on:
+            - mysql
+            - redis
+        networks:
+            - todo-net
+        environment:
+            - REDIS_HOST=redis
+            - REDIS_PORT=6379
+            - BEARER_TOKEN=${BEARER_TOKEN}
 
-  python-backend:
-    build: ./python-backend
-    container_name: python-backend
-    env_file:
-      - .env
-    ports:
-      - "5001:5001"
-    networks:
-      - todo-net
+    python-backend:
+        build: ./python-backend
+        container_name: python-backend
+        env_file:
+            - .env
+        ports:
+            - "5001:5001"
+        networks:
+            - todo-net
+        environment:
+            - BEARER_TOKEN=${BEARER_TOKEN}
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
-    container_name: frontend-app
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    networks:
-      - todo-net
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile.dev
+        container_name: frontend-app
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./frontend:/app
+            - /app/node_modules
+        environment:
+            - CHOKIDAR_USEPOLLING=true
+        networks:
+            - todo-net
 
-  flyway:
-    image: flyway/flyway
-    entrypoint: [
-      "flyway",
-      "-url=jdbc:mysql://mysql:3306/todo_db?useSSL=false&allowPublicKeyRetrieval=true",
-      "-user=user",
-      "-password=password",
-      "-baselineOnMigrate=true",
-      "-locations=filesystem:/flyway/sql",
-      "migrate"
-    ]
-    volumes:
-      - ./migrations:/flyway/sql
-    depends_on:
-      - mysql
-    networks:
-      - todo-net
+    flyway:
+        image: flyway/flyway
+        entrypoint:
+            [
+                "flyway",
+                "-url=jdbc:mysql://mysql:3306/todo_db?useSSL=false&allowPublicKeyRetrieval=true",
+                "-user=user",
+                "-password=password",
+                "-baselineOnMigrate=true",
+                "-locations=filesystem:/flyway/sql",
+                "migrate",
+            ]
+        volumes:
+            - ./migrations:/flyway/sql
+        depends_on:
+            - mysql
+        networks:
+            - todo-net
 
-  redis:
-    image: redis:7.2-alpine
-    container_name: redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - todo-net
+    redis:
+        image: redis:7.2-alpine
+        container_name: redis
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+        networks:
+            - todo-net
 
 networks:
-  todo-net:
-    driver: bridge
+    todo-net:
+        driver: bridge
 
 volumes:
-  mysql_data:
-  redis_data:
-
+    mysql_data:
+    redis_data:

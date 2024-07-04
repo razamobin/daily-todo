@@ -514,6 +514,14 @@ func GetLatestThreadIDHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
+    // Bearer token check
+    token := os.Getenv("BEARER_TOKEN")
+    authHeader := r.Header.Get("Authorization")
+    if authHeader == "" || authHeader != "Bearer "+token {
+        http.Error(w, "Unauthorized", http.StatusUnauthorized)
+        return
+    }
+
     userIDStr := r.URL.Query().Get("user_id")
     if userIDStr == "" {
         http.Error(w, "user_id is required", http.StatusBadRequest)
