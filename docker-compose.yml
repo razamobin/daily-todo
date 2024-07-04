@@ -22,8 +22,12 @@ services:
       - "8080:8080"
     depends_on:
       - mysql
+      - redis
     networks:
       - todo-net
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
 
   python-backend:
     build: ./python-backend
@@ -68,9 +72,21 @@ services:
     networks:
       - todo-net
 
+  redis:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - todo-net
+
 networks:
   todo-net:
     driver: bridge
 
 volumes:
   mysql_data:
+  redis_data:
+

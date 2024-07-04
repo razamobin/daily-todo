@@ -6,14 +6,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
 
+	"github.com/alexedwards/scs/redisstore"
 	"github.com/alexedwards/scs/v2"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
@@ -194,8 +197,22 @@ func main() {
         log.Fatal(err)
     }
 
+    redisHost := os.Getenv("REDIS_HOST")
+    redisPort := os.Getenv("REDIS_PORT")
+    redisAddr := fmt.Sprintf("%s:%s", redisHost, redisPort)
+
+    // Initialize Redis pool
+    pool := &redis.Pool{
+        MaxIdle:   10,
+        MaxActive: 10,
+        Dial: func() (redis.Conn, error) {
+            return redis.Dial("tcp", redisAddr)
+        },
+    }
+
     // init session manager
     sessionManager = scs.New()
+    sessionManager.Store = redisstore.New(pool)
     sessionManager.Lifetime = 24 * time.Hour
     sessionManager.IdleTimeout = 12 * time.Hour
     sessionManager.Cookie.Name = "session_id"
