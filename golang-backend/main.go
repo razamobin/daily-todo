@@ -239,10 +239,6 @@ func main() {
     router.HandleFunc("/api/assistant-id", GetAssistantIDHandler).Methods("GET")
     router.HandleFunc("/api/save-assistant-id", SaveAssistantIDHandler).Methods("POST")
 
-    // New test endpoints
-    router.HandleFunc("/api/save-test", SaveTestHandler).Methods("GET")
-    router.HandleFunc("/api/read-test", ReadTestHandler).Methods("GET")
-
     sessionRouter := sessionManager.LoadAndSave(router)
 
     // Set up CORS headers
@@ -419,6 +415,12 @@ func GetUserIDFromSession(r *http.Request) (int, error) {
 }
 
 func UpdateSortIndexesHandler(w http.ResponseWriter, r *http.Request) {
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
     var updates map[int]int // Maps daily_todo ID to new sort_index
     if err := json.NewDecoder(r.Body).Decode(&updates); err != nil {
         http.Error(w, "Invalid request payload", http.StatusBadRequest)
@@ -426,7 +428,7 @@ func UpdateSortIndexesHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     for id, newIndex := range updates {
-        _, err := db.Exec("UPDATE daily_todos SET sort_index = ? WHERE id = ?", newIndex, id)
+        _, err := db.Exec("UPDATE daily_todos SET sort_index = ? WHERE id = ? AND user_id = ?", newIndex, id, userID)
         if err != nil {
             http.Error(w, fmt.Sprintf("Failed to update sort_index for todo ID %d: %v", id, err), http.StatusInternalServerError)
             return
@@ -439,15 +441,9 @@ func UpdateSortIndexesHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func GetUserFirstNameHandler(w http.ResponseWriter, r *http.Request) {
-    userIDStr := r.URL.Query().Get("user_id")
-    if userIDStr == "" {
-        http.Error(w, "user_id is required", http.StatusBadRequest)
-        return
-    }
-
-    userID, err := strconv.Atoi(userIDStr)
+    userID, err := GetUserIDFromSession(r)
     if err != nil {
-        http.Error(w, "invalid user_id", http.StatusBadRequest)
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
         return
     }
 
@@ -469,8 +465,13 @@ func GetUserFirstNameHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SaveUserThreadHandler(w http.ResponseWriter, r *http.Request) {
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
     var input struct {
-        UserID   int    `json:"user_id"`
         ThreadID string `json:"thread_id"`
     }
 
@@ -479,11 +480,11 @@ func SaveUserThreadHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err := db.Exec(`
+    _, err = db.Exec(`
         INSERT INTO user_threads (user_id, thread_id, created_at, updated_at)
         VALUES (?, ?, NOW(), NOW())
         ON DUPLICATE KEY UPDATE updated_at = NOW()`,
-        input.UserID, input.ThreadID)
+        userID, input.ThreadID)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to save user thread: %v", err), http.StatusInternalServerError)
         return
@@ -495,14 +496,14 @@ func SaveUserThreadHandler(w http.ResponseWriter, r *http.Request) {
 
 
 func GetLatestThreadIDHandler(w http.ResponseWriter, r *http.Request) {
-    userID := r.URL.Query().Get("user_id")
-    if userID == "" {
-        http.Error(w, "user_id is required", http.StatusBadRequest)
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
         return
     }
 
     var threadID *string
-    err := db.QueryRow("SELECT thread_id FROM user_threads WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", userID).Scan(&threadID)
+    err = db.QueryRow("SELECT thread_id FROM user_threads WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", userID).Scan(&threadID)
     if err != nil {
         if err == sql.ErrNoRows {
             response := map[string]*string{"thread_id": nil}
@@ -521,15 +522,9 @@ func GetLatestThreadIDHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
-    userIDStr := r.URL.Query().Get("user_id")
-    if userIDStr == "" {
-        http.Error(w, "user_id is required", http.StatusBadRequest)
-        return
-    }
-
-    userID, err := strconv.Atoi(userIDStr)
+    userID, err := GetUserIDFromSession(r)
     if err != nil {
-        http.Error(w, "invalid user_id", http.StatusBadRequest)
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
         return
     }
 
@@ -680,7 +675,13 @@ func DeleteTodoHandler(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
     id := vars["id"]
 
-    _, err := db.Exec("UPDATE daily_todos SET deleted = TRUE WHERE id = ?", id)
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
+    _, err = db.Exec("UPDATE daily_todos SET deleted = TRUE WHERE id = ? AND user_id = ?", id, userID)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to delete todo: %v", err), http.StatusInternalServerError)
         return
@@ -695,15 +696,21 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
     id := vars["id"]
 
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
     var todo Todo
     if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
         http.Error(w, err.Error(), http.StatusBadRequest)
         return
     }
 
-    // Fetch the current status and goal from the database
+        // Fetch the current status and goal from the database
     var currentStatus, currentGoal int
-    err := db.QueryRow("SELECT status, goal FROM daily_todos WHERE id = ? AND deleted = 0", id).Scan(&currentStatus, &currentGoal)
+    err = db.QueryRow("SELECT status, goal FROM daily_todos WHERE id = ? AND user_id = ? AND deleted = 0", id, userID).Scan(&currentStatus, &currentGoal)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to fetch current todo: %v", err), http.StatusInternalServerError)
         return
@@ -714,7 +721,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
         todo.Status = todo.Goal
     }
 
-    _, err = db.Exec("UPDATE daily_todos SET title = ?, status = ?, goal = ? WHERE id = ?", todo.Title, todo.Status, todo.Goal, id)
+    _, err = db.Exec("UPDATE daily_todos SET title = ?, status = ?, goal = ? WHERE id = ? AND user_id = ?", todo.Title, todo.Status, todo.Goal, id, userID)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
@@ -725,8 +732,13 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func SaveAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
     var input struct {
-        UserID    int    `json:"user_id"`
         DayNumber int    `json:"day_number"`
         Message   string `json:"message"`
     }
@@ -736,10 +748,10 @@ func SaveAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err := db.Exec(`
+    _, err = db.Exec(`
         INSERT INTO saved_assistant_messages (user_id, day_number, message, created_at)
         VALUES (?, ?, ?, NOW())`,
-        input.UserID, input.DayNumber, input.Message)
+        userID, input.DayNumber, input.Message)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to save assistant message: %v", err), http.StatusInternalServerError)
         return
@@ -750,17 +762,15 @@ func SaveAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetSavedAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
-    userIDStr := r.URL.Query().Get("user_id")
-    dayNumberStr := r.URL.Query().Get("day_number")
-
-    if userIDStr == "" || dayNumberStr == "" {
-        http.Error(w, "user_id and day_number are required", http.StatusBadRequest)
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
         return
     }
 
-    userID, err := strconv.Atoi(userIDStr)
-    if err != nil {
-        http.Error(w, "invalid user_id", http.StatusBadRequest)
+    dayNumberStr := r.URL.Query().Get("day_number")
+    if dayNumberStr == "" {
+        http.Error(w, "day_number is required", http.StatusBadRequest)
         return
     }
 
@@ -826,24 +836,4 @@ func SaveAssistantIDHandler(w http.ResponseWriter, r *http.Request) {
 
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("Assistant ID saved successfully"))
-}
-
-// New test endpoints
-func SaveTestHandler(w http.ResponseWriter, r *http.Request) {
-    sessionManager.Put(r.Context(), "test", "raza")
-    log.Println("Saved 'test' = 'raza' in session")
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("Saved 'test' = 'raza' in session"))
-}
-
-func ReadTestHandler(w http.ResponseWriter, r *http.Request) {
-    testValue, ok := sessionManager.Get(r.Context(), "test").(string)
-    if !ok {
-        log.Println("No 'test' value found in session")
-        http.Error(w, "No 'test' value found in session", http.StatusNotFound)
-        return
-    }
-    log.Printf("Retrieved 'test' = '%s' from session", testValue)
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte(fmt.Sprintf("Retrieved 'test' = '%s' from session", testValue)))
 }

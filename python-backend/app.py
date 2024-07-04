@@ -33,40 +33,45 @@ class GetUserMission(OpenAISchema):
     )
 
     def run(self):
-        response = requests.get(
-            f'http://golang-backend:8080/api/user-mission?user_id={self.user_id}'
-        )
+        response = forward_request_with_session_cookie(
+            f'http://golang-backend:8080/api/user-mission')
         if response.status_code != 200:
             return f"Error: Failed to fetch latest thread ID, Status Code: {response.status_code}"
         else:
             return json.dumps(response.json())
 
 
-def wprint(*args, width=70, **kwargs):
-    """
-    Custom print function that wraps text to a specified width.
-
-    Args:
-    *args: Variable length argument list.
-    width (int): The maximum width of wrapped lines.
-    **kwargs: Arbitrary keyword arguments.
-    """
-    wrapper = textwrap.TextWrapper(width=width)
-
-    # Process all arguments to make sure they are strings and wrap them
-    wrapped_args = [wrapper.fill(str(arg)) for arg in args]
-
-    # Call the built-in print function with the wrapped text
-    builtins.print(*wrapped_args, **kwargs)
-
-
 app = Flask(__name__)
-CORS(app)
+CORS(app, supports_credentials=True)
+
+
+def forward_request_with_session_cookie(url, method='GET', json=None):
+    session_cookie = request.cookies.get('session_id')
+    headers = {}
+    if session_cookie:
+        headers['Cookie'] = f'session_id={session_cookie}'
+
+    if method == 'GET':
+        return requests.get(url, headers=headers)
+    elif method == 'POST':
+        return requests.post(url, headers=headers, json=json)
+    else:
+        raise ValueError(f"Unsupported method: {method}")
+    # Add other methods if needed
 
 
 @app.route('/')
 def home():
-    return jsonify(message="Hello from the Python backend!")
+    response = forward_request_with_session_cookie(
+        'http://golang-backend:8080/api/logged-in-user')
+    if response.status_code != 200:
+        print('home')
+        print(response.status_code)
+        return jsonify(
+            error="Failed to fetch logged in user"), response.status_code
+    print(response.json())
+    return jsonify(message="Hello from the Python backend!",
+                   user=response.json())
 
 
 def get_completion_stream(client, message, agent, funcs, thread, q,
@@ -140,7 +145,7 @@ def get_completion_stream(client, message, agent, funcs, thread, q,
             self.function_name = tool_call.function.name
             self.tool_id = tool_call.id
             print(
-                f"\on_tool_call_created > run_step.status > {self.run_step.status}"
+                f"\non_tool_call_created > run_step.status > {self.run_step.status}"
             )
 
             print(f"\nassistant > {tool_call.type} {self.function_name}\n",
@@ -248,6 +253,7 @@ def get_completion_stream(client, message, agent, funcs, thread, q,
 
 @app.route('/api/daily-message', methods=['GET'])
 def daily_message():
+    # TODO call /api/get-logged-in-user to get current user. forward session cookies of course
     user_id_str: str = request.args.get('user_id', '')
     new_day_number_str: str = request.args.get('new_day_number', '')
     if not user_id_str or user_id_str == '':
@@ -266,8 +272,8 @@ def daily_message():
         return jsonify(error="new_day_number must be an integer"), 400
 
     # Check if a message already exists for the given user_id and new_day_number
-    response = requests.get(
-        f'http://golang-backend:8080/api/get-saved-assistant-message?user_id={user_id}&day_number={new_day_number}'
+    response = forward_request_with_session_cookie(
+        f'http://golang-backend:8080/api/get-saved-assistant-message?day_number={new_day_number}'
     )
     if response.status_code == 200:
         existing_message = response.json().get('message')
@@ -285,8 +291,8 @@ def daily_message():
             error="Failed to check for existing message"), response.status_code
 
     # Fetch the user's first name
-    response = requests.get(
-        f'http://golang-backend:8080/api/user-first-name?user_id={user_id}')
+    response = forward_request_with_session_cookie(
+        f'http://golang-backend:8080/api/user-first-name')
     if response.status_code != 200:
         return jsonify(
             error="Failed to fetch user's first name"), response.status_code
@@ -295,8 +301,8 @@ def daily_message():
     if not first_name:
         return jsonify(error="User's first name not found"), 404
 
-    response = requests.get(
-        f'http://golang-backend:8080/api/latest-thread?user_id={user_id}')
+    response = forward_request_with_session_cookie(
+        f'http://golang-backend:8080/api/latest-thread')
     if response.status_code != 200:
         return jsonify(
             error="Failed to fetch latest thread ID"), response.status_code
@@ -317,8 +323,9 @@ def daily_message():
         thread_id = thread.id
         print(f"thread_id: {thread_id}")
         # Save thread id to db for this user
-        save_thread_response = requests.post(
+        save_thread_response = forward_request_with_session_cookie(
             'http://golang-backend:8080/api/user-thread',
+            method='POST',
             json={
                 'user_id': user_id,
                 'thread_id': thread_id
@@ -328,7 +335,8 @@ def daily_message():
                            ), save_thread_response.status_code
 
     # get openai assistant
-    response = requests.get('http://golang-backend:8080/api/assistant-id')
+    response = forward_request_with_session_cookie(
+        'http://golang-backend:8080/api/assistant-id')
     if response.status_code != 200:
         return jsonify(
             error="Failed to fetch assistant ID"), response.status_code
@@ -369,8 +377,9 @@ def daily_message():
         full_message = full_message_queue.get(block=True)
 
         # Save the full message to the database
-        save_message_response = requests.post(
+        save_message_response = forward_request_with_session_cookie(
             'http://golang-backend:8080/api/save-assistant-message',
+            method='POST',
             json={
                 'user_id': user_id,
                 'day_number': new_day_number,
@@ -389,7 +398,8 @@ def daily_message():
 def create_assistant():
 
     # Check if an assistant already exists in the database
-    response = requests.get('http://golang-backend:8080/api/assistant-id')
+    response = forward_request_with_session_cookie(
+        'http://golang-backend:8080/api/assistant-id')
     if response.status_code == 200:
         assistant_id = response.json().get('assistant_id')
         if assistant_id:
@@ -436,8 +446,9 @@ def create_assistant():
     assistant_id = eternal_optimist.id
 
     # Save the assistant_id to the MySQL database
-    response = requests.post(
+    response = forward_request_with_session_cookie(
         'http://golang-backend:8080/api/save-assistant-id',
+        method='POST',
         json={'assistant_id': assistant_id})
     if response.status_code != 200:
         return jsonify(
@@ -445,46 +456,6 @@ def create_assistant():
 
     return jsonify(message="Assistant created successfully",
                    assistant_id=assistant_id)
-
-
-@app.route('/api/cancel-active-runs', methods=['POST'])
-def cancel_active_runs():
-    if not request.is_json:
-        return jsonify(error="Request must be JSON"), 400
-
-    data = request.get_json()
-    user_id_str = data.get('user_id',
-                           '')  # Ensure data is not None and get user_id
-
-    if not user_id_str:
-        return jsonify(error="user_id is required"), 400
-
-    try:
-        user_id: int = int(user_id_str)  # Convert user_id to an integer
-    except ValueError:
-        return jsonify(error="user_id must be an integer"), 400
-
-    # Fetch the thread ID for the user
-    response = requests.get(
-        f'http://golang-backend:8080/api/latest-thread?user_id={user_id}')
-    if response.status_code != 200:
-        return jsonify(
-            error="Failed to fetch latest thread ID"), response.status_code
-
-    thread_id = response.json().get('thread_id')
-    if not thread_id:
-        return jsonify(error="No thread found for the user"), 404
-
-    client = Client(api_key=os.getenv('OPENAI_API_KEY'))
-
-    # Check for active runs and cancel them
-    active_runs = client.beta.threads.runs.list(thread_id=thread_id)
-    for run in active_runs.data:
-        if run.status in ['queued', 'in_progress']:
-            client.beta.threads.runs.cancel(thread_id=thread_id, run_id=run.id)
-
-    return jsonify(message="Active runs cancelled successfully",
-                   thread_id=thread_id)
 
 
 if __name__ == '__main__':

@@ -29,7 +29,8 @@ function App() {
         const fetchDailyMessage = (newDayNumber) => {
             if (!user) return;
             const eventSource = new EventSource(
-                `http://localhost:5001/api/daily-message?user_id=${user.id}&new_day_number=${newDayNumber}`
+                `http://localhost:5001/api/daily-message?user_id=${user.id}&new_day_number=${newDayNumber}`,
+                { withCredentials: true }
             );
 
             eventSource.onmessage = (event) => {

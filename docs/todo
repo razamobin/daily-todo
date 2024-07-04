@@ -58,6 +58,9 @@
 
     x add unique email key to db, error if try a dup
 
+    x more react edits - make call don't make backend call, depends if user logged in or not. send correct user id, not just 1 everytime
+        x i think we're good
+
 NEXT July 3 2024
     x global state rest - have to reset daily message upon logout (or maybe login)
         x pick a good solution to this
@@ -86,64 +89,28 @@ NEXT July 3 2024
         +----+-------------------------------+---------------------+---------------------+
         2 rows in set (0.01 sec)
 
-    save sessions to redis!!!
+    x save sessions to redis!!!
         https://github.com/alexedwards/scs?tab=readme-ov-file
         https://github.com/alexedwards/scs/tree/master/redisstore
 
-    edit golang to do the correct thing or block depending on who the session logged in user is. look at every endpoint. get help from ai. can't edit todos that aren't yours, etc
+    *edit golang to do the correct thing or block depending on who the session logged in user is. look at every endpoint. get help from ai. can't edit todos that aren't yours, etc
+        make list of all services, and think about each one. what kind of "logged in user" guard should i add to each service?
 
-    more react edits - make call don't make backend call, depends if user logged in or not. send correct user id, not just 1 everytime
-
----
-    sign up form - style
-
-    login form - style
-
-    profile page - username, email, update password, change timezone, add/edit user mission
+        remove user_id from being sent by python to golang in all / almost all cases. send session cookie instead and golang will see what user is logged in (if any)
 
 ---
-    *make it live in prod
-        user sign up. enter display name, email, password, select timezone
+    *sign up form - style
 
-        user login
+    *login form - style
 
-        logout
+    *profile page - username, email, update password, change timezone, add/edit user mission
+        link
 
-        *profile page or modal to edit info/timezone/mission
+    *style hello
 
-        user login sessions
+    *style / place logout button
 
-        prod config - cookies secure true, strict on same site, etc. uwsgi.
-
-        domains
-            dailytodos.ai - main domain
-            dailytodo.ai - buy and it redirects
-            samethingeveryday.ai
-
-        add security on all these golang endpoints. cant just post and edit other people's lists lol. or get other people's missions/data
-            login session cookie
-
-    let anon users fill in all their info
-        create a temp user in db, tmp user login session
-        create their todos
-        check off their todos
-        display name
-        their mission
-        email
-        password
-
-        100 test users. test1@mailinator.com test1 to 100. login and play around, kick the tires.
-
-        create a skool login link. has tasks there. could be my tasks i would do at skool lol. very clever. hey skool, my name is raza, i build this todo app for myself. backend engineer 16 years. using ai to buld full stack. shows my appraoch to coding and ui/ux. here's the source. ai integration. would love to chat more if you think i'd be a good fit.
-
-            hypothetical skool todo list for raza
-                design real time chat for skool communities. web sockets
-                1 hour ai study to improve dev productivity
-                fix bug with ...
-                improve stats calculation speed
-                redesign notifications system
-            always do your homework
-
+---
     *concept of "finalize" the current day or most recent previous day
         before ai get's today's message it asks you to make final edits to previous day and submit
             reflect on previous day. what you did good. what could be better. any special notes you have on the day. final edit of checkboxes, submit. then you get new AI message for today :)
@@ -176,7 +143,49 @@ NEXT July 3 2024
 
     share on youtube. walkthrough the code, and how people can get it working locally
 
-    unique key email in users table
+---
+    *make it live in prod
+        *profile page or modal to edit info/timezone/mission
+
+        prod config - cookies secure true, strict on same site, etc. uwsgi.
+
+        domains
+            dailytodos.ai - main domain
+            dailytodo.ai - buy and it redirects
+            samethingeveryday.ai
+
+
+
+    let anon users fill in all their info
+            create a temp user in db, tmp user login session
+            create their todos
+            check off their todos
+            display name
+            their mission
+            email
+            password
+
+            100 test users. test1@mailinator.com test1 to 100. login and play around, kick the tires.
+
+            create a skool login link. has tasks there. could be my tasks i would do at skool lol. very clever. hey skool, my name is raza, i build this todo app for myself. backend engineer 16 years. using ai to buld full stack. shows my appraoch to coding and ui/ux. here's the source. ai integration. would love to chat more if you think i'd be a good fit.
+
+                hypothetical skool todo list for raza
+                    design real time chat for skool communities. web sockets
+                    1 hour ai study to improve dev productivity
+                    fix bug with ...
+                    improve stats calculation speed
+                    redesign notifications system
+                always do your homework
+
+
+---
+    tech clean up
+        CreateOrUpdateTodayTodo
+            impossible to update, there is no such thing as duplicate because there is no unique key. change name and sql insert/update query
+
+        GetAssistantIDHandler, SaveAssistantIDHandler -> i think only python hits these, need some authentication so that random people cannot hit them
+            could make create assistant a one off script instead of an endpoint. get assistant, fine anyone can get it lol. no one cares
+
 ---
 
     the AI assistant guides you to using the site
