@@ -268,9 +268,13 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     // Validate timezone
-    if _, err := time.LoadLocation(credentials.Timezone); err != nil {
-        http.Error(w, "Invalid timezone", http.StatusBadRequest)
-        return
+    credentials.Timezone = strings.TrimSpace(credentials.Timezone)
+    if credentials.Timezone == "" {
+        log.Printf("Empty or whitespace-only timezone provided. Defaulting to America/Los_Angeles")
+        credentials.Timezone = "America/Los_Angeles"
+    } else if _, err := time.LoadLocation(credentials.Timezone); err != nil {
+        log.Printf("Invalid timezone provided: %s. Defaulting to America/Los_Angeles", credentials.Timezone)
+        credentials.Timezone = "America/Los_Angeles"
     }
 
     // Hash the password
