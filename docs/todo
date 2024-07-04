@@ -65,13 +65,26 @@ NEXT July 3 2024
 
     x test sign up form for all the cases i put in my notes
 
-    block sign up if no timezone selected!
-        cannot be null / empty in db
-        or save a default
-        or make it on a default - detect or just put LA pacific / New York
+    x block sign up if no timezone selected!
+        x cannot be null / empty in db
+        x or save a default
+        x or make it on a default - detect or just put LA pacific / New York
 
     why is markdown creating big text for no reason in the middle of the paragraph
         also skipped #. ask it to escape? # is why text got big, how to fix?
+
+                UPDATE saved_assistant_messages
+        SET message = REPLACE(message, '#', '\\#')
+        WHERE user_id = 1 and message LIKE '%#%';
+            
+            mysql> select * from assistants;
+        +----+-------------------------------+---------------------+---------------------+
+        | id | assistant_id                  | created_at          | updated_at          |
+        +----+-------------------------------+---------------------+---------------------+
+        |  1 | asst_ECwIWvLMiOvwMYeBA5wNy3Yd | 2024-07-01 14:54:45 | 2024-07-01 15:23:24 |
+        |  2 | asst_vJIhQzXEr9QaaQDx16GHE2HM | 2024-07-01 15:22:03 | 2024-07-01 15:22:03 |
+        +----+-------------------------------+---------------------+---------------------+
+        2 rows in set (0.01 sec)
 
     save sessions to redis!!!
         https://github.com/alexedwards/scs?tab=readme-ov-file
@@ -165,6 +178,15 @@ NEXT July 3 2024
 
     unique key email in users table
 ---
+
+    the AI assistant guides you to using the site
+        add some todos
+        fill in your mission here - link to profile page
+        you can add info to each todo, notes for the day. why it's important to your mission
+        you can finalize your day then i can incorporate it into my feedback officially! let me know how far you got!
+        hand holds. intro to the site. intelligent, not just hardcoded steps. personality. tailored to you. conversation with you.
+            knows how the site works inside and out, and helps you get the most out of it.
+
     golang endpoint, get daily message from previous day. show most recent finalized day with date. ask user to finalize any day after that to get the new encouragement.
 
     could ditch threads and start convo fresh daily, with the state latest of the checkboxes. so it reacts to what is there. it needs to understand that the state changes over the course of the day. and when the day is over, not much more will be checked, just a few nightime things. AI needs to be smarter / be prompted better
