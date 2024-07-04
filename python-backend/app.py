@@ -33,8 +33,9 @@ class GetUserMission(OpenAISchema):
     )
 
     def run(self):
-        response = forward_request_with_session_cookie(
-            f'http://golang-backend:8080/api/user-mission')
+        response = requests.get(
+            f'http://golang-backend:8080/api/user-mission?user_id={self.user_id}'
+        )
         if response.status_code != 200:
             return f"Error: Failed to fetch latest thread ID, Status Code: {response.status_code}"
         else:
@@ -253,25 +254,36 @@ def get_completion_stream(client, message, agent, funcs, thread, q,
 
 @app.route('/api/daily-message', methods=['GET'])
 def daily_message():
-    # TODO call /api/get-logged-in-user to get current user. forward session cookies of course
-    user_id_str: str = request.args.get('user_id', '')
+    # Get the logged-in user
+    response = forward_request_with_session_cookie(
+        'http://golang-backend:8080/api/logged-in-user')
+    if response.status_code == 401:
+
+        @stream_with_context
+        def generate():
+            yield "event: end\ndata: END\n\n"
+
+        return Response(generate(), content_type='text/event-stream')
+    elif response.status_code != 200:
+        return jsonify(
+            error="Failed to fetch logged in user"), response.status_code
+
+    user_data = response.json()
+    user_id = user_data.get('id')
+    if not user_id:
+        return jsonify(error="User ID not found"), 400
+
     new_day_number_str: str = request.args.get('new_day_number', '')
-    if not user_id_str or user_id_str == '':
-        return jsonify(error="user_id is required"), 400
     if not new_day_number_str or new_day_number_str == '':
         return jsonify(error="new_day_number is required"), 400
 
-    try:
-        user_id: int = int(user_id_str)  # Convert user_id to an integer
-    except ValueError:
-        return jsonify(error="user_id must be an integer"), 400
     try:
         new_day_number: int = int(
             new_day_number_str)  # Convert new_day_number to an integer
     except ValueError:
         return jsonify(error="new_day_number must be an integer"), 400
 
-    # Check if a message already exists for the given user_id and new_day_number
+    # Check if a message already exists for the given user and new_day_number
     response = forward_request_with_session_cookie(
         f'http://golang-backend:8080/api/get-saved-assistant-message?day_number={new_day_number}'
     )
@@ -326,10 +338,7 @@ def daily_message():
         save_thread_response = forward_request_with_session_cookie(
             'http://golang-backend:8080/api/user-thread',
             method='POST',
-            json={
-                'user_id': user_id,
-                'thread_id': thread_id
-            })
+            json={'thread_id': thread_id})
         if save_thread_response.status_code != 200:
             return jsonify(error="Failed to save thread ID"
                            ), save_thread_response.status_code
@@ -381,7 +390,6 @@ def daily_message():
             'http://golang-backend:8080/api/save-assistant-message',
             method='POST',
             json={
-                'user_id': user_id,
                 'day_number': new_day_number,
                 'message': full_message
             })
@@ -435,7 +443,7 @@ def create_assistant():
          """Always return your messages in markdown format. """
          """Be sure to escape special characters when referencing a user's todo items to avoid formatting issues."""
          ),
-        model="gpt-4o",
+        model="gpt-3.5-turbo",
         tools=[
             {
                 "type": "function",

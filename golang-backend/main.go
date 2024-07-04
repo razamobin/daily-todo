@@ -376,15 +376,7 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 func LoggedInUserHandler(w http.ResponseWriter, r *http.Request) {
     userID, err := GetUserIDFromSession(r)
     if err != nil {
-        // Return a mock user if not logged in
-        anonymousUser := User{
-            ID:       0,
-            Email:    "anonymoususer@mailinator.com",
-            Timezone: "America/Los_Angeles",
-            Username: "anonymoususer",
-        }
-        w.Header().Set("Content-Type", "application/json")
-        json.NewEncoder(w).Encode(anonymousUser)
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
         return
     }
 
@@ -522,9 +514,15 @@ func GetLatestThreadIDHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
-    userID, err := GetUserIDFromSession(r)
+    userIDStr := r.URL.Query().Get("user_id")
+    if userIDStr == "" {
+        http.Error(w, "user_id is required", http.StatusBadRequest)
+        return
+    }
+
+    userID, err := strconv.Atoi(userIDStr)
     if err != nil {
-        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        http.Error(w, "invalid user_id", http.StatusBadRequest)
         return
     }
 
