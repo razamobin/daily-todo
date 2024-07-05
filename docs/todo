@@ -93,23 +93,24 @@ NEXT July 3 2024
         https://github.com/alexedwards/scs?tab=readme-ov-file
         https://github.com/alexedwards/scs/tree/master/redisstore
 
-    *edit golang to do the correct thing or block depending on who the session logged in user is. look at every endpoint. get help from ai. can't edit todos that aren't yours, etc
+    x edit golang to do the correct thing or block depending on who the session logged in user is. look at every endpoint. get help from ai. can't edit todos that aren't yours, etc
         x make list of all services, and think about each one. what kind of "logged in user" guard should i add to each service?
 
-        remove user_id from being sent by python to golang in all / almost all cases. send session cookie instead and golang will see what user is logged in (if any)
+        x remove user_id from being sent by python to golang in all / almost all cases. send session cookie instead and golang will see what user is logged in (if any)
 
 ---
-    *sign up form - style
-        boot strap? tailwind?
+    x sign up form - style
+        x tailwind
 
-    *login form - style
+    x login form - style
+
+    *style hello raza
+
+    *style / place logout button
 
     *profile page - username, email, update password, change timezone, add/edit user mission
         link
-
-    *style hello
-
-    *style / place logout button
+        backend and frontend
 
 ---
     *concept of "finalize" the current day or most recent previous day
@@ -127,14 +128,14 @@ NEXT July 3 2024
         could just be a simple button below each day. finalize june 25th. add flag to db finalized or not. feed AI finalized days for context.
             need concept of finalize so that the ai doesn't base comments in incomplete days. like even next morning, it doesnt see your final checks like 11pm laptop, breathing etc.
 
-    *editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
-
-    *put edit form inline
-
     *allow edit form to add today's notes - open by default. also add why is this todo important to your mission/goals (this can be hidden with that arrow open close UI thing)
         why each thing relates to mission, why it's important to you
         daily notes/caveats on each todo item - travel day, could't do as much focused coding time
         send the info to AI to help it understand you better
+
+    *editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
+
+    *put edit form inline
 
     *warning modal upon clicking delete. cancel, delete, this cannot be undone
 
@@ -148,6 +149,8 @@ NEXT July 3 2024
         convert day # to display date. probably need structured json back. and i can format it
         you probably want to be able to chat back and forth - hey did you get day 18? remember that i didn't finalize it, so no need to say incomplete, i did do it
             or, hey that day is finalized, i didn't do the thing, it's not in progress, it's in the past. i couldn't fit it in
+        better identification of what you are good at, consisteny, streaks, areas of improvement etc.
+        memory? knows everything about you
 
 ---
     *make it live in prod
@@ -192,7 +195,9 @@ NEXT July 3 2024
         GetAssistantIDHandler, SaveAssistantIDHandler -> i think only python hits these, need some authentication so that random people cannot hit them
             could make create assistant a one off script instead of an endpoint. get assistant, fine anyone can get it lol. no one cares
 
-        make a .env.example
+        convert to Vite project, not create-react-app (seems outdated, not modern)
+
+        if you refresh fast, run is still running and you interrupted it. and you would have to cancel it, before hitting AI again
 
 ---
 

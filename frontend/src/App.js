@@ -77,7 +77,7 @@ function App() {
         <>
             <div className="header-container">
                 <header>
-                    <h1>
+                    <h1 className="text-4xl pb-1">
                         daily <span>todos</span>
                     </h1>
                 </header>

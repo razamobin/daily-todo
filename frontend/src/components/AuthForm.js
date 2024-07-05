@@ -63,60 +63,88 @@ const AuthForm = () => {
     };
 
     return (
-        <div className="auth-container">
-            <div className="tab-interface">
-                <button onClick={handleToggleForm}>
-                    {isLoginForm ? "Sign Up" : "Log In"}
-                </button>
-            </div>
-            {isLoginForm ? (
-                <form className="login-form" onSubmit={handleLogin}>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    {error && <div style={{ color: "red" }}>{error}</div>}
-                    <button type="submit">Log In</button>
+        <div className="auth-container flex items-center justify-center py-12">
+            <div className="border border-black p-8 w-full max-w-md">
+                <h2 className="text-2xl font-bold mb-6 text-center">
+                    {isLoginForm ? "Login" : "Sign Up"}
+                </h2>
+                <form onSubmit={isLoginForm ? handleLogin : handleSignUp}>
+                    <div className="mb-4">
+                        <label
+                            className="block text-gray-700 text-sm font-bold mb-2"
+                            htmlFor="email"
+                        >
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            id="email"
+                            className="border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+                    <div className="mb-6">
+                        <label
+                            className="block text-gray-700 text-sm font-bold mb-2"
+                            htmlFor="password"
+                        >
+                            Password
+                        </label>
+                        <input
+                            type="password"
+                            id="password"
+                            className="border border-black rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
+                    {!isLoginForm && (
+                        <div className="mb-6">
+                            <label
+                                className="block text-gray-700 text-sm font-bold mb-2"
+                                htmlFor="timezone"
+                            >
+                                Timezone
+                            </label>
+                            <select
+                                id="timezone"
+                                className="border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+                                value={timezone}
+                                onChange={(e) => setTimezone(e.target.value)}
+                            >
+                                <option value="" disabled>
+                                    Select Timezone
+                                </option>
+                                {timeZones.map((tz) => (
+                                    <option key={tz.name} value={tz.name}>
+                                        {tz.currentTimeFormat}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                    {error && <div className="text-red-500 mb-4">{error}</div>}
+                    <div className="flex items-center justify-between">
+                        <button
+                            type="submit"
+                            className="bg-black hover:bg-gray-800 text-white font-bold py-2 px-4 rounded focus:outline-none"
+                        >
+                            {isLoginForm ? "Log In" : "Sign Up"}
+                        </button>
+                    </div>
                 </form>
-            ) : (
-                <form className="signup-form" onSubmit={handleSignUp}>
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-                    <select
-                        value={timezone}
-                        onChange={(e) => setTimezone(e.target.value)}
+                <div className="mt-4 text-center">
+                    <button
+                        onClick={handleToggleForm}
+                        className="text-black underline hover:text-gray-800"
                     >
-                        <option value="" disabled>
-                            Select Timezone
-                        </option>
-                        {timeZones.map((tz) => (
-                            <option key={tz.name} value={tz.name}>
-                                {tz.currentTimeFormat}
-                            </option>
-                        ))}
-                    </select>
-                    {error && <div style={{ color: "red" }}>{error}</div>}
-                    <button type="submit">Sign Up</button>
-                </form>
-            )}
+                        {isLoginForm ? "Sign Up" : "Log In"}
+                    </button>
+                </div>
+            </div>
         </div>
     );
 };
