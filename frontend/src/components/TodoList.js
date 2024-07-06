@@ -88,25 +88,28 @@ function TodoList({ todos, setTodos, onEditTodo }) {
         <>
             {sortedDayNumbers.map((dayNumber, index) => (
                 <React.Fragment key={dayNumber}>
-                    <div className="day">
-                        <div className="date-container">
-                            <span className="day-of-week">
+                    <div className="day col-start-1 col-end-2 justify-self-end text-lg">
+                        <div className="flex items-center mb-5 leading-none">
+                            <span className="day-of-week text-xs mr-1.5">
                                 {formatDayNumber(dayNumber).weekday}
                             </span>
-                            <div className="date-details">
-                                <div className="day-of-month">
+                            <div className="date-details text-right">
+                                <div className="day-of-month text-5xl">
                                     {formatDayNumber(dayNumber).day}
                                 </div>
-                                <div className="month">
+                                <div className="month text-sm">
                                     {formatDayNumber(dayNumber).month}
                                 </div>
-                                <div className="year">
+                                <div className="year text-sm">
                                     {formatDayNumber(dayNumber).year}
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div key={dayNumber} className="todo-list">
+                    <div
+                        key={dayNumber}
+                        className="todo-list col-start-3 col-end-4"
+                    >
                         {index === 0 ? ( // Only allow drag and drop for the most recent day
                             <DragDropContext onDragEnd={onDragEnd}>
                                 <Droppable
@@ -117,6 +120,7 @@ function TodoList({ todos, setTodos, onEditTodo }) {
                                         <ul
                                             ref={provided.innerRef}
                                             {...provided.droppableProps}
+                                            className="p-0 m-0 border-t border-gray-200"
                                         >
                                             {groupedTodos[dayNumber].map(
                                                 (todo, index) => (
@@ -134,10 +138,11 @@ function TodoList({ todos, setTodos, onEditTodo }) {
                                                                 }
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
+                                                                className="flex items-center p-1 border-b border-gray-200"
                                                             >
-                                                                <p>
+                                                                <p className="flex-1 text-xs mx-2 font-normal">
                                                                     <span
-                                                                        className="todo-title"
+                                                                        className="todo-title hover:underline cursor-pointer"
                                                                         onClick={() =>
                                                                             onEditTodo(
                                                                                 todo
@@ -174,6 +179,7 @@ function TodoList({ todos, setTodos, onEditTodo }) {
                                                                                         idx
                                                                                     )
                                                                                 }
+                                                                                className="mr-2"
                                                                             />
                                                                         )
                                                                     )}
@@ -189,11 +195,16 @@ function TodoList({ todos, setTodos, onEditTodo }) {
                                 </Droppable>
                             </DragDropContext>
                         ) : (
-                            <ul>
+                            <ul className="p-0 m-0 border-t border-gray-200">
                                 {groupedTodos[dayNumber].map((todo) => (
-                                    <li key={todo.id}>
-                                        <p>
-                                            <span>{todo.title}</span>
+                                    <li
+                                        key={todo.id}
+                                        className="flex items-center p-1 border-b border-gray-200"
+                                    >
+                                        <p className="flex-1 text-xs mx-2 font-normal">
+                                            <span className="todo-title hover:underline cursor-pointer">
+                                                {todo.title}
+                                            </span>
                                         </p>
                                         <section>
                                             {Array.from({
@@ -209,6 +220,7 @@ function TodoList({ todos, setTodos, onEditTodo }) {
                                                             idx
                                                         )
                                                     }
+                                                    className="mr-2"
                                                 />
                                             ))}
                                         </section>

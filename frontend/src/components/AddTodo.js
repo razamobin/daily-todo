@@ -22,21 +22,27 @@ function AddTodo({ setTodos }) {
     };
 
     return (
-        <section className="add-todo">
-            <form id="addTodoForm" onSubmit={handleSubmit}>
+        <section className="add-todo mt-2 mb-2">
+            <form
+                id="addTodoForm"
+                onSubmit={handleSubmit}
+                className="w-full max-w-[600px] mx-auto p-2 flex items-center gap-2"
+            >
                 <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="New Todo"
                     required
+                    className="p-2 text-sm border border-gray-300 rounded flex-1"
                 />
-                <div className="goal-container">
+                <div className="goal-container flex items-center gap-1">
                     <select
                         id="goal"
                         value={goal}
                         onChange={(e) => setGoal(parseInt(e.target.value, 10))}
                         required
+                        className="w-16 p-2 text-sm border border-gray-300 rounded"
                     >
                         {Array.from({ length: 24 }, (_, i) => (
                             <option key={i + 1} value={i + 1}>
@@ -44,11 +50,16 @@ function AddTodo({ setTodos }) {
                             </option>
                         ))}
                     </select>
-                    <span className="goal-text">
+                    <span className="goal-text inline-block w-22 text-left text-sm">
                         {goal === 1 ? "time per day" : "times per day"}
                     </span>
                 </div>
-                <button type="submit">Add Todo</button>
+                <button
+                    type="submit"
+                    className="bg-black text-white p-2 px-4 rounded cursor-pointer text-sm hover:bg-gray-800"
+                >
+                    Add Todo
+                </button>
             </form>
         </section>
     );
