@@ -10,6 +10,8 @@ import rehypeReact from "rehype-react";
 import remarkGfm from "remark-gfm"; // Optional: for GitHub flavored markdown
 import remarkBreaks from "remark-breaks"; // Plugin to convert newlines to <br>
 import AuthForm from "./components/AuthForm";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircle } from "@fortawesome/free-solid-svg-icons";
 
 function App() {
     const { user, logout } = useContext(AuthContext);
@@ -76,14 +78,34 @@ function App() {
     return (
         <>
             <div className="header-container">
-                <header>
-                    <h1 className="text-4xl pb-1">
+                <header className="header flex justify-between items-center border-b-2 border-current pb-1">
+                    <h1 className="text-3xl">
                         daily <span>todos</span>
                     </h1>
+                    {user && (
+                        <div className="user-controls flex items-center">
+                            <p className="">
+                                hello,{" "}
+                                <span className="font-bold">
+                                    {user.username}
+                                </span>
+                            </p>
+                            <FontAwesomeIcon
+                                icon={faCircle}
+                                className="mx-2 text-[6px]"
+                            />{" "}
+                            {/* Font Awesome icon */}
+                            <button
+                                onClick={logout}
+                                className="btn-logout underline"
+                            >
+                                logout
+                            </button>
+                        </div>
+                    )}
                 </header>
                 {user ? (
                     <>
-                        <p>Hello, {user.username}</p>
                         {isUpdateMode ? (
                             <UpdateTodo
                                 key={currentTodo ? currentTodo.id : "new"}
@@ -94,7 +116,6 @@ function App() {
                         ) : (
                             <AddTodo setTodos={setTodos} />
                         )}
-                        <button onClick={logout}>Logout</button>
                     </>
                 ) : (
                     <AuthForm />

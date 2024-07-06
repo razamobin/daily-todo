@@ -104,12 +104,12 @@ NEXT July 3 2024
 
     x login form - style
 
-    *style hello raza
+    x style hello raza
 
-    *style / place logout button
+    x style / place logout button
 
     *profile page - username, email, update password, change timezone, add/edit user mission
-        link
+        link / change state
         backend and frontend
 
 ---
@@ -152,6 +152,7 @@ NEXT July 3 2024
         better identification of what you are good at, consisteny, streaks, areas of improvement etc.
         memory? knows everything about you
 
+    restyle with tailwind for everything
 ---
     *make it live in prod
         *profile page or modal to edit info/timezone/mission
@@ -162,8 +163,6 @@ NEXT July 3 2024
             dailytodos.ai - main domain
             dailytodo.ai - buy and it redirects
             samethingeveryday.ai
-
-
 
     let anon users fill in all their info
             create a temp user in db, tmp user login session

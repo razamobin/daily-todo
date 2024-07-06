@@ -44,11 +44,6 @@ header {
     margin-bottom: 20px;
 }
 
-h1 {
-    font-weight: 500;
-    border-bottom: 2px solid #333;
-}
-
 /* font-family: Georgia, serif; */
 .todo-list {
     /* border-top: 1px solid #333; */
