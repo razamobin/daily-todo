@@ -4,7 +4,7 @@ import { getTimeZones } from "@vvo/tzdb";
 import axios from "../axiosConfig";
 
 function ProfilePage() {
-    const { user, setUser } = useContext(AuthContext);
+    const { updateUser } = useContext(AuthContext);
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [timezone, setTimezone] = useState("");
@@ -46,10 +46,9 @@ function ProfilePage() {
                     mission,
                 }
             );
-            setUser((prevUser) => ({
-                ...prevUser,
-                ...response.data,
-            }));
+            console.log("response.data in profile page.js");
+            console.log(response.data);
+            updateUser(response.data);
             setSuccess("Profile updated successfully.");
         } catch (error) {
             console.log(error);

@@ -156,6 +156,10 @@ NEXT July 3 2024
 
     there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
 
+    react state bugs
+        user after user profile edit
+        profile page showing after logout/login. should default to todos. add to reset state thingy on logout?
+
 ---
     *make it live in prod
         *profile page or modal to edit info/timezone/mission

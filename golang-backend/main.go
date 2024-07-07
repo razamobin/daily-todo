@@ -325,8 +325,21 @@ func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("Profile updated successfully"))
+    // Fetch the updated user data
+    err = db.QueryRow("SELECT id, email, username, timezone FROM users WHERE id = ?", userID).Scan(&user.ID, &user.Email, &user.Username, &user.Timezone)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to fetch updated user data: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    err = db.QueryRow("SELECT mission FROM user_missions WHERE user_id = ?", userID).Scan(&user.Mission)
+    if err != nil && err != sql.ErrNoRows {
+        http.Error(w, fmt.Sprintf("Failed to fetch updated user mission: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(user)
 }
 
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
