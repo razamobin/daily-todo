@@ -108,6 +108,8 @@ NEXT July 3 2024
 
     x style / place logout button
 
+    x restyle with tailwind for everything
+
     *profile page - username, email, update password, change timezone, add/edit user mission
         link / change state
         backend and frontend
@@ -152,7 +154,8 @@ NEXT July 3 2024
         better identification of what you are good at, consisteny, streaks, areas of improvement etc.
         memory? knows everything about you
 
-    restyle with tailwind for everything
+    there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
+
 ---
     *make it live in prod
         *profile page or modal to edit info/timezone/mission

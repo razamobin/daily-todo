@@ -141,7 +141,7 @@ function App() {
 
     return (
         <>
-            <div className="header-container w-full max-w-[600px] mx-auto">
+            <div className="header-container w-full max-w-[540px] mx-auto">
                 <header className="header flex justify-between items-center border-b-2 border-current pb-1">
                     <h1 className="text-3xl">
                         daily <span>todos</span>
@@ -173,7 +173,7 @@ function App() {
                 </header>
                 {renderAddUpdateTodoView()}
             </div>
-            <div className="main-container w-[1300px] mx-auto grid grid-cols-[1fr_20px_600px_20px_1fr] grid-rows-auto gap-x-0 gap-y-[45px]">
+            <div className="main-container w-[1300px] mx-auto grid grid-cols-[1fr_20px_540px_20px_1fr] grid-rows-auto gap-x-0 gap-y-[45px]">
                 {renderMainView()}
             </div>
         </>

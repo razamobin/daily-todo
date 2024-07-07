@@ -42,7 +42,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
             <form
                 id="updateTodoForm"
                 onSubmit={handleSubmit}
-                className="w-full max-w-[600px] mx-auto p-2 grid gap-2"
+                className="w-full max-w-[540px] mx-auto p-2 grid gap-2"
             >
                 <div className="form-row flex items-center gap-2">
                     <input
@@ -51,7 +51,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Edit Todo"
                         required
-                        className="p-2 text-sm border border-gray-300 rounded flex-1"
+                        className="p-2 text-xs border border-gray-300 rounded flex-1"
                     />
                     <div className="goal-container flex items-center gap-1">
                         <select
@@ -61,7 +61,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                                 setGoal(parseInt(e.target.value, 10))
                             }
                             required
-                            className="w-16 p-2 text-sm border border-gray-300 rounded"
+                            className="w-16 p-2 text-xs border border-gray-300 rounded"
                         >
                             {Array.from({ length: 24 }, (_, i) => (
                                 <option key={i + 1} value={i + 1}>
@@ -69,20 +69,20 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                                 </option>
                             ))}
                         </select>
-                        <span className="goal-text inline-block w-22 text-left text-sm">
+                        <span className="goal-text inline-block w-22 text-left text-xs">
                             {goal === 1 ? "time per day" : "times per day"}
                         </span>
                     </div>
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="bg-white text-black border border-black p-2 px-4 rounded cursor-pointer text-sm hover:bg-gray-200"
+                        className="bg-white text-black border border-black p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-200"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="bg-black text-white p-2 px-4 rounded cursor-pointer text-sm hover:bg-gray-800"
+                        className="bg-black text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-800"
                     >
                         Update
                     </button>
@@ -91,7 +91,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                     <button
                         type="button"
                         onClick={handleDelete}
-                        className="bg-red-500 text-white p-2 px-4 rounded cursor-pointer text-sm hover:bg-red-700 flex items-center justify-center"
+                        className="bg-red-500 text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-red-700 flex items-center justify-center"
                     >
                         <FontAwesomeIcon icon={faTrash} />
                     </button>
