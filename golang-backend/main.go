@@ -30,6 +30,7 @@ type User struct {
     Password string `json:"password,omitempty"`
     Timezone string `json:"timezone"`
     Username string `json:"username"`
+    Mission  string `json:"mission"`
 }
 
 type Todo struct {
@@ -238,6 +239,7 @@ func main() {
     router.HandleFunc("/api/update-sort-indexes", UpdateSortIndexesHandler).Methods("POST")
     router.HandleFunc("/api/assistant-id", GetAssistantIDHandler).Methods("GET")
     router.HandleFunc("/api/save-assistant-id", SaveAssistantIDHandler).Methods("POST")
+    router.HandleFunc("/api/user-profile", UserProfileHandler).Methods("GET", "POST")
 
     sessionRouter := sessionManager.LoadAndSave(router)
 
@@ -251,6 +253,80 @@ func main() {
 
     fmt.Println("Starting server on :8080")
     log.Fatal(http.ListenAndServe(":8080", corsHandler(sessionRouter)))
+}
+
+func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
+    switch r.Method {
+    case "GET":
+        GetUserProfile(w, r)
+    case "POST":
+        UpdateUserProfile(w, r)
+    default:
+        http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+    }
+}
+
+func GetUserProfile(w http.ResponseWriter, r *http.Request) {
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
+    var user User
+    err = db.QueryRow("SELECT id, email, username, timezone FROM users WHERE id = ?", userID).Scan(&user.ID, &user.Email, &user.Username, &user.Timezone)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            http.Error(w, "User not found", http.StatusNotFound)
+        } else {
+            http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+        }
+        return
+    }
+
+    var mission string
+    err = db.QueryRow("SELECT mission FROM user_missions WHERE user_id = ?", userID).Scan(&mission)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            mission = "" // No mission found, set to empty string
+        } else {
+            http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+            return
+        }
+    }
+    user.Mission = mission
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(user)
+}
+
+func UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
+    var user User
+    if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    _, err = db.Exec("UPDATE users SET email = ?, username = ?, timezone = ? WHERE id = ?", user.Email, user.Username, user.Timezone, userID)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to update user profile: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    _, err = db.Exec("INSERT INTO user_missions (user_id, mission) VALUES (?, ?) ON DUPLICATE KEY UPDATE mission = ?", userID, user.Mission, user.Mission)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to update user mission: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Profile updated successfully"))
 }
 
 func SignUpHandler(w http.ResponseWriter, r *http.Request) {
