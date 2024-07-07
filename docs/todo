@@ -110,12 +110,12 @@ NEXT July 3 2024
 
     x restyle with tailwind for everything
 
-    *profile page - username, email, update password, change timezone, add/edit user mission
+    x profile page - username, email, change timezone, add/edit user mission
         link / change state
         backend and frontend
 
 ---
-    *concept of "finalize" the current day or most recent previous day
+    **concept of "finalize" the current day or most recent previous day
         before ai get's today's message it asks you to make final edits to previous day and submit
             reflect on previous day. what you did good. what could be better. any special notes you have on the day. final edit of checkboxes, submit. then you get new AI message for today :)
             reflect on it. what was good, what could be improved
@@ -130,7 +130,7 @@ NEXT July 3 2024
         could just be a simple button below each day. finalize june 25th. add flag to db finalized or not. feed AI finalized days for context.
             need concept of finalize so that the ai doesn't base comments in incomplete days. like even next morning, it doesnt see your final checks like 11pm laptop, breathing etc.
 
-    *allow edit form to add today's notes - open by default. also add why is this todo important to your mission/goals (this can be hidden with that arrow open close UI thing)
+    **allow edit form to add today's notes - open by default. also add why is this todo important to your mission/goals (this can be hidden with that arrow open close UI thing)
         why each thing relates to mission, why it's important to you
         daily notes/caveats on each todo item - travel day, could't do as much focused coding time
         send the info to AI to help it understand you better
@@ -147,7 +147,7 @@ NEXT July 3 2024
 
     share on youtube. walkthrough the code, and how people can get it working locally
 
-    *improve AI
+    **improve AI
         convert day # to display date. probably need structured json back. and i can format it
         you probably want to be able to chat back and forth - hey did you get day 18? remember that i didn't finalize it, so no need to say incomplete, i did do it
             or, hey that day is finalized, i didn't do the thing, it's not in progress, it's in the past. i couldn't fit it in
@@ -155,10 +155,6 @@ NEXT July 3 2024
         memory? knows everything about you
 
     there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
-
-    react state bugs
-        user after user profile edit
-        profile page showing after logout/login. should default to todos. add to reset state thingy on logout?
 
 ---
     *make it live in prod

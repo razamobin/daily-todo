@@ -240,6 +240,7 @@ func main() {
     router.HandleFunc("/api/assistant-id", GetAssistantIDHandler).Methods("GET")
     router.HandleFunc("/api/save-assistant-id", SaveAssistantIDHandler).Methods("POST")
     router.HandleFunc("/api/user-profile", UserProfileHandler).Methods("GET", "POST")
+    router.HandleFunc("/api/finalize-day", FinalizeDayHandler).Methods("POST")
 
     sessionRouter := sessionManager.LoadAndSave(router)
 
@@ -253,6 +254,32 @@ func main() {
 
     fmt.Println("Starting server on :8080")
     log.Fatal(http.ListenAndServe(":8080", corsHandler(sessionRouter)))
+}
+
+func FinalizeDayHandler(w http.ResponseWriter, r *http.Request) {
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
+    var input struct {
+        DayNumber int `json:"day_number"`
+    }
+
+    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    _, err = db.Exec("INSERT INTO finalized_days (user_id, day_number, finalized) VALUES (?, ?, TRUE) ON DUPLICATE KEY UPDATE finalized = TRUE", userID, input.DayNumber)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to finalize day: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("Day finalized successfully"))
 }
 
 func UserProfileHandler(w http.ResponseWriter, r *http.Request) {
@@ -661,12 +688,14 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
 // Helper function to fetch the last 7 days of todos excluding the current day
 func getLast7DaysTodos(userID int, upToDayNumber int) ([]map[string]interface{}, error) {
     rows, err := db.Query(`
-        SELECT day_number, title, status, goal 
-        FROM daily_todos 
-        WHERE user_id = ? 
-        AND day_number BETWEEN ? AND ?
-        AND deleted = 0
-        ORDER BY day_number DESC, sort_index ASC`, userID, upToDayNumber-6, upToDayNumber)
+        SELECT dt.day_number, dt.title, dt.status, dt.goal 
+        FROM daily_todos dt
+        JOIN finalized_days fd ON dt.user_id = fd.user_id AND dt.day_number = fd.day_number
+        WHERE dt.user_id = ? 
+        AND dt.day_number BETWEEN ? AND ?
+        AND dt.deleted = 0
+        AND fd.finalized = TRUE
+        ORDER BY dt.day_number DESC, dt.sort_index ASC`, userID, upToDayNumber-6, upToDayNumber)
     if err != nil {
         return nil, fmt.Errorf("failed to fetch todos: %w", err)
     }
