@@ -7,12 +7,14 @@ export const AppStateProvider = ({ children }) => {
     const [dailyMessage, setDailyMessage] = useState("");
     const [isUpdateMode, setIsUpdateMode] = useState(false);
     const [currentTodo, setCurrentTodo] = useState(null);
+    const [view, setView] = useState("todos");
 
     const resetAppState = () => {
         setTodos([]);
         setDailyMessage("");
         setIsUpdateMode(false);
         setCurrentTodo(null);
+        setView("todos");
     };
 
     return (
@@ -26,6 +28,8 @@ export const AppStateProvider = ({ children }) => {
                 setIsUpdateMode,
                 currentTodo,
                 setCurrentTodo,
+                view,
+                setView,
                 resetAppState,
             }}
         >

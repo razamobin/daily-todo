@@ -25,8 +25,9 @@ function App() {
         setIsUpdateMode,
         currentTodo,
         setCurrentTodo,
+        view,
+        setView,
     } = useContext(AppStateContext);
-    const [view, setView] = useState("todos");
 
     useEffect(() => {
         if (!user) return;
