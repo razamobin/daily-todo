@@ -130,6 +130,10 @@ NEXT July 3 2024
         could just be a simple button below each day. finalize june 25th. add flag to db finalized or not. feed AI finalized days for context.
             need concept of finalize so that the ai doesn't base comments in incomplete days. like even next morning, it doesnt see your final checks like 11pm laptop, breathing etc.
 
+        tweak the recent todos response to return list of days. then map of each day to list of the todos for that day. and the finalized status of that day. cleaner response, and UI can work with it better imo
+
+        don't hit AI if there is no new finalized day. saved AI message from day 22, if day 23 is not finalized, there is nothing todo for now. tell user to finalize 23
+
     **allow edit form to add today's notes - open by default. also add why is this todo important to your mission/goals (this can be hidden with that arrow open close UI thing)
         why each thing relates to mission, why it's important to you
         daily notes/caveats on each todo item - travel day, could't do as much focused coding time

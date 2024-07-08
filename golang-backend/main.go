@@ -46,9 +46,10 @@ type Todo struct {
 }
 
 type TodosResponse struct {
-    Todos        []Todo `json:"todos"`
-    NewDay       bool   `json:"new_day"`
-    NewDayNumber int    `json:"new_day_number"`
+    Todos        []Todo            `json:"todos"`
+    NewDay       bool              `json:"new_day"`
+    NewDayNumber int               `json:"new_day_number"`
+    FinalizedMap map[int]bool      `json:"finalized_map"` // New field
 }
 
 // Reference date: June 16, 2024
@@ -133,10 +134,10 @@ func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int
 }
 
 // Fetch the recent todos for the user
-func getRecentTodosForUser(userID int) ([]Todo, bool, int, error) {
+func getRecentTodosForUser(userID int) ([]Todo, bool, int, map[int]bool, error) {
     userTimezone, currentTime, err := getUserTimezoneAndCurrentTime(userID)
     if err != nil {
-        return nil, false, 0, err
+        return nil, false, 0, nil, err
     }
 
     fmt.Println("User Timezone:", userTimezone)
@@ -144,12 +145,12 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, error) {
 
     recentDayNumber, err := getMostRecentDayNumberForUser(userID)
     if err != nil {
-        return nil, false, 0, err
+        return nil, false, 0, nil, err
     }
 
     if recentDayNumber == 0 {
         // No todos found for the user, return empty list
-        return []Todo{}, false, 0, nil
+        return []Todo{}, false, 0, nil, nil
     }
 
     currentDayNumber := calculateDayNumber(currentTime, userTimezone)
@@ -161,7 +162,7 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, error) {
     // Adjust the logic to copy todos if the current day number is greater than the recent day number
     if recentDayNumber < currentDayNumber {
         if err := copyTodosToCurrentDay(userID, recentDayNumber, currentDayNumber); err != nil {
-            return nil, false, 0, err
+            return nil, false, 0, nil, err
         }
         // Update the recentDayNumber after copying todos
         recentDayNumber = currentDayNumber
@@ -170,25 +171,34 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, error) {
 
     sevenDaysAgo := currentDayNumber - 7
 
-    rows, err := db.Query("SELECT id, user_id, title, day_number, status, goal, created_at, updated_at FROM daily_todos WHERE user_id = ? AND day_number BETWEEN ? AND ? AND deleted = 0 ORDER BY day_number DESC, sort_index ASC", userID, sevenDaysAgo, currentDayNumber)
+    rows, err := db.Query(`
+        SELECT dt.id, dt.user_id, dt.title, dt.day_number, dt.status, dt.goal, dt.created_at, dt.updated_at, 
+               COALESCE(fd.finalized, FALSE) AS finalized
+        FROM daily_todos dt
+        LEFT JOIN finalized_days fd ON dt.user_id = fd.user_id AND dt.day_number = fd.day_number
+        WHERE dt.user_id = ? AND dt.day_number BETWEEN ? AND ? AND dt.deleted = 0
+        ORDER BY dt.day_number DESC, dt.sort_index ASC`, userID, sevenDaysAgo, currentDayNumber)
     if err != nil {
-        return nil, false, 0, fmt.Errorf("failed to fetch recent todos: %w", err)
+        return nil, false, 0, nil, fmt.Errorf("failed to fetch recent todos: %w", err)
     }
     defer rows.Close()
 
     todos := []Todo{}
+    finalizedMap := make(map[int]bool)
     for rows.Next() {
         var todo Todo
         var createdAt, updatedAt string
-        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt); err != nil {
-            return nil, false, 0, fmt.Errorf("failed to scan todo: %w", err)
+        var finalized bool
+        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt, &finalized); err != nil {
+            return nil, false, 0, nil, fmt.Errorf("failed to scan todo: %w", err)
         }
         todo.CreatedAt = createdAt
         todo.UpdatedAt = updatedAt
         todos = append(todos, todo)
+        finalizedMap[todo.DayNumber] = finalized
     }
 
-    return todos, newDay, currentDayNumber, nil
+    return todos, newDay, currentDayNumber, finalizedMap, nil
 }
 
 func main() {
@@ -724,7 +734,7 @@ func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    todos, newDay, newDayNumber, err := getRecentTodosForUser(userID)
+    todos, newDay, newDayNumber, finalizedMap, err := getRecentTodosForUser(userID)
     if err != nil {
         log.Printf("failed to get recent todos: %v", err)
         http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -735,6 +745,7 @@ func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
         Todos:        todos,
         NewDay:       newDay,
         NewDayNumber: newDayNumber,
+        FinalizedMap: finalizedMap,
     }
 
     w.Header().Set("Content-Type", "application/json")

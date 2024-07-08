@@ -29,6 +29,8 @@ function App() {
         setView,
     } = useContext(AppStateContext);
 
+    const [finalizedMap, setFinalizedMap] = useState({});
+
     useEffect(() => {
         if (!user) return;
         const fetchDailyMessage = (newDayNumber) => {
@@ -55,11 +57,11 @@ function App() {
                 eventSource.close();
             };
         };
-
         axios
             .get("http://localhost:8080/api/todos")
             .then((response) => {
                 setTodos(response.data.todos);
+                setFinalizedMap(response.data.finalized_map); // Set the finalized map
                 if (response.data.new_day) {
                     console.log("new day!");
                 }
@@ -76,6 +78,20 @@ function App() {
     const handleCancelUpdate = () => {
         setIsUpdateMode(false);
         setCurrentTodo(null);
+    };
+
+    const finalizeDay = (dayNumber) => {
+        axios
+            .post(`http://localhost:8080/api/finalize-day`, {
+                day_number: dayNumber,
+            })
+            .then((response) => {
+                setFinalizedMap((prevMap) => ({
+                    ...prevMap,
+                    [dayNumber]: true,
+                }));
+            })
+            .catch((error) => console.error("Error finalizing day:", error));
     };
 
     const renderAddUpdateTodoView = () => {
@@ -125,6 +141,8 @@ function App() {
                             todos={todos}
                             setTodos={setTodos}
                             onEditTodo={handleEditTodo}
+                            finalizedMap={finalizedMap} // Pass the finalized map
+                            finalizeDay={finalizeDay} // Pass the finalizeDay function
                         />
                     </>
                 );

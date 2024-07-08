@@ -2,7 +2,7 @@ import React from "react";
 import axios from "../axiosConfig";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
-function TodoList({ todos, setTodos, onEditTodo }) {
+function TodoList({ todos, setTodos, onEditTodo, finalizedMap, finalizeDay }) {
     const handleQuantityChange = (todo, index) => {
         let newStatus;
         if (index < todo.status) {
@@ -78,6 +78,35 @@ function TodoList({ todos, setTodos, onEditTodo }) {
             .replace(/,/g, "")
             .split(" ");
         return { weekday, month, day, year };
+    };
+
+    const formatSpecialDate = (dayNumber) => {
+        const referenceDate = new Date("2024-06-16");
+        referenceDate.setDate(referenceDate.getDate() + dayNumber);
+        const options = {
+            month: "long", // Full month name
+            day: "numeric",
+        };
+        const [month, day] = referenceDate
+            .toLocaleDateString("en-US", options)
+            .replace(/,/g, "")
+            .split(" ");
+        const dayWithSuffix = `${day}${getOrdinalSuffix(parseInt(day, 10))}`;
+        return `${month} ${dayWithSuffix}`;
+    };
+
+    const getOrdinalSuffix = (day) => {
+        if (day > 3 && day < 21) return "th"; // Covers 11th to 20th
+        switch (day % 10) {
+            case 1:
+                return "st";
+            case 2:
+                return "nd";
+            case 3:
+                return "rd";
+            default:
+                return "th";
+        }
     };
 
     const sortedDayNumbers = Object.keys(groupedTodos)
@@ -227,6 +256,16 @@ function TodoList({ todos, setTodos, onEditTodo }) {
                                     </li>
                                 ))}
                             </ul>
+                        )}
+                        {!finalizedMap[dayNumber] && (
+                            <div className="flex justify-end mt-2">
+                                <button
+                                    onClick={() => finalizeDay(dayNumber)}
+                                    className="bg-black text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-800"
+                                >
+                                    Finalize {formatSpecialDate(dayNumber)}
+                                </button>
+                            </div>
                         )}
                     </div>
                 </React.Fragment>
