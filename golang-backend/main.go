@@ -34,15 +34,16 @@ type User struct {
 }
 
 type Todo struct {
-    ID        int       `json:"id"`
-    UserID    int       `json:"user_id"`
-    Title     string    `json:"title"`
-    DayNumber int       `json:"day_number"`
-    Status    int       `json:"status"`
-    Goal      int       `json:"goal"`
-    CreatedAt string    `json:"created_at"`
-    UpdatedAt string    `json:"updated_at"`
-    SortIndex int       `json:"sort_index"`
+    ID             int       `json:"id"`
+    UserID         int       `json:"user_id"`
+    Title          string    `json:"title"`
+    DayNumber      int       `json:"day_number"`
+    Status         int       `json:"status"`
+    Goal           int       `json:"goal"`
+    CreatedAt      string    `json:"created_at"`
+    UpdatedAt      string    `json:"updated_at"`
+    SortIndex      int       `json:"sort_index"`
+    Description    string    `json:"description,omitempty"`
 }
 
 type TodosResponse struct {
@@ -173,10 +174,11 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, map[int]bool, error) 
     sevenDaysAgo := currentDayNumber - 7
 
     rows, err := db.Query(`
-        SELECT dt.id, dt.user_id, dt.title, dt.day_number, dt.status, dt.goal, dt.created_at, dt.updated_at, 
-               COALESCE(fd.finalized, FALSE) AS finalized
+        SELECT dt.id, dt.user_id, dt.title, dt.day_number, dt.status, dt.goal, dt.created_at, dt.updated_at, dt.todo_description_id,
+            COALESCE(fd.finalized, FALSE) AS finalized, td.description
         FROM daily_todos dt
         LEFT JOIN finalized_days fd ON dt.user_id = fd.user_id AND dt.day_number = fd.day_number
+        LEFT JOIN todo_descriptions td ON dt.todo_description_id = td.id
         WHERE dt.user_id = ? AND dt.day_number BETWEEN ? AND ? AND dt.deleted = 0
         ORDER BY dt.day_number DESC, dt.sort_index ASC`, userID, sevenDaysAgo, currentDayNumber)
     if err != nil {
@@ -189,12 +191,17 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, map[int]bool, error) 
     for rows.Next() {
         var todo Todo
         var createdAt, updatedAt string
+        var description sql.NullString
         var finalized bool
-        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt, &finalized); err != nil {
+        var todoDescriptionID sql.NullInt64
+        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt, &todoDescriptionID, &finalized, &description); err != nil {
             return nil, false, 0, nil, fmt.Errorf("failed to scan todo: %w", err)
         }
         todo.CreatedAt = createdAt
         todo.UpdatedAt = updatedAt
+        if todoDescriptionID.Valid && description.Valid {
+            todo.Description = description.String
+        }
         todos = append(todos, todo)
         finalizedMap[todo.DayNumber] = finalized
     }
