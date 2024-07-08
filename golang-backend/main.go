@@ -110,7 +110,7 @@ func getMostRecentDayNumberForUser(userID int) (int, error) {
 
 // Copy todos from the most recent day to the current day
 func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int) error {
-    rows, err := db.Query("SELECT title, goal, sort_index FROM daily_todos WHERE user_id = ? AND day_number = ? AND deleted = 0", userID, recentDayNumber)
+    rows, err := db.Query("SELECT title, goal, sort_index, todo_description_id FROM daily_todos WHERE user_id = ? AND day_number = ? AND deleted = 0", userID, recentDayNumber)
     if err != nil {
         return fmt.Errorf("failed to fetch recent todos: %w", err)
     }
@@ -119,12 +119,13 @@ func copyTodosToCurrentDay(userID int, recentDayNumber int, currentDayNumber int
     for rows.Next() {
         var title string
         var goal, sortIndex int
-        if err := rows.Scan(&title, &goal, &sortIndex); err != nil {
+        var todoDescriptionID sql.NullInt64
+        if err := rows.Scan(&title, &goal, &sortIndex, &todoDescriptionID); err != nil {
             return fmt.Errorf("failed to scan todo: %w", err)
         }
 
-        _, err := db.Exec("INSERT INTO daily_todos (user_id, title, day_number, status, goal, sort_index, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())",
-            userID, title, currentDayNumber, 0, goal, sortIndex)
+        _, err := db.Exec("INSERT INTO daily_todos (user_id, title, day_number, status, goal, sort_index, todo_description_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())",
+            userID, title, currentDayNumber, 0, goal, sortIndex, todoDescriptionID)
         if err != nil {
             return fmt.Errorf("failed to insert new todo: %w", err)
         }
