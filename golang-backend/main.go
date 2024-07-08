@@ -251,6 +251,7 @@ func main() {
     router.HandleFunc("/api/save-assistant-id", SaveAssistantIDHandler).Methods("POST")
     router.HandleFunc("/api/user-profile", UserProfileHandler).Methods("GET", "POST")
     router.HandleFunc("/api/finalize-day", FinalizeDayHandler).Methods("POST")
+    router.HandleFunc("/api/todo-description", SaveOrUpdateTodoDescriptionHandler).Methods("POST")
 
     sessionRouter := sessionManager.LoadAndSave(router)
 
@@ -264,6 +265,80 @@ func main() {
 
     fmt.Println("Starting server on :8080")
     log.Fatal(http.ListenAndServe(":8080", corsHandler(sessionRouter)))
+}
+
+func SaveOrUpdateTodoDescriptionHandler(w http.ResponseWriter, r *http.Request) {
+    userID, err := GetUserIDFromSession(r)
+    if err != nil {
+        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        return
+    }
+
+    var input struct {
+        DailyTodoID  int    `json:"daily_todo_id"`
+        Description  string `json:"description"`
+    }
+    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+        http.Error(w, "Invalid request payload", http.StatusBadRequest)
+        return
+    }
+
+    // Check if the daily_todo belongs to the user
+    var todoUserID int
+    err = db.QueryRow("SELECT user_id FROM daily_todos WHERE id = ?", input.DailyTodoID).Scan(&todoUserID)
+    if err != nil {
+        http.Error(w, "Todo not found", http.StatusNotFound)
+        return
+    }
+    if todoUserID != userID {
+        http.Error(w, "Unauthorized: You do not own this todo", http.StatusUnauthorized)
+        return
+    }
+
+    // Check if a description already exists for the given daily_todo_id
+    var descriptionID sql.NullInt64
+    err = db.QueryRow("SELECT todo_description_id FROM daily_todos WHERE id = ?", input.DailyTodoID).Scan(&descriptionID)
+    if err != nil && err != sql.ErrNoRows {
+        http.Error(w, fmt.Sprintf("Failed to check existing description: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    if !descriptionID.Valid {
+        // Insert the new todo_description
+        result, err := db.Exec("INSERT INTO todo_descriptions (description, user_id, initial_daily_todo_id) VALUES (?, ?, ?)",
+            input.Description, userID, input.DailyTodoID)
+        if err != nil {
+            http.Error(w, fmt.Sprintf("Failed to save todo description: %v", err), http.StatusInternalServerError)
+            return
+        }
+
+        newDescriptionID, err := result.LastInsertId()
+        if err != nil {
+            http.Error(w, "Failed to retrieve description ID", http.StatusInternalServerError)
+            return
+        }
+
+        // Update the daily_todo to link to the new description
+        _, err = db.Exec("UPDATE daily_todos SET todo_description_id = ? WHERE id = ?", newDescriptionID, input.DailyTodoID)
+        if err != nil {
+            http.Error(w, fmt.Sprintf("Failed to update todo with description: %v", err), http.StatusInternalServerError)
+            return
+        }
+
+        w.WriteHeader(http.StatusOK)
+        w.Write([]byte("Todo description saved successfully"))
+    } else {
+        // Update the existing todo_description
+        _, err = db.Exec("UPDATE todo_descriptions SET description = ?, updated_at = NOW() WHERE id = ? AND user_id = ?",
+            input.Description, descriptionID.Int64, userID)
+        if err != nil {
+            http.Error(w, fmt.Sprintf("Failed to update todo description: %v", err), http.StatusInternalServerError)
+            return
+        }
+
+        w.WriteHeader(http.StatusOK)
+        w.Write([]byte("Todo description updated successfully"))
+    }
 }
 
 func FinalizeDayHandler(w http.ResponseWriter, r *http.Request) {

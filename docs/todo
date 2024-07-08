@@ -115,7 +115,7 @@ NEXT July 3 2024
         backend and frontend
 
 ---
-    **concept of "finalize" the current day or most recent previous day
+    x concept of "finalize" the current day or most recent previous day
         before ai get's today's message it asks you to make final edits to previous day and submit
             reflect on previous day. what you did good. what could be better. any special notes you have on the day. final edit of checkboxes, submit. then you get new AI message for today :)
             reflect on it. what was good, what could be improved
@@ -139,9 +139,13 @@ NEXT July 3 2024
         daily notes/caveats on each todo item - travel day, could't do as much focused coding time
         send the info to AI to help it understand you better
 
-    *editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
+        why important table
 
-    *put edit form inline
+        notes per todo table
+
+    **put edit form inline
+
+    *editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
 
     *warning modal upon clicking delete. cancel, delete, this cannot be undone
 
@@ -153,12 +157,31 @@ NEXT July 3 2024
 
     **improve AI
         convert day # to display date. probably need structured json back. and i can format it
+
         you probably want to be able to chat back and forth - hey did you get day 18? remember that i didn't finalize it, so no need to say incomplete, i did do it
             or, hey that day is finalized, i didn't do the thing, it's not in progress, it's in the past. i couldn't fit it in
-        better identification of what you are good at, consisteny, streaks, areas of improvement etc.
-        memory? knows everything about you
 
+        better identification of what you are good at, consisteny, streaks, areas of improvement etc.
+            provide examples
+
+        memory? knows everything about you
+            use agency swarm. perplexity i have a thread on this
+
+        agency swarm, have diff roles
+            give i context up front. make sure there are new finalized days, else just show previously saved message.
+                saved assistant message should save latest finalized day number w the message. only gen new message if you have a new finalized day. else show prev
+
+    put label on daily message - message for most recent finalized day - july 7th 
+        if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
+        put past history of messages there?
+        give past history of messages to AI so it doesn't repeat itself?
+
+---
     there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
+
+    after finalize, not allowed to edit / check todos anymore
+
+    show finalize button if not finalized and if it's a new day (configuration)
 
 ---
     *make it live in prod
