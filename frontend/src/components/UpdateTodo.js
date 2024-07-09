@@ -6,6 +6,7 @@ import { faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 function UpdateTodo({ todo, setTodos, onCancel }) {
     const [title, setTitle] = useState(todo.title);
     const [goal, setGoal] = useState(todo.goal);
+    const [description, setDescription] = useState(todo.description || "");
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -13,6 +14,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
             ...todo,
             title,
             goal: parseInt(goal, 10) || 1,
+            description,
         };
         axios
             .put(`http://localhost:8080/api/todos/${todo.id}`, updatedTodo)
@@ -86,6 +88,14 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                     >
                         Update
                     </button>
+                </div>
+                <div className="form-row flex items-center gap-2">
+                    <textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Edit Description"
+                        className="p-2 text-xs border border-gray-300 rounded flex-1"
+                    />
                 </div>
                 <div className="form-row action-buttons flex justify-end gap-2">
                     <button

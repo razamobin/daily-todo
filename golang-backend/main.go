@@ -913,7 +913,6 @@ func DeleteTodoHandler(w http.ResponseWriter, r *http.Request) {
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {
     vars := mux.Vars(r)
     id := vars["id"]
-
     userID, err := GetUserIDFromSession(r)
     if err != nil {
         http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
@@ -926,9 +925,10 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-        // Fetch the current status and goal from the database
+    // Fetch the current status, goal, and description ID from the database
     var currentStatus, currentGoal int
-    err = db.QueryRow("SELECT status, goal FROM daily_todos WHERE id = ? AND user_id = ? AND deleted = 0", id, userID).Scan(&currentStatus, &currentGoal)
+    var descriptionID sql.NullInt64
+    err = db.QueryRow("SELECT status, goal, todo_description_id FROM daily_todos WHERE id = ? AND user_id = ? AND deleted = 0", id, userID).Scan(&currentStatus, &currentGoal, &descriptionID)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to fetch current todo: %v", err), http.StatusInternalServerError)
         return
@@ -939,10 +939,45 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
         todo.Status = todo.Goal
     }
 
+    // Update the todo item
     _, err = db.Exec("UPDATE daily_todos SET title = ?, status = ?, goal = ? WHERE id = ? AND user_id = ?", todo.Title, todo.Status, todo.Goal, id, userID)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
+    }
+
+    // Handle the description logic
+    if todo.Description != "" {
+        if !descriptionID.Valid {
+            // Insert the new todo_description
+            result, err := db.Exec("INSERT INTO todo_descriptions (description, user_id, initial_daily_todo_id) VALUES (?, ?, ?)",
+                todo.Description, userID, id)
+            if err != nil {
+                http.Error(w, fmt.Sprintf("Failed to save todo description: %v", err), http.StatusInternalServerError)
+                return
+            }
+
+            newDescriptionID, err := result.LastInsertId()
+            if err != nil {
+                http.Error(w, "Failed to retrieve description ID", http.StatusInternalServerError)
+                return
+            }
+
+            // Update the daily_todo to link to the new description
+            _, err = db.Exec("UPDATE daily_todos SET todo_description_id = ? WHERE id = ?", newDescriptionID, id)
+            if err != nil {
+                http.Error(w, fmt.Sprintf("Failed to update todo with description: %v", err), http.StatusInternalServerError)
+                return
+            }
+        } else {
+            // Update the existing todo_description
+            _, err = db.Exec("UPDATE todo_descriptions SET description = ?, updated_at = NOW() WHERE id = ? AND user_id = ?",
+                todo.Description, descriptionID.Int64, userID)
+            if err != nil {
+                http.Error(w, fmt.Sprintf("Failed to update todo description: %v", err), http.StatusInternalServerError)
+                return
+            }
+        }
     }
 
     w.Header().Set("Content-Type", "application/json")
