@@ -1,8 +1,19 @@
 import React from "react";
 import axios from "../axiosConfig";
+import UpdateTodo from "./UpdateTodo";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { AppStateContext } from "../context/AppStateContext";
+import { useContext } from "react";
 
-function TodoList({ todos, setTodos, onEditTodo, finalizedMap, finalizeDay }) {
+function TodoList({
+    todos,
+    setTodos,
+    onEditTodo,
+    finalizedMap,
+    finalizeDay,
+    handleCancelUpdate,
+}) {
+    const { isUpdateMode, currentTodo } = useContext(AppStateContext);
     const handleQuantityChange = (todo, index) => {
         let newStatus;
         if (index < todo.status) {
@@ -169,50 +180,72 @@ function TodoList({ todos, setTodos, onEditTodo, finalizedMap, finalizeDay }) {
                                                                 {...provided.dragHandleProps}
                                                                 className="flex items-center p-1 border-b border-gray-200"
                                                             >
-                                                                <p className="flex-1 text-xs mx-2 font-normal">
-                                                                    <span
-                                                                        className="todo-title hover:underline cursor-pointer"
-                                                                        onClick={() =>
-                                                                            onEditTodo(
-                                                                                todo
-                                                                            )
+                                                                {isUpdateMode &&
+                                                                currentTodo &&
+                                                                currentTodo.id ===
+                                                                    todo.id ? (
+                                                                    <UpdateTodo
+                                                                        key={
+                                                                            currentTodo.id
                                                                         }
-                                                                    >
-                                                                        {
-                                                                            todo.title
+                                                                        todo={
+                                                                            currentTodo
                                                                         }
-                                                                    </span>
-                                                                </p>
-                                                                <section>
-                                                                    {Array.from(
-                                                                        {
-                                                                            length: todo.goal,
+                                                                        setTodos={
+                                                                            setTodos
                                                                         }
-                                                                    ).map(
-                                                                        (
-                                                                            _,
-                                                                            idx
-                                                                        ) => (
-                                                                            <input
-                                                                                key={
-                                                                                    idx
-                                                                                }
-                                                                                type="checkbox"
-                                                                                checked={
-                                                                                    idx <
-                                                                                    todo.status
-                                                                                }
-                                                                                onChange={() =>
-                                                                                    handleQuantityChange(
-                                                                                        todo,
-                                                                                        idx
+                                                                        onCancel={
+                                                                            handleCancelUpdate
+                                                                        }
+                                                                    />
+                                                                ) : (
+                                                                    <>
+                                                                        <p className="flex-1 text-xs mx-2 font-normal">
+                                                                            <span
+                                                                                className="todo-title hover:underline cursor-pointer"
+                                                                                onClick={() =>
+                                                                                    onEditTodo(
+                                                                                        todo
                                                                                     )
                                                                                 }
-                                                                                className="mr-2"
-                                                                            />
-                                                                        )
-                                                                    )}
-                                                                </section>
+                                                                            >
+                                                                                {
+                                                                                    todo.title
+                                                                                }
+                                                                            </span>
+                                                                        </p>
+                                                                        <section>
+                                                                            {Array.from(
+                                                                                {
+                                                                                    length: todo.goal,
+                                                                                }
+                                                                            ).map(
+                                                                                (
+                                                                                    _,
+                                                                                    idx
+                                                                                ) => (
+                                                                                    <input
+                                                                                        key={
+                                                                                            idx
+                                                                                        }
+                                                                                        type="checkbox"
+                                                                                        checked={
+                                                                                            idx <
+                                                                                            todo.status
+                                                                                        }
+                                                                                        onChange={() =>
+                                                                                            handleQuantityChange(
+                                                                                                todo,
+                                                                                                idx
+                                                                                            )
+                                                                                        }
+                                                                                        className="mr-2"
+                                                                                    />
+                                                                                )
+                                                                            )}
+                                                                        </section>
+                                                                    </>
+                                                                )}
                                                             </li>
                                                         )}
                                                     </Draggable>

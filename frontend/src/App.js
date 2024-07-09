@@ -21,9 +21,7 @@ function App() {
         setTodos,
         dailyMessage,
         setDailyMessage,
-        isUpdateMode,
         setIsUpdateMode,
-        currentTodo,
         setCurrentTodo,
         view,
         setView,
@@ -97,18 +95,7 @@ function App() {
     const renderAddUpdateTodoView = () => {
         if (user) {
             if (view === "todos") {
-                if (isUpdateMode) {
-                    return (
-                        <UpdateTodo
-                            key={currentTodo ? currentTodo.id : "new"}
-                            todo={currentTodo}
-                            setTodos={setTodos}
-                            onCancel={handleCancelUpdate}
-                        />
-                    );
-                } else {
-                    return <AddTodo setTodos={setTodos} />;
-                }
+                return <AddTodo setTodos={setTodos} />;
             }
         } else {
             return <AuthForm />;
@@ -143,6 +130,7 @@ function App() {
                             onEditTodo={handleEditTodo}
                             finalizedMap={finalizedMap} // Pass the finalized map
                             finalizeDay={finalizeDay} // Pass the finalizeDay function
+                            handleCancelUpdate={handleCancelUpdate}
                         />
                     </>
                 );
