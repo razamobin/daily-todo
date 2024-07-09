@@ -44,6 +44,7 @@ type Todo struct {
     UpdatedAt      string    `json:"updated_at"`
     SortIndex      int       `json:"sort_index"`
     Description    string    `json:"description,omitempty"`
+    Notes          string    `json:"notes,omitempty"`
 }
 
 type TodosResponse struct {
@@ -142,9 +143,6 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, map[int]bool, error) 
         return nil, false, 0, nil, err
     }
 
-    fmt.Println("User Timezone:", userTimezone)
-    fmt.Println("Current Time:", currentTime)
-
     recentDayNumber, err := getMostRecentDayNumberForUser(userID)
     if err != nil {
         return nil, false, 0, nil, err
@@ -156,9 +154,6 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, map[int]bool, error) 
     }
 
     currentDayNumber := calculateDayNumber(currentTime, userTimezone)
-
-    fmt.Println("Recent Day Number:", recentDayNumber)
-    fmt.Println("Current Day Number:", currentDayNumber)
 
     newDay := false
     // Adjust the logic to copy todos if the current day number is greater than the recent day number
@@ -175,10 +170,11 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, map[int]bool, error) 
 
     rows, err := db.Query(`
         SELECT dt.id, dt.user_id, dt.title, dt.day_number, dt.status, dt.goal, dt.created_at, dt.updated_at, dt.todo_description_id,
-            COALESCE(fd.finalized, FALSE) AS finalized, td.description
+            COALESCE(fd.finalized, FALSE) AS finalized, td.description, ttn.notes
         FROM daily_todos dt
         LEFT JOIN finalized_days fd ON dt.user_id = fd.user_id AND dt.day_number = fd.day_number
         LEFT JOIN todo_descriptions td ON dt.todo_description_id = td.id
+        LEFT JOIN todays_todo_notes ttn ON dt.id = ttn.daily_todo_id
         WHERE dt.user_id = ? AND dt.day_number BETWEEN ? AND ? AND dt.deleted = 0
         ORDER BY dt.day_number DESC, dt.sort_index ASC`, userID, sevenDaysAgo, currentDayNumber)
     if err != nil {
@@ -191,16 +187,19 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, map[int]bool, error) 
     for rows.Next() {
         var todo Todo
         var createdAt, updatedAt string
-        var description sql.NullString
+        var description, notes sql.NullString
         var finalized bool
         var todoDescriptionID sql.NullInt64
-        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt, &todoDescriptionID, &finalized, &description); err != nil {
+        if err := rows.Scan(&todo.ID, &todo.UserID, &todo.Title, &todo.DayNumber, &todo.Status, &todo.Goal, &createdAt, &updatedAt, &todoDescriptionID, &finalized, &description, &notes); err != nil {
             return nil, false, 0, nil, fmt.Errorf("failed to scan todo: %w", err)
         }
         todo.CreatedAt = createdAt
         todo.UpdatedAt = updatedAt
         if todoDescriptionID.Valid && description.Valid {
             todo.Description = description.String
+        }
+        if notes.Valid {
+            todo.Notes = notes.String
         }
         todos = append(todos, todo)
         finalizedMap[todo.DayNumber] = finalized
@@ -977,6 +976,15 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
                 http.Error(w, fmt.Sprintf("Failed to update todo description: %v", err), http.StatusInternalServerError)
                 return
             }
+        }
+    }
+
+    // Handle the notes logic
+    if todo.Notes != "" {
+        _, err = db.Exec("INSERT INTO todays_todo_notes (daily_todo_id, notes, user_id) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE notes = ?", id, todo.Notes, userID, todo.Notes)
+        if err != nil {
+            http.Error(w, fmt.Sprintf("Failed to save todo notes: %v", err), http.StatusInternalServerError)
+            return
         }
     }
 

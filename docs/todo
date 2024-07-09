@@ -136,14 +136,22 @@ NEXT July 3 2024
 
     x put edit form inline
 
+    x make text area larger
+
     **allow edit form to add today's notes - open by default. also add why is this todo important to your mission/goals (this can be hidden with that arrow open close UI thing)
-        why each thing relates to mission, why it's important to you
+        x why each thing relates to mission, why it's important to you
+
         daily notes/caveats on each todo item - travel day, could't do as much focused coding time
+
         send the info to AI to help it understand you better
 
-        why important table
+        x why important table
 
-        notes per todo table
+        today's notes for the todo table
+
+    rename
+        item importance
+        item notes today
 
     *editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
 
@@ -177,10 +185,13 @@ NEXT July 3 2024
         give past history of messages to AI so it doesn't repeat itself?
 
 ---
+    move trash icon lol, that's where update should be
 
     there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
 
     after finalize, not allowed to edit / check todos anymore
+
+    can enter final comments about the day before finalize
 
     show finalize button if not finalized and if it's a new day (configuration)
 
