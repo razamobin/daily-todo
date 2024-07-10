@@ -138,20 +138,16 @@ NEXT July 3 2024
 
     x make text area larger
 
-    **allow edit form to add today's notes - open by default. also add why is this todo important to your mission/goals (this can be hidden with that arrow open close UI thing)
+    x allow edit form to add today's notes - open by default. also add why is this todo important to your mission/goals (this can be hidden with that arrow open close UI thing)
         x why each thing relates to mission, why it's important to you
 
-        daily notes/caveats on each todo item - travel day, could't do as much focused coding time
-
-        send the info to AI to help it understand you better
+        x daily notes/caveats on each todo item - travel day, could't do as much focused coding time
 
         x why important table
 
-        today's notes for the todo table
-
     rename
-        item importance
-        item notes today
+        todo item importance
+        todo item notes today
 
     *editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
 
@@ -164,6 +160,8 @@ NEXT July 3 2024
     share on youtube. walkthrough the code, and how people can get it working locally
 
     **improve AI
+        send the todo importance info, and daily notes info to AI to help it understand you better
+
         convert day # to display date. probably need structured json back. and i can format it
 
         you probably want to be able to chat back and forth - hey did you get day 18? remember that i didn't finalize it, so no need to say incomplete, i did do it
@@ -179,11 +177,6 @@ NEXT July 3 2024
             give i context up front. make sure there are new finalized days, else just show previously saved message.
                 saved assistant message should save latest finalized day number w the message. only gen new message if you have a new finalized day. else show prev
 
-    put label on daily message - message for most recent finalized day - july 7th 
-        if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
-        put past history of messages there?
-        give past history of messages to AI so it doesn't repeat itself?
-
 ---
     move trash icon lol, that's where update should be
 
@@ -194,6 +187,11 @@ NEXT July 3 2024
     can enter final comments about the day before finalize
 
     show finalize button if not finalized and if it's a new day (configuration)
+
+    put label on daily message - message for most recent finalized day - july 7th 
+        if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
+        put past history of messages there?
+        give past history of messages to AI so it doesn't repeat itself?
 
 ---
     *make it live in prod

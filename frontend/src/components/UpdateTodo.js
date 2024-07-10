@@ -91,22 +91,36 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                         Update
                     </button>
                 </div>
-                <div className="form-row flex items-center gap-2">
+                <div className="form-row flex flex-col gap-1">
+                    <label
+                        htmlFor="itemNotes"
+                        className="text-xs font-semibold"
+                    >
+                        How is this todo going today?
+                    </label>
                     <textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Edit Description"
-                        className="p-2 text-xs border border-gray-300 rounded flex-1"
-                        rows="5"
-                    />
-                </div>
-                <div className="form-row flex items-center gap-2">
-                    <textarea
+                        id="itemNotes"
                         value={itemNotes}
                         onChange={(e) => setItemNotes(e.target.value)}
                         placeholder="Edit Notes"
                         className="p-2 text-xs border border-gray-300 rounded flex-1"
                         rows="3"
+                    />
+                </div>
+                <div className="form-row flex flex-col gap-1">
+                    <label
+                        htmlFor="description"
+                        className="text-xs font-semibold"
+                    >
+                        Why is this todo important to you?
+                    </label>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Edit Description"
+                        className="p-2 text-xs border border-gray-300 rounded flex-1"
+                        rows="5"
                     />
                 </div>
                 <div className="form-row action-buttons flex justify-end gap-2">

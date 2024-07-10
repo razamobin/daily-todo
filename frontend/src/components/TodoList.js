@@ -291,7 +291,7 @@ function TodoList({
                             </ul>
                         )}
                         {!finalizedMap[dayNumber] && (
-                            <div className="flex justify-end mt-2">
+                            <div className="flex justify-end mt-2 mr-2">
                                 <button
                                     onClick={() => finalizeDay(dayNumber)}
                                     className="bg-black text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-800"
