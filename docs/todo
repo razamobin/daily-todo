@@ -159,13 +159,12 @@ NEXT July 3 2024
 
     share on youtube. walkthrough the code, and how people can get it working locally
 
+    **fix button layout on edit todo - cancel, update, trash
+
     **improve AI
         send the todo importance info, and daily notes info to AI to help it understand you better
 
         convert day # to display date. probably need structured json back. and i can format it
-
-        you probably want to be able to chat back and forth - hey did you get day 18? remember that i didn't finalize it, so no need to say incomplete, i did do it
-            or, hey that day is finalized, i didn't do the thing, it's not in progress, it's in the past. i couldn't fit it in
 
         better identification of what you are good at, consisteny, streaks, areas of improvement etc.
             provide examples
@@ -176,6 +175,9 @@ NEXT July 3 2024
         agency swarm, have diff roles
             give i context up front. make sure there are new finalized days, else just show previously saved message.
                 saved assistant message should save latest finalized day number w the message. only gen new message if you have a new finalized day. else show prev
+
+        you probably want to be able to chat back and forth - hey did you get day 18? remember that i didn't finalize it, so no need to say incomplete, i did do it
+            or, hey that day is finalized, i didn't do the thing, it's not in progress, it's in the past. i couldn't fit it in
 
 ---
     move trash icon lol, that's where update should be

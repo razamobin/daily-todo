@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "../axiosConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function UpdateTodo({ todo, setTodos, onCancel }) {
     const [title, setTitle] = useState(todo.title);
@@ -77,19 +77,6 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                             {goal === 1 ? "time per day" : "times per day"}
                         </span>
                     </div>
-                    <button
-                        type="button"
-                        onClick={onCancel}
-                        className="bg-white text-black border border-black p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-200"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="bg-black text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-800"
-                    >
-                        Update
-                    </button>
                 </div>
                 <div className="form-row flex flex-col gap-1">
                     <label
@@ -123,7 +110,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                         rows="5"
                     />
                 </div>
-                <div className="form-row action-buttons flex justify-end gap-2">
+                <div className="form-row action-buttons flex justify-between gap-2">
                     <button
                         type="button"
                         onClick={handleDelete}
@@ -131,6 +118,21 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                     >
                         <FontAwesomeIcon icon={faTrash} />
                     </button>
+                    <div className="flex gap-2">
+                        <button
+                            type="button"
+                            onClick={onCancel}
+                            className="bg-white text-black border border-black p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-200"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="bg-black text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-800"
+                        >
+                            Update
+                        </button>
+                    </div>
                 </div>
             </form>
         </section>
