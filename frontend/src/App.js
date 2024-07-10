@@ -1,9 +1,8 @@
-import React, { useEffect, useContext, useState } from "react";
+import React, { useEffect, useContext, useState, useCallback } from "react";
 import { AuthContext } from "./context/AuthProvider";
 import { AppStateContext } from "./context/AppStateContext";
 import axios from "./axiosConfig";
 import AddTodo from "./components/AddTodo";
-import UpdateTodo from "./components/UpdateTodo";
 import TodoList from "./components/TodoList";
 import ReactMarkdown from "react-markdown";
 import rehypeReact from "rehype-react";
@@ -29,9 +28,8 @@ function App() {
 
     const [finalizedMap, setFinalizedMap] = useState({});
 
-    useEffect(() => {
-        if (!user) return;
-        const fetchDailyMessage = (newDayNumber) => {
+    const fetchDailyMessage = useCallback(
+        (newDayNumber) => {
             if (!user) return;
             const eventSource = new EventSource(
                 `http://localhost:5001/api/daily-message?user_id=${user.id}&new_day_number=${newDayNumber}`,
@@ -54,7 +52,12 @@ function App() {
                 console.error("Error fetching daily message:", error);
                 eventSource.close();
             };
-        };
+        },
+        [user, setDailyMessage]
+    );
+
+    useEffect(() => {
+        if (!user) return;
         axios
             .get("http://localhost:8080/api/todos")
             .then((response) => {
@@ -68,7 +71,7 @@ function App() {
                 fetchDailyMessage(response.data.highest_finalized_day);
             })
             .catch((error) => console.error(error));
-    }, [user, setTodos, setDailyMessage]);
+    }, [user, setTodos, setDailyMessage, fetchDailyMessage]);
 
     const handleEditTodo = (todo) => {
         setCurrentTodo(todo);
@@ -90,6 +93,8 @@ function App() {
                     ...prevMap,
                     [dayNumber]: true,
                 }));
+                setDailyMessage(""); // Clear the daily message
+                fetchDailyMessage(dayNumber); // Fetch a new daily message
             })
             .catch((error) => console.error("Error finalizing day:", error));
     };
