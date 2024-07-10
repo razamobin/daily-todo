@@ -60,10 +60,12 @@ function App() {
             .then((response) => {
                 setTodos(response.data.todos);
                 setFinalizedMap(response.data.finalized_map); // Set the finalized map
-                if (response.data.new_day) {
-                    console.log("new day!");
+                if (response.data.new_finalized_day) {
+                    console.log("new finalized day!");
+                } else {
+                    console.log("not a new finalized day :(");
                 }
-                fetchDailyMessage(response.data.new_day_number);
+                fetchDailyMessage(response.data.highest_finalized_day);
             })
             .catch((error) => console.error(error));
     }, [user, setTodos, setDailyMessage]);

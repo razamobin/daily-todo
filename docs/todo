@@ -145,7 +145,40 @@ NEXT July 3 2024
 
         x why important table
 
-    rename
+    x fix button layout on edit todo - cancel, update, trash
+
+    **make sure there are new finalized days, else just show previously saved message.
+        x saved assistant message should save latest finalized day number w the message. only gen new message if you have a new finalized day. else show prev
+        x return max finalized day no matter what. so UI can hit python w that day to get message for
+            not 0, even though 23 is in db
+
+        how can we call daily message when a user clicks finalize? because there is a new finalized day now
+
+    **improve AI
+
+        send the todo importance info, and daily notes info to AI to help it understand you better
+
+        dont need to give it tool for user mission, just hand it the user mission in the prompt/context
+
+        better identification of what you are good at, consisteny, streaks, areas of improvement etc.
+            provide examples
+
+        memory? knows everything about you
+            use agency swarm. perplexity i have a thread on this
+
+        agency swarm, have diff roles
+            give i context up front. 
+           
+        convert day # to display date. probably need structured json back. and i can format it
+
+        you probably want to be able to chat back and forth - hey did you get day 18? remember that i didn't finalize it, so no need to say incomplete, i did do it
+            or, hey that day is finalized, i didn't do the thing, it's not in progress, it's in the past. i couldn't fit it in
+
+    **share on skool. people will like this
+
+    **share on youtube. walkthrough the code, and how people can get it working locally
+
+    *rename tables, variables
         todo item importance
         todo item notes today
 
@@ -155,36 +188,15 @@ NEXT July 3 2024
 
     *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
 
-    share on skool. people will like this hist
-
-    share on youtube. walkthrough the code, and how people can get it working locally
-
-    **fix button layout on edit todo - cancel, update, trash
-
-    **improve AI
-        send the todo importance info, and daily notes info to AI to help it understand you better
-
-        convert day # to display date. probably need structured json back. and i can format it
-
-        better identification of what you are good at, consisteny, streaks, areas of improvement etc.
-            provide examples
-
-        memory? knows everything about you
-            use agency swarm. perplexity i have a thread on this
-
-        agency swarm, have diff roles
-            give i context up front. make sure there are new finalized days, else just show previously saved message.
-                saved assistant message should save latest finalized day number w the message. only gen new message if you have a new finalized day. else show prev
-
-        you probably want to be able to chat back and forth - hey did you get day 18? remember that i didn't finalize it, so no need to say incomplete, i did do it
-            or, hey that day is finalized, i didn't do the thing, it's not in progress, it's in the past. i couldn't fit it in
-
 ---
-    move trash icon lol, that's where update should be
+    x move trash icon lol, that's where update should be
 
     there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
 
-    after finalize, not allowed to edit / check todos anymore
+    before finalizing, you can still edit how the todo went that day (yesterday for example)
+
+    after finalize, not allowed to edit / check off todos anymore
+        but you can click and see uneditable text fields. not update button, no trash, just close.
 
     can enter final comments about the day before finalize
 
@@ -203,7 +215,6 @@ NEXT July 3 2024
 
         domains
             dailytodos.ai - main domain
-            dailytodo.ai - buy and it redirects
             samethingeveryday.ai
 
     let anon users fill in all their info
@@ -239,6 +250,9 @@ NEXT July 3 2024
         convert to Vite project, not create-react-app (seems outdated, not modern)
 
         if you refresh fast, run is still running and you interrupted it. and you would have to cancel it, before hitting AI again
+
+        sql - rename saved_assistant_messages column to new_finalized_day
+            refactor App.js sending the request, python receiving the request, python hitting golang. all should use new finalized day when referring to saved assistant messages
 
 ---
 
