@@ -9,6 +9,7 @@ require (
 	github.com/gomodule/redigo v1.8.0
 	github.com/gorilla/handlers v1.5.2
 	github.com/gorilla/mux v1.8.1
+	github.com/jmoiron/sqlx v1.4.0
 	golang.org/x/crypto v0.24.0
 )
 

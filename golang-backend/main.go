@@ -19,6 +19,7 @@ import (
 	"github.com/gomodule/redigo/redis"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/jmoiron/sqlx"
 )
 
 var db *sql.DB
@@ -785,20 +786,83 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
     }
     currentDayNumber := calculateDayNumber(currentTime, userTimezone)
 
-    // Fetch the last 7 days of todos excluding the current day
-    todos, err := getLast7DaysTodos(userID, currentDayNumber-1)
+    // Fetch the most recent 7 finalized days of todos
+    todos, err := getMostRecentFinalizedDaysTodos(userID)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to fetch todos: %v", err), http.StatusInternalServerError)
         return
     }
 
     response := map[string]interface{}{
-        "mission":           mission,
-        "todos":             todos,
+        "mission":            mission,
+        "todos_history":              todos,
         "current_day_number": currentDayNumber,
     }
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
+}
+
+// Helper function to fetch the most recent 7 finalized days of todos
+func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, error) {
+    // Fetch the 7 most recent finalized days
+    rows, err := db.Query(`
+        SELECT day_number 
+        FROM finalized_days 
+        WHERE user_id = ? 
+        AND finalized = TRUE
+        ORDER BY day_number DESC
+        LIMIT 7`, userID)
+    if err != nil {
+        return nil, fmt.Errorf("failed to fetch finalized days: %w", err)
+    }
+    defer rows.Close()
+
+    dayNumbers := []int{}
+    for rows.Next() {
+        var dayNumber int
+        if err := rows.Scan(&dayNumber); err != nil {
+            return nil, fmt.Errorf("failed to scan day number: %w", err)
+        }
+        dayNumbers = append(dayNumbers, dayNumber)
+    }
+
+    if len(dayNumbers) == 0 {
+        return []map[string]interface{}{}, nil
+    }
+
+    // Fetch todos for the 7 most recent finalized days
+    query, args, err := sqlx.In(`
+        SELECT dt.day_number, dt.title, dt.status, dt.goal 
+        FROM daily_todos dt
+        WHERE dt.user_id = ? 
+        AND dt.day_number IN (?) 
+        AND dt.deleted = 0
+        ORDER BY dt.day_number DESC, dt.sort_index ASC`, userID, dayNumbers)
+    if err != nil {
+        return nil, fmt.Errorf("failed to build query: %w", err)
+    }
+
+    query = sqlx.Rebind(sqlx.QUESTION, query)
+    rows, err = db.Query(query, args...)
+    if err != nil {
+        return nil, fmt.Errorf("failed to fetch todos: %w", err)
+    }
+    defer rows.Close()
+
+    todos := []map[string]interface{}{}
+    for rows.Next() {
+        var dayNumber, status, goal int
+        var title string
+        if err := rows.Scan(&dayNumber, &title, &status, &goal); err != nil {
+            return nil, fmt.Errorf("failed to scan todo: %w", err)
+        }
+        todos = append(todos, map[string]interface{}{
+            "day_number": dayNumber,
+            "title":      title,
+            "progress":   fmt.Sprintf("%d out of %d", status, goal),
+        })
+    }
+    return todos, nil
 }
 
 // Helper function to fetch the last 7 days of todos excluding the current day

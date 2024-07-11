@@ -163,9 +163,17 @@ NEXT July 3 2024
 
         *send the todo importance info, and daily notes info to AI to help it understand you better
             try w gpt4o to see how it uses this great info
+            most recent 7 finalized, any days
+            todo importance
+            todo journal
+
+            RESUME
+                edit to include journal notes
+                edit to include importance (just on most recent day, or in a general key. not associated with a particular day. try both ways. whatever gives good results)
 
         *convert day # to display date. probably need structured json back. and i can format it
             gpt4o references day #s, so can tell it in the prompt to use days, or give me formatted json and i can convert # to display date
+            ask AI what is the best way to do this
 
         better identification of what you are good at, consisteny, streaks, areas of improvement etc.
             provide examples
@@ -206,6 +214,7 @@ NEXT July 3 2024
 
 ---
     there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
+        i added grocery, and i think i dragged it to where i wanted it. then it also showed up at the bottom lol wut.
 
     before finalizing, you can still edit how the todo went that day (yesterday for example)
 
@@ -268,6 +277,8 @@ NEXT July 3 2024
 
         sql - rename saved_assistant_messages column to new_finalized_day
             refactor App.js sending the request, python receiving the request, python hitting golang. all should use new finalized day when referring to saved assistant messages
+
+        app.py don't need GetUserMission tool right now. might add other tools in the future though
 
 ---
 
@@ -545,6 +556,11 @@ curl -X POST http://localhost:8080/api/login \
          }'
 
 curl -X GET http://localhost:8080/api/logged-in-user
+
+curl -G -H "Authorization: Bearer YOUR_BEARER_TOKEN" \
+     --data-urlencode "user_id=USER_ID" \
+     http://localhost:8080/api/user-mission
+
 ===
 my life's mission is to do creative work 6 hours a day and live healthy forever
     put that at the top of your todo page
