@@ -147,18 +147,25 @@ NEXT July 3 2024
 
     x fix button layout on edit todo - cancel, update, trash
 
-    **make sure there are new finalized days, else just show previously saved message.
+    x move trash icon lol, that's where update should be
+
+    x make sure there are new finalized days, else just show previously saved message.
         x saved assistant message should save latest finalized day number w the message. only gen new message if you have a new finalized day. else show prev
         x return max finalized day no matter what. so UI can hit python w that day to get message for
             not 0, even though 23 is in db
 
-        how can we call daily message when a user clicks finalize? because there is a new finalized day now
+        x how can we call daily message when a user clicks finalize? because there is a new finalized day now
 
     **improve AI
 
-        send the todo importance info, and daily notes info to AI to help it understand you better
+        x dont need to give it tool for user mission, just hand it the user mission in the prompt/context
+            x aka give it context upfront
 
-        dont need to give it tool for user mission, just hand it the user mission in the prompt/context
+        *send the todo importance info, and daily notes info to AI to help it understand you better
+            try w gpt4o to see how it uses this great info
+
+        *convert day # to display date. probably need structured json back. and i can format it
+            gpt4o references day #s, so can tell it in the prompt to use days, or give me formatted json and i can convert # to display date
 
         better identification of what you are good at, consisteny, streaks, areas of improvement etc.
             provide examples
@@ -166,31 +173,38 @@ NEXT July 3 2024
         memory? knows everything about you
             use agency swarm. perplexity i have a thread on this
 
-        agency swarm, have diff roles
-            give i context up front. 
-           
-        convert day # to display date. probably need structured json back. and i can format it
+        switch to agency swarm, have diff roles. history analyzer, encourager, etc
 
-        you probably want to be able to chat back and forth - hey did you get day 18? remember that i didn't finalize it, so no need to say incomplete, i did do it
-            or, hey that day is finalized, i didn't do the thing, it's not in progress, it's in the past. i couldn't fit it in
+        **maybe you just want to chat with someone daily about your mission/goals, what you did that day to further your mission/goals, challenges. hash out your thinking. etc. bounce ideas.
+            and the ai sees you putting in work, knows you, your mission, your daily habits, what you did every day, what you couldn't fit it, obstacles etc.
+            ai's mission is to be an unrelenting optimistic force in Raza's life to help him achieve his mission and goals. live healthy forever, and do focused creative work for 6 hours a day forever.
+            AI window should be a chat. it gives you encouragement daily, but you can chat with it anytime and have a convo about your day
+
+    **share on youtube. walkthrough the code, and how people can get it working locally
+        it will get 100k views
 
     **share on skool. people will like this
 
-    **share on youtube. walkthrough the code, and how people can get it working locally
+---
+    **editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
 
-    *rename tables, variables
-        todo item importance
-        todo item notes today
-
-    *editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
-
-    *warning modal upon clicking delete. cancel, delete, this cannot be undone
+    **warning modal upon clicking delete. cancel, delete, this cannot be undone
 
     *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
 
 ---
-    x move trash icon lol, that's where update should be
 
+    **bring back pencil edit icon
+        where did it go lol
+
+    **put title on the edit mode, like put the original todo item as the title "Edit 3 mag 1g/day" and the text updates as you type in the input field
+
+    **put label on daily message - message for most recent finalized day - july 7th 
+        if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
+        put past history of messages there?
+        give past history of messages to AI so it doesn't repeat itself?
+
+---
     there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
 
     before finalizing, you can still edit how the todo went that day (yesterday for example)
@@ -201,15 +215,16 @@ NEXT July 3 2024
     can enter final comments about the day before finalize
 
     show finalize button if not finalized and if it's a new day (configuration)
+        aka don't show finalize button until it is the next day. can't finalize early on accident
+            or show it, but put modal, are you sure? day is not over. day over?
+                job's not finished. job finished?
 
-    put label on daily message - message for most recent finalized day - july 7th 
-        if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
-        put past history of messages there?
-        give past history of messages to AI so it doesn't repeat itself?
+    rename tables, variables
+        todo item importance
+        todo item notes today
 
 ---
     *make it live in prod
-        *profile page or modal to edit info/timezone/mission
 
         prod config - cookies secure true, strict on same site, etc. uwsgi.
 
@@ -272,11 +287,6 @@ NEXT July 3 2024
     instead of user = null in react, user.email = 'anonymoususer@mailinator.com'
 
     needs automated tests for various db interactions, sequences
-
-    maybe you just want to chat with someone daily about your mission/goals, what you did that day to further your mission/goals, challenges. hash out your thinking. etc. bounce ideas.
-        and the ai sees you putting in work, knows you, your mission, your daily habits, what you did every day, what you couldn't fit it, obstacles etc.
-        ai's mission is to be an unrelenting optimistic force in Raza's life to help him achieve his mission and goals. live healthy forever, and do focused creative work for 6 hours a day forever.
-        AI window should be a chat. it gives you encouragement daily, but you can chat with it anytime and have a convo about your day
 
     make the AI better, more varied, lots of work here. dont repeat. better prompting, give it better data
 
@@ -359,16 +369,6 @@ x style of the form
     x disable button if fields not filled in
 
 ---
-enter your mission goals vision
-    save to db. save to files, and send to ai
-    profile page / account settings page
-        raza link, right side, daily todos
-            links to profile page
-
-profile page
-    change timezone
-    enter your mission
-    logout
 
 x each todo is a link, and pops up a modal
     show context - is this editing just this 1 todo for this day? or all todos?
@@ -450,10 +450,6 @@ x hover over a todo - then you can edit
 
 strikethrough when 3 / 3, 1 / 1 etc
 ---
-
-allow sign up
-
-allow login/logout
 
 show current time and timezone on UI, and let user change timezone
 

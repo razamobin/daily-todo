@@ -304,6 +304,8 @@ def daily_message():
         return jsonify(
             error="Failed to check for existing message"), response.status_code
 
+    # get user info, and make AI assistant request with that info to get the latest encouraging message
+
     # Fetch the user's first name
     response = forward_request_with_session_cookie(
         f'http://golang-backend:8080/api/user-first-name')
@@ -361,7 +363,22 @@ def daily_message():
 
     # start a thread with the assistant. new thread or existing if found in the db for this user
     # add a message to the thread "send an encouraging message"
-    eternal_optimist_tools = [GetUserMission]
+    eternal_optimist_tools = []
+
+    # Fetch the user's mission and history using Bearer token
+    token = os.getenv('BEARER_TOKEN', '')
+    headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(
+        f'http://golang-backend:8080/api/user-mission?user_id={user_id}',
+        headers=headers)
+    if response.status_code != 200:
+        return jsonify(error="Failed to fetch user mission and history"
+                       ), response.status_code
+
+    user_mission_history = response.json()
+    user_mission_history_str = json.dumps(user_mission_history)
+
+    print(user_mission_history_str)
 
     q = queue.Queue()
     full_message_queue = queue.Queue()  # New queue for the full message
@@ -370,7 +387,7 @@ def daily_message():
         target=get_completion_stream,
         args=
         (client,
-         f"send an encouraging message to the user with user_id = {user_id}. use tools to get the user's mission and recent daily todo history based on this user_id. finally, in your message addressing the user, please refer to them by their first name {first_name} :)",
+         f"Send an encouraging message to the user who goes by {first_name}. Here is the user's mission and recent daily todo history in JSON form: {user_mission_history_str}.",
          assistant, eternal_optimist_tools, thread, q, full_message_queue))
     completion_thread.start()
 
