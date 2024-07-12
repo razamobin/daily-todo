@@ -1,6 +1,6 @@
 # daily-todo
 
-![App Screenshot](assets/images/screen1.png)
+![App Screenshot](assets/images/screen2.png)
 
 1. clone the repo: git clone https://github.com/razamobin/daily-todo.git
 2. create your .env at the root of the project with your openai api key: OPENAI_API_KEY='sk-my-project-123'. also BEARER_TOKEN which is a shared secret between the golang and python backends. model .env.example
