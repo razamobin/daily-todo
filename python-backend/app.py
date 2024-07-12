@@ -383,12 +383,25 @@ def daily_message():
     q = queue.Queue()
     full_message_queue = queue.Queue()  # New queue for the full message
 
-    completion_thread = threading.Thread(
-        target=get_completion_stream,
-        args=
-        (client,
-         f"Send an encouraging message to the user who goes by {first_name}. Here is the user's mission and recent daily todo history in JSON form: {user_mission_history_str}.",
-         assistant, eternal_optimist_tools, thread, q, full_message_queue))
+    completion_thread = threading.Thread(target=get_completion_stream,
+                                         args=(client, f"""
+       At the end of this message I've included a JSON data string which contains all the 
+       information you will need to compose an encouraging message for the user today. 
+       The data contains the user's mission in life, their recent history of daily todo 
+       items (that they feel helps them reach their goals and accomplish their mission), 
+       and the reasons why each todo item is important to them and their mission. The 
+       user has also included daily notes of how each todo item went on a particular day, 
+       like a mini journal entry. Please address the user by their first name {first_name}. 
+       In your message, be sure to include specific encouragement on how well the user is 
+       doing. Identify and reference ALL streaks they have (7 days in a row of gym for 
+       example). Acknowledge any difficulties and obstacles that they've overcome based on 
+       the notes they've provided or any other relevant information. Emphazise all the 
+       amazing progress they're making. Emphasize how consistent they are. Reminder 
+       that you are an eternal optimist, your mission is to be an unwavering optimistic 
+       force in all your communications with the user. Your mission is to encourage 
+       {first_name} against all odds, doubts, and setbacks to achieve their mission and 
+       goals in life. JSON data: {user_mission_history_str}
+        """, assistant, eternal_optimist_tools, thread, q, full_message_queue))
     completion_thread.start()
 
     @stream_with_context
@@ -453,21 +466,21 @@ def create_assistant():
     eternal_optimist = client.beta.assistants.create(
         name='Eternal Optimist Agent',
         instructions=
-        ("""As an eternal optimist, your mission is to be an unwavering and """
-         """relentless optimistic force in all your communications with the user. """
-         """You can use tools to access the user's mission and goals in life, """
-         """as well as their daily todos going back as far as the user has entered data for. """
-         """In the future, you have context about why each todo is important to the user, and why it is important to their mission and goals. """
-         """Your mission is to encourage the user against all odds, doubts, and setbacks to achieve their mission and goals in life. """
-         """Always return your messages in markdown format. """
-         """Be sure to escape special characters when referencing a user's todo items to avoid formatting issues."""
-         ),
+        ("""As an eternal optimist, your mission is to be an unwavering and relentless """
+         """optimistic force in all your communications with the user. You will be given """
+         """the context such as the user's mission and goals in life, as well as their daily """
+         """todos going back a week or so. You also have context about why each todo is """
+         """important to the user, and why it is important to their mission and goals. """
+         """Your mission is to encourage the user against all odds, doubts, and setbacks to """
+         """achieve their mission and goals in life. Always return your messages in markdown """
+         """format. Be sure to escape special characters when referencing a user's todo """
+         """items to avoid formatting issues."""),
         model="gpt-3.5-turbo",
         tools=[
-            {
-                "type": "function",
-                "function": GetUserMission.openai_schema
-            },
+            #   {
+            #       "type": "function",
+            #       "function": GetUserMission.openai_schema
+            #   },
         ],
     )
     assistant_id = eternal_optimist.id

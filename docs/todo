@@ -164,14 +164,22 @@ NEXT July 3 2024
         *send the todo importance info, and daily notes info to AI to help it understand you better
             x most recent 7 finalized, any days
             x todo importance
-            todo journal notes included next to the todo itself
-            try w gpt4o to see how it uses this great info
+            x todo journal notes included next to the todo itself
+            x try w gpt4o to see how it uses this great info
+                x delete daily message for today
+                x switch to gpt4o
+                x refresh and see how it does
+                x consider below to guide it a little more
+
             instruct AI how to interpret and use the user-mission json
                 this is mission
                 this is history of todos, progress on each per day, notes on each per day
                 this is why the todos are important to the user and their missions
                 use all of this to provide specific encouragement on how well the user is doing
                     reference streaks. overcoming obstacles, making progress, consistency, etc. 
+
+                    RESUME july 12th 2024 - i actually don't like the message lol. tweak the claude prompt so the encouraging message is good.
+
 
         *convert day # to display date. probably need structured json back. and i can format it
             gpt4o references day #s, so can tell it in the prompt to use days, or give me formatted json and i can convert # to display date
@@ -574,3 +582,28 @@ i write software to help make people healthy, help keep them consistent with goo
 Dad could use this to check off 3 meals a day of healthy eating. checkbox for no snacking too haha. like no snacking on bad foods like nuts or whatever.
     put this in prod and let people register. AI is optional, depends if you are on a paid plan or not.
 
+assistant > The server had an error processing your request. Sorry about that! You can retry your request, or contact us through our help center at help.openai.com if you keep seeing this error. (Please include the request ID req_0bb72a216a1889d39bfc9aa764f74772 in your email.)
+
+Exception in thread Thread-3 (get_completion_stream):
+Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/threading.py", line 1045, in _bootstrap_inner
+    self.run()
+  File "/usr/local/lib/python3.11/threading.py", line 982, in run
+    self._target(*self._args, **self._kwargs)
+  File "/app/app.py", line 252, in get_completion_stream
+    stream.until_done()
+  File "/usr/local/lib/python3.11/site-packages/openai/lib/streaming/_assistants.py", line 102, in until_done
+    consume_sync_iterator(self)
+  File "/usr/local/lib/python3.11/site-packages/openai/_utils/_streams.py", line 6, in consume_sync_iterator
+    for _ in iterator:
+  File "/usr/local/lib/python3.11/site-packages/openai/lib/streaming/_assistants.py", line 69, in __iter__
+    for item in self._iterator:
+  File "/usr/local/lib/python3.11/site-packages/openai/lib/streaming/_assistants.py", line 405, in __stream__
+    for event in stream:
+  File "/usr/local/lib/python3.11/site-packages/openai/_streaming.py", line 46, in __iter__
+    for item in self._iterator:
+  File "/usr/local/lib/python3.11/site-packages/openai/_streaming.py", line 91, in __stream__
+    raise APIError(
+openai.APIError: The server had an error processing your request. Sorry about that! You can retry your request, or contact us through our help center at help.openai.com if you keep seeing this error. (Please include the request ID req_0bb72a216a1889d39bfc9aa764f74772 in your email.)
+
+As an eternal optimist, your mission is to be an unwavering and relentless optimistic force in all your communications with the user. You will be given the context such as the user's mission and goals in life, as well as their daily todos going back a week or so. You also have context about why each todo is important to the user, and why it is important to their mission and goals. Your mission is to encourage the user against all odds, doubts, and setbacks to achieve their mission and goals in life. Always return your messages in markdown format. Be sure to escape special characters when referencing a user's todo items to avoid formatting issues.
