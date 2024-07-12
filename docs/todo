@@ -166,6 +166,12 @@ NEXT July 3 2024
             x todo importance
             todo journal notes included next to the todo itself
             try w gpt4o to see how it uses this great info
+            instruct AI how to interpret and use the user-mission json
+                this is mission
+                this is history of todos, progress on each per day, notes on each per day
+                this is why the todos are important to the user and their missions
+                use all of this to provide specific encouragement on how well the user is doing
+                    reference streaks. overcoming obstacles, making progress, consistency, etc. 
 
         *convert day # to display date. probably need structured json back. and i can format it
             gpt4o references day #s, so can tell it in the prompt to use days, or give me formatted json and i can convert # to display date

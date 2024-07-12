@@ -833,9 +833,10 @@ func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, map[
 
     // Fetch todos for the 7 most recent finalized days
     query, args, err := sqlx.In(`
-        SELECT dt.day_number, dt.title, dt.status, dt.goal, td.description 
+        SELECT dt.day_number, dt.title, dt.status, dt.goal, td.description, ttn.notes
         FROM daily_todos dt
         LEFT JOIN todo_descriptions td ON dt.todo_description_id = td.id
+        LEFT JOIN todays_todo_notes ttn ON dt.id = ttn.daily_todo_id
         WHERE dt.user_id = ? 
         AND dt.day_number IN (?) 
         AND dt.deleted = 0
@@ -856,16 +857,20 @@ func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, map[
     for rows.Next() {
         var dayNumber, status, goal int
         var title string
-        var description sql.NullString
-        // Use sql.NullString to handle NULL values in the description column
-        if err := rows.Scan(&dayNumber, &title, &status, &goal, &description); err != nil {
+        var description, notes sql.NullString
+        // Use sql.NullString to handle NULL values in the description and notes columns
+        if err := rows.Scan(&dayNumber, &title, &status, &goal, &description, &notes); err != nil {
             return nil, nil, fmt.Errorf("failed to scan todo: %w", err)
         }
-        todos = append(todos, map[string]interface{}{
+        todo := map[string]interface{}{
             "day_number": dayNumber,
             "title":      title,
             "progress":   fmt.Sprintf("%d out of %d", status, goal),
-        })
+        }
+        if notes.Valid {
+            todo["notes"] = notes.String
+        }
+        todos = append(todos, todo)
         if description.Valid {
             todoImportance[title] = description.String
         }
