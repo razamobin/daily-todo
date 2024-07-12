@@ -162,18 +162,16 @@ NEXT July 3 2024
             x aka give it context upfront
 
         *send the todo importance info, and daily notes info to AI to help it understand you better
+            x most recent 7 finalized, any days
+            x todo importance
+            todo journal notes included next to the todo itself
             try w gpt4o to see how it uses this great info
-            most recent 7 finalized, any days
-            todo importance
-            todo journal
-
-            RESUME
-                edit to include journal notes
-                edit to include importance (just on most recent day, or in a general key. not associated with a particular day. try both ways. whatever gives good results)
 
         *convert day # to display date. probably need structured json back. and i can format it
             gpt4o references day #s, so can tell it in the prompt to use days, or give me formatted json and i can convert # to display date
-            ask AI what is the best way to do this
+            reproduce w gpt4o, then if need to fix still ask AI what is the best way to do this
+                ai responds with day numbers, i want to convert that to day in user's timzone, how can i reliably pick out the day number and replace with real dates? 
+                    should i instruct the ai to put day numbers in a certain format?
 
         better identification of what you are good at, consisteny, streaks, areas of improvement etc.
             provide examples

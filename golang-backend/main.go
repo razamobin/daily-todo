@@ -787,7 +787,7 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
     currentDayNumber := calculateDayNumber(currentTime, userTimezone)
 
     // Fetch the most recent 7 finalized days of todos
-    todos, err := getMostRecentFinalizedDaysTodos(userID)
+    todos, todoImportance, err := getMostRecentFinalizedDaysTodos(userID)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to fetch todos: %v", err), http.StatusInternalServerError)
         return
@@ -796,6 +796,7 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
     response := map[string]interface{}{
         "mission":            mission,
         "todos_history":              todos,
+        "todo_importance":    todoImportance,
         "current_day_number": currentDayNumber,
     }
     w.Header().Set("Content-Type", "application/json")
@@ -803,7 +804,7 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Helper function to fetch the most recent 7 finalized days of todos
-func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, error) {
+func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, map[string]string, error) {
     // Fetch the 7 most recent finalized days
     rows, err := db.Query(`
         SELECT day_number 
@@ -813,7 +814,7 @@ func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, erro
         ORDER BY day_number DESC
         LIMIT 7`, userID)
     if err != nil {
-        return nil, fmt.Errorf("failed to fetch finalized days: %w", err)
+        return nil, nil, fmt.Errorf("failed to fetch finalized days: %w", err)
     }
     defer rows.Close()
 
@@ -821,48 +822,55 @@ func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, erro
     for rows.Next() {
         var dayNumber int
         if err := rows.Scan(&dayNumber); err != nil {
-            return nil, fmt.Errorf("failed to scan day number: %w", err)
+            return nil, nil, fmt.Errorf("failed to scan day number: %w", err)
         }
         dayNumbers = append(dayNumbers, dayNumber)
     }
 
     if len(dayNumbers) == 0 {
-        return []map[string]interface{}{}, nil
+        return []map[string]interface{}{}, map[string]string{}, nil
     }
 
     // Fetch todos for the 7 most recent finalized days
     query, args, err := sqlx.In(`
-        SELECT dt.day_number, dt.title, dt.status, dt.goal 
+        SELECT dt.day_number, dt.title, dt.status, dt.goal, td.description 
         FROM daily_todos dt
+        LEFT JOIN todo_descriptions td ON dt.todo_description_id = td.id
         WHERE dt.user_id = ? 
         AND dt.day_number IN (?) 
         AND dt.deleted = 0
         ORDER BY dt.day_number DESC, dt.sort_index ASC`, userID, dayNumbers)
     if err != nil {
-        return nil, fmt.Errorf("failed to build query: %w", err)
+        return nil, nil, fmt.Errorf("failed to build query: %w", err)
     }
 
     query = sqlx.Rebind(sqlx.QUESTION, query)
     rows, err = db.Query(query, args...)
     if err != nil {
-        return nil, fmt.Errorf("failed to fetch todos: %w", err)
+        return nil, nil, fmt.Errorf("failed to fetch todos: %w", err)
     }
     defer rows.Close()
 
     todos := []map[string]interface{}{}
+    todoImportance := make(map[string]string)
     for rows.Next() {
         var dayNumber, status, goal int
         var title string
-        if err := rows.Scan(&dayNumber, &title, &status, &goal); err != nil {
-            return nil, fmt.Errorf("failed to scan todo: %w", err)
+        var description sql.NullString
+        // Use sql.NullString to handle NULL values in the description column
+        if err := rows.Scan(&dayNumber, &title, &status, &goal, &description); err != nil {
+            return nil, nil, fmt.Errorf("failed to scan todo: %w", err)
         }
         todos = append(todos, map[string]interface{}{
             "day_number": dayNumber,
             "title":      title,
             "progress":   fmt.Sprintf("%d out of %d", status, goal),
         })
+        if description.Valid {
+            todoImportance[title] = description.String
+        }
     }
-    return todos, nil
+    return todos, todoImportance, nil
 }
 
 // Helper function to fetch the last 7 days of todos excluding the current day
