@@ -156,12 +156,12 @@ NEXT July 3 2024
 
         x how can we call daily message when a user clicks finalize? because there is a new finalized day now
 
-    **improve AI
+    x improve AI v1
 
         x dont need to give it tool for user mission, just hand it the user mission in the prompt/context
             x aka give it context upfront
 
-        *send the todo importance info, and daily notes info to AI to help it understand you better
+        x send the todo importance info, and daily notes info to AI to help it understand you better
             x most recent 7 finalized, any days
             x todo importance
             x todo journal notes included next to the todo itself
@@ -171,15 +171,61 @@ NEXT July 3 2024
                 x refresh and see how it does
                 x consider below to guide it a little more
 
-            instruct AI how to interpret and use the user-mission json
+            x instruct AI how to interpret and use the user-mission json
                 this is mission
                 this is history of todos, progress on each per day, notes on each per day
                 this is why the todos are important to the user and their missions
                 use all of this to provide specific encouragement on how well the user is doing
                     reference streaks. overcoming obstacles, making progress, consistency, etc. 
 
-                    RESUME july 12th 2024 - i actually don't like the message lol. tweak the claude prompt so the encouraging message is good.
+                    x RESUME july 12th 2024 - i actually don't like the message lol. tweak the claude prompt so the encouraging message is good.
 
+        x better identification of what you are good at, consisteny, streaks, areas of improvement etc.
+            x provide examples
+---
+    **put title on the edit mode, like put the original todo item as the title "Edit 3 mag 1g/day" and the text updates as you type in the input field
+
+    **bring back pencil edit icon
+        where did it go lol
+
+    **editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
+
+    **there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
+        i added grocery, and i think i dragged it to where i wanted it. then it also showed up at the bottom lol wut.
+        reproduce and try to figure out where the bug is. just on react side, backend seems fine
+
+    **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
+---
+    **share on youtube. walkthrough the code, and how people can get it working locally
+        it will get 100k views
+
+    **share on skool. people will like this
+---
+
+    *make it live in prod
+
+        prod config - cookies secure true, strict on same site, etc. uwsgi.
+
+        domains
+            dailytodos.ai - main domain
+            samethingeveryday.ai
+
+        *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
+            plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
+            am walk, pm walk like clockwork
+---
+    *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
+======
+    *put label on daily message - message for most recent finalized day - july 7th 
+        if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
+        put past history of messages there?
+        give past history of messages to AI so it doesn't repeat itself?
+---
+    improve AI v2
+        **maybe you just want to chat with someone daily about your mission/goals, what you did that day to further your mission/goals, challenges. hash out your thinking. etc. bounce ideas.
+            and the ai sees you putting in work, knows you, your mission, your daily habits, what you did every day, what you couldn't fit it, obstacles etc.
+            ai's mission is to be an unrelenting optimistic force in Raza's life to help him achieve his mission and goals. live healthy forever, and do focused creative work for 6 hours a day forever.
+            AI window should be a chat. it gives you encouragement daily, but you can chat with it anytime and have a convo about your day
 
         *convert day # to display date. probably need structured json back. and i can format it
             gpt4o references day #s, so can tell it in the prompt to use days, or give me formatted json and i can convert # to display date
@@ -187,47 +233,12 @@ NEXT July 3 2024
                 ai responds with day numbers, i want to convert that to day in user's timzone, how can i reliably pick out the day number and replace with real dates? 
                     should i instruct the ai to put day numbers in a certain format?
 
-        better identification of what you are good at, consisteny, streaks, areas of improvement etc.
-            provide examples
-
-        memory? knows everything about you
+        memory? knows everything about you. remembers important events from past conversations
             use agency swarm. perplexity i have a thread on this
 
         switch to agency swarm, have diff roles. history analyzer, encourager, etc
 
-        **maybe you just want to chat with someone daily about your mission/goals, what you did that day to further your mission/goals, challenges. hash out your thinking. etc. bounce ideas.
-            and the ai sees you putting in work, knows you, your mission, your daily habits, what you did every day, what you couldn't fit it, obstacles etc.
-            ai's mission is to be an unrelenting optimistic force in Raza's life to help him achieve his mission and goals. live healthy forever, and do focused creative work for 6 hours a day forever.
-            AI window should be a chat. it gives you encouragement daily, but you can chat with it anytime and have a convo about your day
-
-    **share on youtube. walkthrough the code, and how people can get it working locally
-        it will get 100k views
-
-    **share on skool. people will like this
-
 ---
-    **editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
-
-    **warning modal upon clicking delete. cancel, delete, this cannot be undone
-
-    *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
-
----
-
-    **bring back pencil edit icon
-        where did it go lol
-
-    **put title on the edit mode, like put the original todo item as the title "Edit 3 mag 1g/day" and the text updates as you type in the input field
-
-    **put label on daily message - message for most recent finalized day - july 7th 
-        if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
-        put past history of messages there?
-        give past history of messages to AI so it doesn't repeat itself?
-
----
-    there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
-        i added grocery, and i think i dragged it to where i wanted it. then it also showed up at the bottom lol wut.
-
     before finalizing, you can still edit how the todo went that day (yesterday for example)
 
     after finalize, not allowed to edit / check off todos anymore
@@ -245,13 +256,6 @@ NEXT July 3 2024
         todo item notes today
 
 ---
-    *make it live in prod
-
-        prod config - cookies secure true, strict on same site, etc. uwsgi.
-
-        domains
-            dailytodos.ai - main domain
-            samethingeveryday.ai
 
     let anon users fill in all their info
             create a temp user in db, tmp user login session
