@@ -214,11 +214,16 @@ NEXT July 3 2024
 
 RESUME
 
-    **make UpdateTodo part of the li, unified with the bolded todo item. less space between bolded item and the form
-        could change pencil icon. to signify click will close now
+    x make UpdateTodo part of the li, unified with the bolded todo item. less space between bolded item and the form
+        x could change pencil icon. to signify click will close now
+
+    **allow click edit on any todo
+        if not finalized you can add text, edit, submit
+        if finalized you can view only, no buttons like trash, update. maybe leave cancel
+            disable clicking checkboxes too
+        keep dnd only on most recent (prevents dnd across days)
 
     **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
-
 ---
     **share on youtube. walkthrough the code, and how people can get it working locally
         record a screenshare youtube video on my mac laptop
@@ -243,6 +248,10 @@ RESUME
             am walk, pm walk like clockwork
 ---
     *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
+
+    make profile page smaller text, wider, bigger text area for mission, etc. match daily todo styling/look
+
+    auto finalize todos from day before yesterday
 ======
     *put label on daily message - message for most recent finalized day - july 7th 
         if you didn't get a new message, it's obvious. you need to finalize july 8th. etc

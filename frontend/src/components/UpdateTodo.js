@@ -42,7 +42,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
     };
 
     return (
-        <section className="flex-1 text-xs font-normal bg-gray-100 p-4 rounded-md">
+        <section className="flex-1 text-xs font-normal bg-gray-100 pl-4 pr-4 pb-4 rounded-md">
             <form
                 id="updateTodoForm"
                 onSubmit={handleSubmit}
