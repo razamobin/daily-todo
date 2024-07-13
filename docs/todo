@@ -187,26 +187,32 @@ NEXT July 3 2024
         x where did it go lol
             x when i moved from css to tailwind
 
-    there is a new user bug
-        daily message gets weird when there is no todos and dates?
+    x there is a new user bug
+        x daily message gets weird when there is no todos and dates?
 
-        add todo breaks? can't parse 27, null?
+        x add todo breaks? can't parse 27, null?
 
-        refresh makes the page work though
+        x refresh makes the page work though
 
     **there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
         i added grocery, and i think i dragged it to where i wanted it. then it also showed up at the bottom lol wut.
         reproduce and try to figure out where the bug is. just on react side, backend seems fine
 
     **editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
-
-    **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
+        edit mode, click anywhere closes it
+        edit mode title needed. context switch when clicking is disorienting
 
     **put title on the edit mode, like put the original todo item as the title "Edit 3 mag 1g/day" and the text updates as you type in the input field
         tried it but it didn't look good. shelve it?
 
+    **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
+
 ---
     **share on youtube. walkthrough the code, and how people can get it working locally
+        record a screenshare youtube video on my mac laptop
+        ai generated title
+        new yt channel - raza writes code
+        ai generated thumbnail with my face. ai face is fine w headphones glasses hoodie, baseball cap
         it will get 100k views
 
     **share on skool. people will like this

@@ -46,27 +46,26 @@ function TodoList({
 
         const dayNumber = parseInt(result.source.droppableId, 10);
         const reorderedTodos = Array.from(groupedTodos[dayNumber]);
-        // in the new order
-        const [removed] = reorderedTodos.splice(result.source.index, 1);
-        reorderedTodos.splice(result.destination.index, 0, removed);
 
-        // Update the state with the reordered todos
-        const newTodos = todos.map((todo, index) => {
-            if (index < reorderedTodos.length) {
-                return reorderedTodos[index];
-            }
-            return todo;
-        });
+        // Remove the dragged item from the source list
+        const [movedTodo] = reorderedTodos.splice(result.source.index, 1);
+
+        // Insert it back in the new position
+        reorderedTodos.splice(result.destination.index, 0, movedTodo);
+
+        // Update the grouped todos for the day
+        groupedTodos[dayNumber] = reorderedTodos;
+
+        // Flatten the grouped todos back into a single array
+        const newTodos = Object.values(groupedTodos).flat();
 
         setTodos(newTodos);
 
         // Create the JSON object mapping todo id to new sort index
-        const sortIndexMap = reorderedTodos.reduce((acc, todo, index) => {
+        const sortIndexMap = newTodos.reduce((acc, todo, index) => {
             acc[todo.id] = index;
             return acc;
         }, {});
-
-        console.log(sortIndexMap);
 
         // Save the new order to the backend
         axios
