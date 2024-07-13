@@ -194,10 +194,11 @@ NEXT July 3 2024
 
         x refresh makes the page work though
 
-    **there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
-        i added grocery, and i think i dragged it to where i wanted it. then it also showed up at the bottom lol wut.
-        reproduce and try to figure out where the bug is. just on react side, backend seems fine
+    x there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
+        x i added grocery, and i think i dragged it to where i wanted it. then it also showed up at the bottom lol wut.
+        x reproduce and try to figure out where the bug is. just on react side, backend seems fine
 
+---
     **editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
         edit mode, click anywhere closes it
         edit mode title needed. context switch when clicking is disorienting

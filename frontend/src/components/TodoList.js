@@ -13,7 +13,9 @@ function TodoList({
     finalizeDay,
     handleCancelUpdate,
 }) {
-    const { isUpdateMode, currentTodo } = useContext(AppStateContext);
+    const { isUpdateMode, currentTodo, setCurrentTodo } =
+        useContext(AppStateContext);
+
     const handleQuantityChange = (todo, index) => {
         let newStatus;
         if (index < todo.status) {
@@ -123,6 +125,14 @@ function TodoList({
         .map(Number)
         .sort((a, b) => b - a); // Sort day numbers in descending order
 
+    const handleTodoClick = (todo) => {
+        if (isUpdateMode && currentTodo && currentTodo.id === todo.id) {
+            handleCancelUpdate();
+        } else {
+            onEditTodo(todo);
+        }
+    };
+
     return (
         <>
             {sortedDayNumbers.map((dayNumber, index) => (
@@ -177,74 +187,73 @@ function TodoList({
                                                                 }
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
-                                                                className="flex items-center p-1 border-b border-gray-200"
+                                                                className="grid grid-cols-1 gap-2 p-1 border-b border-gray-200"
                                                             >
-                                                                {isUpdateMode &&
-                                                                currentTodo &&
-                                                                currentTodo.id ===
-                                                                    todo.id ? (
-                                                                    <UpdateTodo
-                                                                        key={
-                                                                            currentTodo.id
-                                                                        }
-                                                                        todo={
-                                                                            currentTodo
-                                                                        }
-                                                                        setTodos={
-                                                                            setTodos
-                                                                        }
-                                                                        onCancel={
-                                                                            handleCancelUpdate
-                                                                        }
-                                                                    />
-                                                                ) : (
-                                                                    <>
-                                                                        <p className="flex-1 text-xs mx-2 font-normal">
-                                                                            <span
-                                                                                className="todo-title hover:underline cursor-pointer"
-                                                                                onClick={() =>
-                                                                                    onEditTodo(
-                                                                                        todo
-                                                                                    )
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    todo.title
-                                                                                }
-                                                                            </span>
-                                                                        </p>
-                                                                        <section>
-                                                                            {Array.from(
-                                                                                {
-                                                                                    length: todo.goal,
-                                                                                }
-                                                                            ).map(
-                                                                                (
-                                                                                    _,
-                                                                                    idx
-                                                                                ) => (
-                                                                                    <input
-                                                                                        key={
-                                                                                            idx
-                                                                                        }
-                                                                                        type="checkbox"
-                                                                                        checked={
-                                                                                            idx <
-                                                                                            todo.status
-                                                                                        }
-                                                                                        onChange={() =>
-                                                                                            handleQuantityChange(
-                                                                                                todo,
-                                                                                                idx
-                                                                                            )
-                                                                                        }
-                                                                                        className="mr-2"
-                                                                                    />
+                                                                <div className="flex items-center">
+                                                                    <p className="flex-1 text-xs mx-2 font-normal">
+                                                                        <span
+                                                                            className="todo-title hover:underline cursor-pointer"
+                                                                            onClick={() =>
+                                                                                handleTodoClick(
+                                                                                    todo
                                                                                 )
-                                                                            )}
-                                                                        </section>
-                                                                    </>
-                                                                )}
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                todo.title
+                                                                            }
+                                                                        </span>
+                                                                    </p>
+                                                                    <section>
+                                                                        {Array.from(
+                                                                            {
+                                                                                length: todo.goal,
+                                                                            }
+                                                                        ).map(
+                                                                            (
+                                                                                _,
+                                                                                idx
+                                                                            ) => (
+                                                                                <input
+                                                                                    key={
+                                                                                        idx
+                                                                                    }
+                                                                                    type="checkbox"
+                                                                                    checked={
+                                                                                        idx <
+                                                                                        todo.status
+                                                                                    }
+                                                                                    onChange={() =>
+                                                                                        handleQuantityChange(
+                                                                                            todo,
+                                                                                            idx
+                                                                                        )
+                                                                                    }
+                                                                                    className="mr-2"
+                                                                                />
+                                                                            )
+                                                                        )}
+                                                                    </section>
+                                                                </div>
+                                                                {isUpdateMode &&
+                                                                    currentTodo &&
+                                                                    currentTodo.id ===
+                                                                        todo.id && (
+                                                                        <UpdateTodo
+                                                                            key={
+                                                                                currentTodo.id
+                                                                            }
+                                                                            todo={
+                                                                                currentTodo
+                                                                            }
+                                                                            setTodos={
+                                                                                setTodos
+                                                                            }
+                                                                            onCancel={
+                                                                                handleCancelUpdate
+                                                                            }
+                                                                        />
+                                                                    )}
                                                             </li>
                                                         )}
                                                     </Draggable>
@@ -260,31 +269,35 @@ function TodoList({
                                 {groupedTodos[dayNumber].map((todo) => (
                                     <li
                                         key={todo.id}
-                                        className="flex items-center p-1 border-b border-gray-200"
+                                        className="grid grid-cols-1 gap-2 p-1 border-b border-gray-200"
                                     >
-                                        <p className="flex-1 text-xs mx-2 font-normal">
-                                            <span className="todo-title hover:underline cursor-pointer">
-                                                {todo.title}
-                                            </span>
-                                        </p>
-                                        <section>
-                                            {Array.from({
-                                                length: todo.goal,
-                                            }).map((_, idx) => (
-                                                <input
-                                                    key={idx}
-                                                    type="checkbox"
-                                                    checked={idx < todo.status}
-                                                    onChange={() =>
-                                                        handleQuantityChange(
-                                                            todo,
-                                                            idx
-                                                        )
-                                                    }
-                                                    className="mr-2"
-                                                />
-                                            ))}
-                                        </section>
+                                        <div className="flex items-center">
+                                            <p className="flex-1 text-xs mx-2 font-normal">
+                                                <span className="todo-title hover:underline cursor-pointer">
+                                                    {todo.title}
+                                                </span>
+                                            </p>
+                                            <section>
+                                                {Array.from({
+                                                    length: todo.goal,
+                                                }).map((_, idx) => (
+                                                    <input
+                                                        key={idx}
+                                                        type="checkbox"
+                                                        checked={
+                                                            idx < todo.status
+                                                        }
+                                                        onChange={() =>
+                                                            handleQuantityChange(
+                                                                todo,
+                                                                idx
+                                                            )
+                                                        }
+                                                        className="mr-2"
+                                                    />
+                                                ))}
+                                            </section>
+                                        </div>
                                     </li>
                                 ))}
                             </ul>
