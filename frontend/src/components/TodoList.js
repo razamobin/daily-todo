@@ -204,7 +204,7 @@ function TodoList({
                                                                             }
                                                                         </span>
                                                                     </p>
-                                                                    <section>
+                                                                    <section className="flex">
                                                                         {Array.from(
                                                                             {
                                                                                 length: todo.goal,
@@ -214,23 +214,27 @@ function TodoList({
                                                                                 _,
                                                                                 idx
                                                                             ) => (
-                                                                                <input
+                                                                                <label
                                                                                     key={
                                                                                         idx
                                                                                     }
-                                                                                    type="checkbox"
-                                                                                    checked={
-                                                                                        idx <
-                                                                                        todo.status
-                                                                                    }
-                                                                                    onChange={() =>
-                                                                                        handleQuantityChange(
-                                                                                            todo,
-                                                                                            idx
-                                                                                        )
-                                                                                    }
-                                                                                    className="mr-2"
-                                                                                />
+                                                                                    className="p-2 cursor-pointer flex items-center justify-center"
+                                                                                >
+                                                                                    <input
+                                                                                        type="checkbox"
+                                                                                        checked={
+                                                                                            idx <
+                                                                                            todo.status
+                                                                                        }
+                                                                                        onChange={() =>
+                                                                                            handleQuantityChange(
+                                                                                                todo,
+                                                                                                idx
+                                                                                            )
+                                                                                        }
+                                                                                        className="cursor-pointer transform scale-100"
+                                                                                    />
+                                                                                </label>
                                                                             )
                                                                         )}
                                                                     </section>
@@ -277,24 +281,29 @@ function TodoList({
                                                     {todo.title}
                                                 </span>
                                             </p>
-                                            <section>
+                                            <section className="flex">
                                                 {Array.from({
                                                     length: todo.goal,
                                                 }).map((_, idx) => (
-                                                    <input
+                                                    <label
                                                         key={idx}
-                                                        type="checkbox"
-                                                        checked={
-                                                            idx < todo.status
-                                                        }
-                                                        onChange={() =>
-                                                            handleQuantityChange(
-                                                                todo,
-                                                                idx
-                                                            )
-                                                        }
-                                                        className="mr-2"
-                                                    />
+                                                        className="p-2 cursor-pointer flex items-center justify-center"
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={
+                                                                idx <
+                                                                todo.status
+                                                            }
+                                                            onChange={() =>
+                                                                handleQuantityChange(
+                                                                    todo,
+                                                                    idx
+                                                                )
+                                                            }
+                                                            className="cursor-pointer transform scale-100"
+                                                        />
+                                                    </label>
                                                 ))}
                                             </section>
                                         </div>

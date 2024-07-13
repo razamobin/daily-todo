@@ -198,13 +198,14 @@ NEXT July 3 2024
         x i added grocery, and i think i dragged it to where i wanted it. then it also showed up at the bottom lol wut.
         x reproduce and try to figure out where the bug is. just on react side, backend seems fine
 
+ x put title on the edit mode, like put the original todo item as the title "Edit 3 mag 1g/day" and the text updates as you type in the input field
+        tried it but it didn't look good. shelve it?
+        x i figured it out nice job
 ---
     **editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
-        edit mode, click anywhere closes it
-        edit mode title needed. context switch when clicking is disorienting
-
-    **put title on the edit mode, like put the original todo item as the title "Edit 3 mag 1g/day" and the text updates as you type in the input field
-        tried it but it didn't look good. shelve it?
+        edit mode, click anywhere closes it? optional
+            main thing is make it easier to click todo to edit, click checkbox to check off, and still easy drag n drop
+                maybe click check box is check (just make click area bigger), click anywhere else is edit if released, click anywhere else and drag is dnd
 
     **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
 
