@@ -924,6 +924,11 @@ func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    // Ensure finalizedMap is not nil
+    if finalizedMap == nil {
+        finalizedMap = make(map[int]bool)
+    }
+
     response := TodosResponse{
         Todos:                todos,
         NewDay:               newDay,

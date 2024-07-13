@@ -183,19 +183,28 @@ NEXT July 3 2024
         x better identification of what you are good at, consisteny, streaks, areas of improvement etc.
             x provide examples
 ---
-    **put title on the edit mode, like put the original todo item as the title "Edit 3 mag 1g/day" and the text updates as you type in the input field
-        tried it but it didn't look good. shelve it?
+    x bring back pencil edit icon
+        x where did it go lol
+            x when i moved from css to tailwind
 
-    **bring back pencil edit icon
-        where did it go lol
+    there is a new user bug
+        daily message gets weird when there is no todos and dates?
 
-    **editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
+        add todo breaks? can't parse 27, null?
+
+        refresh makes the page work though
 
     **there is a drag n drop bug. add new todo. drag it to top. or add, change to 3, drag to top, drag somewhere else. don't refresh
         i added grocery, and i think i dragged it to where i wanted it. then it also showed up at the bottom lol wut.
         reproduce and try to figure out where the bug is. just on react side, backend seems fine
 
+    **editing zones - left is edit, middle is dnd, right side is checkbox. add a buffer around the checkbox that will trigger it. don't have to be so precise
+
     **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
+
+    **put title on the edit mode, like put the original todo item as the title "Edit 3 mag 1g/day" and the text updates as you type in the input field
+        tried it but it didn't look good. shelve it?
+
 ---
     **share on youtube. walkthrough the code, and how people can get it working locally
         it will get 100k views
