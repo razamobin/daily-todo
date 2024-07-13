@@ -209,7 +209,13 @@ NEXT July 3 2024
     x unify todo and the update form. like a tab
         x bold it?
 
-    permanent unify not just on hover
+    x permanent unify not just on hover (bold todo item and update form)
+        x rounded corner on entire li
+
+RESUME
+
+    **make UpdateTodo part of the li, unified with the bolded todo item. less space between bolded item and the form
+        could change pencil icon. to signify click will close now
 
     **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
 

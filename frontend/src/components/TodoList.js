@@ -186,7 +186,14 @@ function TodoList({
                                                                 }
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
-                                                                className="group grid grid-cols-1 gap-2 p-1 border-b border-gray-200 hover:bg-gray-100"
+                                                                className={`group grid grid-cols-1 gap-2 p-1 border-b border-gray-200 hover:bg-gray-100 ${
+                                                                    isUpdateMode &&
+                                                                    currentTodo &&
+                                                                    currentTodo.id ===
+                                                                        todo.id
+                                                                        ? "bg-gray-100 rounded"
+                                                                        : ""
+                                                                }`}
                                                             >
                                                                 <div className="flex items-center">
                                                                     <div
