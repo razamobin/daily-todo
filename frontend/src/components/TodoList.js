@@ -186,11 +186,11 @@ function TodoList({
                                                                 }
                                                                 {...provided.draggableProps}
                                                                 {...provided.dragHandleProps}
-                                                                className="grid grid-cols-1 gap-2 p-1 border-b border-gray-200"
+                                                                className="group grid grid-cols-1 gap-2 p-1 border-b border-gray-200 hover:bg-gray-100"
                                                             >
                                                                 <div className="flex items-center">
                                                                     <div
-                                                                        className="flex-1 text-xs mr-2 font-normal p-0.75 hover:bg-gray-100 cursor-pointer group"
+                                                                        className="flex-1 text-xs mr-2 font-normal p-0.75 cursor-pointer group-hover:bg-gray-100"
                                                                         onClick={() =>
                                                                             handleTodoClick(
                                                                                 todo
