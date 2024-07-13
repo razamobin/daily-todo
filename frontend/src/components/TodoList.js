@@ -211,7 +211,7 @@ function TodoList({
                                                                                     currentTodo &&
                                                                                     currentTodo.id ===
                                                                                         todo.id
-                                                                                        ? "font-bold"
+                                                                                        ? "font-bold edit-mode"
                                                                                         : ""
                                                                                 }`}
                                                                             >

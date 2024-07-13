@@ -15,3 +15,7 @@
     text-decoration: none;
     display: inline-block;
 }
+
+.group:hover .todo-title.edit-mode::after {
+    content: "\f0d7"; /* Font Awesome caret-right icon */
+}
