@@ -13,8 +13,7 @@ function TodoList({
     finalizeDay,
     handleCancelUpdate,
 }) {
-    const { isUpdateMode, currentTodo, setCurrentTodo } =
-        useContext(AppStateContext);
+    const { isUpdateMode, currentTodo } = useContext(AppStateContext);
 
     const handleQuantityChange = (todo, index) => {
         let newStatus;
@@ -159,7 +158,7 @@ function TodoList({
                         key={dayNumber}
                         className="todo-list col-start-3 col-end-4"
                     >
-                        {index === 0 ? ( // Only allow drag and drop for the most recent day
+                        {index === 0 ? (
                             <DragDropContext onDragEnd={onDragEnd}>
                                 <Droppable
                                     key={dayNumber}
@@ -190,20 +189,22 @@ function TodoList({
                                                                 className="grid grid-cols-1 gap-2 p-1 border-b border-gray-200"
                                                             >
                                                                 <div className="flex items-center">
-                                                                    <p className="flex-1 text-xs mx-2 font-normal">
-                                                                        <span
-                                                                            className="todo-title hover:underline cursor-pointer"
-                                                                            onClick={() =>
-                                                                                handleTodoClick(
-                                                                                    todo
-                                                                                )
-                                                                            }
-                                                                        >
-                                                                            {
-                                                                                todo.title
-                                                                            }
-                                                                        </span>
-                                                                    </p>
+                                                                    <div
+                                                                        className="flex-1 text-xs mr-2 font-normal p-1 hover:bg-gray-100 cursor-pointer group"
+                                                                        onClick={() =>
+                                                                            handleTodoClick(
+                                                                                todo
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <div className="p-1">
+                                                                            <span className="todo-title group-hover:underline">
+                                                                                {
+                                                                                    todo.title
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                    </div>
                                                                     <section className="flex">
                                                                         {Array.from(
                                                                             {
@@ -276,11 +277,18 @@ function TodoList({
                                         className="grid grid-cols-1 gap-2 p-1 border-b border-gray-200"
                                     >
                                         <div className="flex items-center">
-                                            <p className="flex-1 text-xs mx-2 font-normal">
-                                                <span className="todo-title hover:underline cursor-pointer">
-                                                    {todo.title}
-                                                </span>
-                                            </p>
+                                            <div
+                                                className="flex-1 text-xs mr-2 font-normal p-1 hover:bg-gray-100 cursor-pointer group"
+                                                onClick={() =>
+                                                    handleTodoClick(todo)
+                                                }
+                                            >
+                                                <div className="p-1">
+                                                    <span className="todo-title group-hover:underline">
+                                                        {todo.title}
+                                                    </span>
+                                                </div>
+                                            </div>
                                             <section className="flex">
                                                 {Array.from({
                                                     length: todo.goal,

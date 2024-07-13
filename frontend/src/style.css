@@ -7,7 +7,7 @@
     transform: rotate(180deg);
 }
 
-.todo-title:hover::after {
+.group:hover .todo-title::after {
     margin-left: 5px;
     content: "\f303"; /* Font Awesome pencil icon */
     font-family: "Font Awesome 5 Free";
