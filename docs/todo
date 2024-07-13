@@ -223,6 +223,10 @@ RESUME
         x if finalized you can view only, no buttons like trash, update. maybe leave cancel
             x disable clicking checkboxes too
 
+    **group hover on non-most-recent day is broken. doesn't highlight entire li
+
+    **click is weird, if it's in dnd hand, click doesn't open the thing. fix that for sure
+
     **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
 ---
     **share on youtube. walkthrough the code, and how people can get it working locally
