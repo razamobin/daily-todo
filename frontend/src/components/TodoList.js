@@ -16,6 +16,7 @@ function TodoList({
     const { isUpdateMode, currentTodo } = useContext(AppStateContext);
 
     const handleQuantityChange = (todo, index) => {
+        if (finalizedMap[todo.day_number]) return; // Prevent changes if the day is finalized
         let newStatus;
         if (index < todo.status) {
             newStatus = index;
@@ -248,6 +249,12 @@ function TodoList({
                                                                                             )
                                                                                         }
                                                                                         className="cursor-pointer transform scale-100"
+                                                                                        disabled={
+                                                                                            finalizedMap[
+                                                                                                todo
+                                                                                                    .day_number
+                                                                                            ]
+                                                                                        }
                                                                                     />
                                                                                 </label>
                                                                             )
@@ -270,6 +277,12 @@ function TodoList({
                                                                             }
                                                                             onCancel={
                                                                                 handleCancelUpdate
+                                                                            }
+                                                                            isFinalized={
+                                                                                finalizedMap[
+                                                                                    currentTodo
+                                                                                        .day_number
+                                                                                ]
                                                                             }
                                                                         />
                                                                     )}
@@ -322,11 +335,35 @@ function TodoList({
                                                                 )
                                                             }
                                                             className="cursor-pointer transform scale-100"
+                                                            disabled={
+                                                                finalizedMap[
+                                                                    todo
+                                                                        .day_number
+                                                                ]
+                                                            }
                                                         />
                                                     </label>
                                                 ))}
                                             </section>
                                         </div>
+                                        {isUpdateMode &&
+                                            currentTodo &&
+                                            currentTodo.id === todo.id && (
+                                                <UpdateTodo
+                                                    key={currentTodo.id}
+                                                    todo={currentTodo}
+                                                    setTodos={setTodos}
+                                                    onCancel={
+                                                        handleCancelUpdate
+                                                    }
+                                                    isFinalized={
+                                                        finalizedMap[
+                                                            currentTodo
+                                                                .day_number
+                                                        ]
+                                                    }
+                                                />
+                                            )}
                                     </li>
                                 ))}
                             </ul>

@@ -217,11 +217,11 @@ RESUME
     x make UpdateTodo part of the li, unified with the bolded todo item. less space between bolded item and the form
         x could change pencil icon. to signify click will close now
 
-    **allow click edit on any todo
-        if not finalized you can add text, edit, submit
-        if finalized you can view only, no buttons like trash, update. maybe leave cancel
-            disable clicking checkboxes too
-        keep dnd only on most recent (prevents dnd across days)
+    x allow click edit on any todo
+        x keep dnd only on most recent (prevents dnd across days)
+        x if not finalized you can add text, edit, submit
+        x if finalized you can view only, no buttons like trash, update. maybe leave cancel
+            x disable clicking checkboxes too
 
     **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
 ---
@@ -235,7 +235,7 @@ RESUME
     **share on skool. people will like this
 ---
 
-    *make it live in prod
+    **make it live in prod
 
         prod config - cookies secure true, strict on same site, etc. uwsgi.
 

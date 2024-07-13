@@ -3,7 +3,7 @@ import axios from "../axiosConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
-function UpdateTodo({ todo, setTodos, onCancel }) {
+function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
     const [title, setTitle] = useState(todo.title);
     const [goal, setGoal] = useState(todo.goal);
     const [description, setDescription] = useState(todo.description || "");
@@ -11,6 +11,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (isFinalized) return; // Prevent form submission if the day is finalized
         const updatedTodo = {
             ...todo,
             title,
@@ -30,6 +31,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
     };
 
     const handleDelete = () => {
+        if (isFinalized) return; // Prevent deletion if the day is finalized
         axios
             .delete(`http://localhost:8080/api/todos/${todo.id}`)
             .then(() => {
@@ -56,6 +58,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                         placeholder="Edit Todo"
                         required
                         className="p-2 text-xs border border-gray-300 rounded flex-1"
+                        disabled={isFinalized}
                     />
                     <div className="goal-container flex items-center gap-1">
                         <select
@@ -66,6 +69,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                             }
                             required
                             className="w-16 p-2 text-xs border border-gray-300 rounded"
+                            disabled={isFinalized}
                         >
                             {Array.from({ length: 24 }, (_, i) => (
                                 <option key={i + 1} value={i + 1}>
@@ -92,6 +96,7 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                         placeholder="Edit Notes"
                         className="p-2 text-xs border border-gray-300 rounded flex-1"
                         rows="3"
+                        disabled={isFinalized}
                     />
                 </div>
                 <div className="form-row flex flex-col gap-1">
@@ -108,13 +113,17 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                         placeholder="Edit Description"
                         className="p-2 text-xs border border-gray-300 rounded flex-1"
                         rows="5"
+                        disabled={isFinalized}
                     />
                 </div>
                 <div className="form-row action-buttons flex justify-between gap-2">
                     <button
                         type="button"
                         onClick={handleDelete}
-                        className="bg-red-500 text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-red-700 flex items-center justify-center"
+                        className={`bg-red-500 text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-red-700 flex items-center justify-center ${
+                            isFinalized ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                        disabled={isFinalized}
                     >
                         <FontAwesomeIcon icon={faTrash} />
                     </button>
@@ -128,7 +137,12 @@ function UpdateTodo({ todo, setTodos, onCancel }) {
                         </button>
                         <button
                             type="submit"
-                            className="bg-black text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-800"
+                            className={`bg-black text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-800 ${
+                                isFinalized
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                            }`}
+                            disabled={isFinalized}
                         >
                             Update
                         </button>
