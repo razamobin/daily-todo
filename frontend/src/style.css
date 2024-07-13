@@ -6,3 +6,12 @@
     writing-mode: vertical-rl;
     transform: rotate(180deg);
 }
+
+.todo-title:hover::after {
+    margin-left: 5px;
+    content: "\f303"; /* Font Awesome pencil icon */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    text-decoration: none;
+    display: inline-block;
+}
