@@ -198,7 +198,16 @@ function TodoList({
                                                                         }
                                                                     >
                                                                         <div className="p-0.75">
-                                                                            <span className="todo-title group-hover:underline">
+                                                                            <span
+                                                                                className={`todo-title group-hover:underline ${
+                                                                                    isUpdateMode &&
+                                                                                    currentTodo &&
+                                                                                    currentTodo.id ===
+                                                                                        todo.id
+                                                                                        ? "font-bold"
+                                                                                        : ""
+                                                                                }`}
+                                                                            >
                                                                                 {
                                                                                     todo.title
                                                                                 }

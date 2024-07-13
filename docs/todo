@@ -206,8 +206,10 @@ NEXT July 3 2024
             main thing is make it easier to click todo to edit, click checkbox to check off, and still easy drag n drop
                 maybe click check box is check (just make click area bigger), click anywhere else is edit if released, click anywhere else and drag is dnd
 ---
-    unify todo and the update form. like a tab
-        bold it?
+    x unify todo and the update form. like a tab
+        x bold it?
+
+    permanent unify not just on hover
 
     **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
 
