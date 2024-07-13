@@ -190,14 +190,14 @@ function TodoList({
                                                             >
                                                                 <div className="flex items-center">
                                                                     <div
-                                                                        className="flex-1 text-xs mr-2 font-normal p-1 hover:bg-gray-100 cursor-pointer group"
+                                                                        className="flex-1 text-xs mr-2 font-normal p-0.75 hover:bg-gray-100 cursor-pointer group"
                                                                         onClick={() =>
                                                                             handleTodoClick(
                                                                                 todo
                                                                             )
                                                                         }
                                                                     >
-                                                                        <div className="p-1">
+                                                                        <div className="p-0.75">
                                                                             <span className="todo-title group-hover:underline">
                                                                                 {
                                                                                     todo.title
@@ -278,12 +278,12 @@ function TodoList({
                                     >
                                         <div className="flex items-center">
                                             <div
-                                                className="flex-1 text-xs mr-2 font-normal p-1 hover:bg-gray-100 cursor-pointer group"
+                                                className="flex-1 text-xs mr-2 font-normal p-0.75 hover:bg-gray-100 cursor-pointer group"
                                                 onClick={() =>
                                                     handleTodoClick(todo)
                                                 }
                                             >
-                                                <div className="p-1">
+                                                <div className="p-0.75">
                                                     <span className="todo-title group-hover:underline">
                                                         {todo.title}
                                                     </span>
