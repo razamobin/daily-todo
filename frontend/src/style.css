@@ -7,6 +7,14 @@
     transform: rotate(180deg);
 }
 
+.todo-title:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
+.todo-title.edit-mode:hover::after {
+    content: "\f0d7"; /* Font Awesome caret-right icon */
+}
+
 .todo-title:hover::after {
     margin-left: 5px;
     content: "\f303"; /* Font Awesome pencil icon */
@@ -14,10 +22,6 @@
     font-weight: 900;
     text-decoration: none;
     display: inline-block;
-}
-
-.todo-title.edit-mode:hover::after {
-    content: "\f0d7"; /* Font Awesome caret-right icon */
 }
 
 /* Add styles for .daily-message context */
