@@ -197,16 +197,9 @@ function TodoList({
                                                                 }`}
                                                             >
                                                                 <div className="flex items-center">
-                                                                    <div
-                                                                        className="flex-1 text-xs mr-2 pl-1 font-normal cursor-pointer"
-                                                                        onClick={() =>
-                                                                            handleTodoClick(
-                                                                                todo
-                                                                            )
-                                                                        }
-                                                                    >
+                                                                    <div className="flex-1 text-xs mr-2 pl-1 font-normal">
                                                                         <span
-                                                                            className={`todo-title group-hover:underline ${
+                                                                            className={`todo-title group-hover:underline cursor-pointer ${
                                                                                 isUpdateMode &&
                                                                                 currentTodo &&
                                                                                 currentTodo.id ===
@@ -214,6 +207,11 @@ function TodoList({
                                                                                     ? "font-bold edit-mode"
                                                                                     : ""
                                                                             }`}
+                                                                            onClick={() =>
+                                                                                handleTodoClick(
+                                                                                    todo
+                                                                                )
+                                                                            }
                                                                         >
                                                                             {
                                                                                 todo.title
@@ -310,14 +308,9 @@ function TodoList({
                                         }`}
                                     >
                                         <div className="flex items-center">
-                                            <div
-                                                className="flex-1 text-xs mr-2 pl-1 font-normal cursor-pointer group"
-                                                onClick={() =>
-                                                    handleTodoClick(todo)
-                                                }
-                                            >
+                                            <div className="flex-1 text-xs mr-2 pl-1 font-normal group">
                                                 <span
-                                                    className={`todo-title group-hover:underline ${
+                                                    className={`todo-title group-hover:underline cursor-pointer ${
                                                         isUpdateMode &&
                                                         currentTodo &&
                                                         currentTodo.id ===
@@ -325,6 +318,9 @@ function TodoList({
                                                             ? "font-bold edit-mode"
                                                             : ""
                                                     }`}
+                                                    onClick={() =>
+                                                        handleTodoClick(todo)
+                                                    }
                                                 >
                                                     {todo.title}
                                                 </span>

@@ -7,7 +7,7 @@
     transform: rotate(180deg);
 }
 
-.group:hover .todo-title::after {
+.todo-title:hover::after {
     margin-left: 5px;
     content: "\f303"; /* Font Awesome pencil icon */
     font-family: "Font Awesome 5 Free";
@@ -16,7 +16,7 @@
     display: inline-block;
 }
 
-.group:hover .todo-title.edit-mode::after {
+.todo-title.edit-mode:hover::after {
     content: "\f0d7"; /* Font Awesome caret-right icon */
 }
 
