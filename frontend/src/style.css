@@ -7,10 +7,6 @@
     transform: rotate(180deg);
 }
 
-.todo-title:hover {
-    text-decoration: underline; /* Underline on hover */
-}
-
 .todo-title.edit-mode:hover::after {
     content: "\f0d7"; /* Font Awesome caret-right icon */
 }

@@ -199,7 +199,7 @@ function TodoList({
                                                                 <div className="flex items-center">
                                                                     <div className="flex-1 text-xs mr-2 pl-1 font-normal">
                                                                         <span
-                                                                            className={`todo-title cursor-pointer ${
+                                                                            className={`todo-title cursor-pointer hover:underline ${
                                                                                 isUpdateMode &&
                                                                                 currentTodo &&
                                                                                 currentTodo.id ===
@@ -324,7 +324,7 @@ function TodoList({
                                         <div className="flex items-center">
                                             <div className="flex-1 text-xs mr-2 pl-1 font-normal group">
                                                 <span
-                                                    className={`todo-title cursor-pointer ${
+                                                    className={`todo-title cursor-pointer hover:underline ${
                                                         isUpdateMode &&
                                                         currentTodo &&
                                                         currentTodo.id ===
