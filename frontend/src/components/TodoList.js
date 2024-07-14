@@ -232,7 +232,14 @@ function TodoList({
                                                                                     key={
                                                                                         idx
                                                                                     }
-                                                                                    className="p-2 cursor-pointer flex items-center justify-center"
+                                                                                    className={`p-2 flex items-center justify-center ${
+                                                                                        finalizedMap[
+                                                                                            todo
+                                                                                                .day_number
+                                                                                        ]
+                                                                                            ? "cursor-default"
+                                                                                            : "cursor-pointer"
+                                                                                    }`}
                                                                                 >
                                                                                     <input
                                                                                         type="checkbox"
@@ -246,7 +253,14 @@ function TodoList({
                                                                                                 idx
                                                                                             )
                                                                                         }
-                                                                                        className="cursor-pointer transform scale-100"
+                                                                                        className={`transform scale-100 ${
+                                                                                            finalizedMap[
+                                                                                                todo
+                                                                                                    .day_number
+                                                                                            ]
+                                                                                                ? "cursor-default"
+                                                                                                : "cursor-pointer"
+                                                                                        }`}
                                                                                         disabled={
                                                                                             finalizedMap[
                                                                                                 todo
@@ -331,7 +345,13 @@ function TodoList({
                                                 }).map((_, idx) => (
                                                     <label
                                                         key={idx}
-                                                        className="p-2 cursor-pointer flex items-center justify-center"
+                                                        className={`p-2 flex items-center justify-center ${
+                                                            finalizedMap[
+                                                                todo.day_number
+                                                            ]
+                                                                ? "cursor-default"
+                                                                : "cursor-pointer"
+                                                        }`}
                                                     >
                                                         <input
                                                             type="checkbox"
@@ -345,7 +365,14 @@ function TodoList({
                                                                     idx
                                                                 )
                                                             }
-                                                            className="cursor-pointer transform scale-100"
+                                                            className={`transform scale-100 ${
+                                                                finalizedMap[
+                                                                    todo
+                                                                        .day_number
+                                                                ]
+                                                                    ? "cursor-default"
+                                                                    : "cursor-pointer"
+                                                            }`}
                                                             disabled={
                                                                 finalizedMap[
                                                                     todo
