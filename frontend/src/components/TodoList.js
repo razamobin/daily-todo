@@ -198,7 +198,7 @@ function TodoList({
                                                             >
                                                                 <div className="flex items-center">
                                                                     <div
-                                                                        className="flex-1 text-xs mr-2 pl-1 font-normal cursor-pointer group-hover:bg-gray-100"
+                                                                        className="flex-1 text-xs mr-2 pl-1 font-normal cursor-pointer"
                                                                         onClick={() =>
                                                                             handleTodoClick(
                                                                                 todo
@@ -301,16 +301,31 @@ function TodoList({
                                 {groupedTodos[dayNumber].map((todo) => (
                                     <li
                                         key={todo.id}
-                                        className="grid grid-cols-1 gap-2 p-1 border-b border-gray-200"
+                                        className={`grid grid-cols-1 gap-2 p-1 border-b border-gray-200 hover:bg-gray-100 ${
+                                            isUpdateMode &&
+                                            currentTodo &&
+                                            currentTodo.id === todo.id
+                                                ? "bg-gray-100 rounded"
+                                                : ""
+                                        }`}
                                     >
                                         <div className="flex items-center">
                                             <div
-                                                className="flex-1 text-xs mr-2 pl-1 font-normal hover:bg-gray-100 cursor-pointer group"
+                                                className="flex-1 text-xs mr-2 pl-1 font-normal cursor-pointer group"
                                                 onClick={() =>
                                                     handleTodoClick(todo)
                                                 }
                                             >
-                                                <span className="todo-title group-hover:underline">
+                                                <span
+                                                    className={`todo-title group-hover:underline ${
+                                                        isUpdateMode &&
+                                                        currentTodo &&
+                                                        currentTodo.id ===
+                                                            todo.id
+                                                            ? "font-bold edit-mode"
+                                                            : ""
+                                                    }`}
+                                                >
                                                     {todo.title}
                                                 </span>
                                             </div>

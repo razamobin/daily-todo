@@ -226,6 +226,15 @@ RESUME
     **group hover on non-most-recent day is broken. doesn't highlight entire li
 
     **click is weird, if it's in dnd hand, click doesn't open the thing. fix that for sure
+        hover 
+            text finger hover 
+            checkbox finger hover
+            any other area dnd hand hover
+
+        behavior
+            click and release checkbox just does check, doesn't open edit
+            any click and release that is not checkbox opens edit
+            click and drag is drag and drop
 
     **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
 ---
@@ -251,11 +260,17 @@ RESUME
             plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
             am walk, pm walk like clockwork
 ---
+    finalize - opens final text area for notes on the day, reflections, etc
+
     *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
 
     make profile page smaller text, wider, bigger text area for mission, etc. match daily todo styling/look
 
     auto finalize todos from day before yesterday
+
+    allow to make text area bigger/taller on edit todo form
+
+    allow to n/a a todo if it doesn't apply to today (don't need to do dd work on saturday). then user-mission can filter it out if it was n/a.
 ======
     *put label on daily message - message for most recent finalized day - july 7th 
         if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
