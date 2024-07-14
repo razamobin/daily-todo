@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "../axiosConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +8,18 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
     const [goal, setGoal] = useState(todo.goal);
     const [description, setDescription] = useState(todo.description || "");
     const [itemNotes, setItemNotes] = useState(todo.notes || "");
+    const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+
+    useEffect(() => {
+        if (isModalOpen) {
+            document.body.classList.add("overflow-hidden");
+        } else {
+            document.body.classList.remove("overflow-hidden");
+        }
+        return () => {
+            document.body.classList.remove("overflow-hidden");
+        };
+    }, [isModalOpen]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -42,6 +54,9 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
             })
             .catch((error) => console.error(error));
     };
+
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
 
     return (
         <section className="flex-1 text-xs font-normal bg-gray-100 pl-4 pr-4 pb-4 rounded-md">
@@ -119,7 +134,7 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                 <div className="form-row action-buttons flex justify-between gap-2">
                     <button
                         type="button"
-                        onClick={handleDelete}
+                        onClick={openModal}
                         className={`bg-red-500 text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-red-700 flex items-center justify-center ${
                             isFinalized ? "opacity-50 cursor-not-allowed" : ""
                         }`}
@@ -149,6 +164,36 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                     </div>
                 </div>
             </form>
+
+            {isModalOpen && (
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-4 rounded shadow-lg max-w-sm w-full">
+                        <h2 className="text-lg font-semibold mb-4">
+                            Confirm Deletion
+                        </h2>
+                        <p className="text-sm mb-4">
+                            Are you sure you want to delete this todo item?
+                        </p>
+                        <div className="flex justify-end gap-2">
+                            <button
+                                onClick={closeModal}
+                                className="bg-gray-200 text-black p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-300"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    handleDelete();
+                                    closeModal();
+                                }}
+                                className="bg-red-500 text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-red-700"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </section>
     );
 }

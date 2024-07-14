@@ -212,8 +212,6 @@ NEXT July 3 2024
     x permanent unify not just on hover (bold todo item and update form)
         x rounded corner on entire li
 
-RESUME
-
     x make UpdateTodo part of the li, unified with the bolded todo item. less space between bolded item and the form
         x could change pencil icon. to signify click will close now
 
@@ -223,9 +221,9 @@ RESUME
         x if finalized you can view only, no buttons like trash, update. maybe leave cancel
             x disable clicking checkboxes too
 
-    **group hover on non-most-recent day is broken. doesn't highlight entire li
+    x group hover on non-most-recent day is broken. doesn't highlight entire li
 
-    **click is weird, if it's in dnd hand, click doesn't open the thing. fix that for sure
+    x click is weird, if it's in dnd hand, click doesn't open the thing. fix that for sure
         hover 
             text finger hover 
             checkbox finger hover
@@ -236,6 +234,7 @@ RESUME
             any click and release that is not checkbox opens edit
             click and drag is drag and drop
 
+---
     **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
 ---
     **share on youtube. walkthrough the code, and how people can get it working locally
@@ -249,6 +248,7 @@ RESUME
 ---
 
     **make it live in prod
+        AWS?
 
         prod config - cookies secure true, strict on same site, etc. uwsgi.
 
@@ -260,9 +260,12 @@ RESUME
             plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
             am walk, pm walk like clockwork
 ---
-    finalize - opens final text area for notes on the day, reflections, etc
-
     *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
+---
+    finalize - opens final text area for notes on the day, reflections, etc. move day
+
+    where can you talk about your sleep?
+
 
     make profile page smaller text, wider, bigger text area for mission, etc. match daily todo styling/look
 
@@ -271,6 +274,7 @@ RESUME
     allow to make text area bigger/taller on edit todo form
 
     allow to n/a a todo if it doesn't apply to today (don't need to do dd work on saturday). then user-mission can filter it out if it was n/a.
+        also maybe a same day todo, not to be copied to next day
 ======
     *put label on daily message - message for most recent finalized day - july 7th 
         if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
