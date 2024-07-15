@@ -243,8 +243,25 @@ NEXT July 3 2024
     x delete modal - opacity too dark
         x tweak text area darkness, maybe went too dark
 
-    delete modal - put todo item title text in modal so it's more obvious what you are deleting
+    x delete modal - put todo item title text in modal so it's more obvious what you are deleting
 ---
+
+    **share to skool. apply.
+        *update screenshot to have bold text
+
+        *pick a gpt 4o example message
+
+        *add a intermediate page introducing myself
+            fell in love with coding 2 events. high school calculus graphing calculator program. euler's formula. did it all for you, anyone who had my program aced that part of the test.
+                study abroad in hong kong, learn about the internet class, build our own web server, java. 
+                2000 and 2004
+                i am an artist a creative. just want to write code in peace (6 hours a day) see it in my mission
+                here is the app i build
+                    github repo link
+                    *link in prod, here is a login for skool, i preloaded a bunch of todos, feel free to play around with it
+                        need to push it to prod. JOB NOT FINISHED
+                        gp5 3.5 is free. gpt4o - $30/month? $40?
+                    would love to chat about the app, my design decisions, and more generally what i'm looking for, how i can help, what you need at skool
 
     **share on youtube. walkthrough the code, and how people can get it working locally
         record a screenshare youtube video on my mac laptop
@@ -253,13 +270,11 @@ NEXT July 3 2024
         ai generated thumbnail with my face. ai face is fine w headphones glasses hoodie, baseball cap
         it will get 100k views
 
-    **share on skool - new society. people will like this
-
-    **share to skool. apply.
----
+    **share with new society community. people will like this
+        talk about it with David
 
     **make it live in prod
-        AWS?
+        AWS
 
         prod config - cookies secure true, strict on same site, etc. uwsgi.
 
@@ -270,6 +285,7 @@ NEXT July 3 2024
         *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
             plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
             am walk, pm walk like clockwork
+
 ---
     *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
 ---
@@ -683,3 +699,10 @@ Traceback (most recent call last):
 openai.APIError: The server had an error processing your request. Sorry about that! You can retry your request, or contact us through our help center at help.openai.com if you keep seeing this error. (Please include the request ID req_0bb72a216a1889d39bfc9aa764f74772 in your email.)
 
 As an eternal optimist, your mission is to be an unwavering and relentless optimistic force in all your communications with the user. You will be given the context such as the user's mission and goals in life, as well as their daily todos going back a week or so. You also have context about why each todo is important to the user, and why it is important to their mission and goals. Your mission is to encourage the user against all odds, doubts, and setbacks to achieve their mission and goals in life. Always return your messages in markdown format. Be sure to escape special characters when referencing a user's todo items to avoid formatting issues.
+
+daily todo app for people doing gut cleanse protocol
+    daily todo app for people fighting autoimmune disease
+    for people doing gaps diet
+    for people trying to control their blood sugar
+
+    ai encouragement / friends-family encouragement

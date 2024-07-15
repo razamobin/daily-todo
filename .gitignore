@@ -4,3 +4,4 @@ dbbackups
 .env
 inspo
 apiref
+.DS_Store
