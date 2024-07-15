@@ -237,8 +237,14 @@ NEXT July 3 2024
 ---
     x show a warning modal upon clicking delete. cancel, delete, this cannot be undone
 
-    **why is sort index getting larger and larger???
+    x why is sort index getting larger and larger???
+        x flattened list fix from a few days ago. fixed now, and original bug is not back.
 ---
+    delete modal - opacity too dark
+        tweak text area darkness, maybe went too dark
+    delete modal - put todo item title text in modal so it's more obvious what you are deleting
+---
+
     **share on youtube. walkthrough the code, and how people can get it working locally
         record a screenshare youtube video on my mac laptop
         ai generated title
@@ -246,7 +252,7 @@ NEXT July 3 2024
         ai generated thumbnail with my face. ai face is fine w headphones glasses hoodie, baseball cap
         it will get 100k views
 
-    **share on skool. people will like this
+    **share on skool - new society. people will like this
 
     **share to skool. apply.
 ---
@@ -281,6 +287,7 @@ NEXT July 3 2024
         also maybe a same day todo, not to be copied to next day
 ======
     *put label on daily message - message for most recent finalized day - july 7th 
+        like what finalized day is this AI talking about, or starting at?
         if you didn't get a new message, it's obvious. you need to finalize july 8th. etc
         put past history of messages there?
         give past history of messages to AI so it doesn't repeat itself?

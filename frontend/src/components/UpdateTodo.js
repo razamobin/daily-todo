@@ -63,14 +63,14 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
         <section className="flex-1 text-xs font-normal bg-gray-100 pl-4 pr-4 pb-4 rounded-md">
             {/* Dark overlay */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-70 z-40 pointer-events-none"></div>
+                <div className="fixed inset-0 bg-black bg-opacity-40 z-40 pointer-events-none"></div>
             )}
 
             <form
                 id="updateTodoForm"
                 onSubmit={handleSubmit}
                 className={`w-full max-w-[540px] mx-auto p-2 grid gap-2 ${
-                    isModalOpen ? "opacity-25 pointer-events-none" : ""
+                    isModalOpen ? "pointer-events-none" : ""
                 }`}
             >
                 <div className="form-row flex items-center gap-2">
@@ -81,7 +81,7 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                         placeholder="Edit Todo"
                         required
                         className={`p-2 text-xs border border-gray-300 rounded flex-1 ${
-                            isModalOpen ? "bg-gray-400" : ""
+                            isModalOpen ? "bg-gray-50" : ""
                         }`}
                         disabled={isFinalized}
                     />
@@ -94,7 +94,7 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                             }
                             required
                             className={`w-16 p-2 text-xs border border-gray-300 rounded ${
-                                isModalOpen ? "bg-gray-400" : ""
+                                isModalOpen ? "bg-gray-50" : ""
                             }`}
                             disabled={isFinalized}
                         >
@@ -122,7 +122,7 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                         onChange={(e) => setItemNotes(e.target.value)}
                         placeholder="Edit Notes"
                         className={`p-2 text-xs border border-gray-300 rounded flex-1 ${
-                            isModalOpen ? "bg-gray-400" : ""
+                            isModalOpen ? "bg-gray-50" : ""
                         }`}
                         rows="3"
                         disabled={isFinalized}
@@ -141,7 +141,7 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Edit Description"
                         className={`p-2 text-xs border border-gray-300 rounded flex-1 ${
-                            isModalOpen ? "bg-gray-400" : ""
+                            isModalOpen ? "bg-gray-50" : ""
                         }`}
                         rows="5"
                         disabled={isFinalized}
