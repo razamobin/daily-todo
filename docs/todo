@@ -240,8 +240,9 @@ NEXT July 3 2024
     x why is sort index getting larger and larger???
         x flattened list fix from a few days ago. fixed now, and original bug is not back.
 ---
-    delete modal - opacity too dark
-        tweak text area darkness, maybe went too dark
+    x delete modal - opacity too dark
+        x tweak text area darkness, maybe went too dark
+
     delete modal - put todo item title text in modal so it's more obvious what you are deleting
 ---
 

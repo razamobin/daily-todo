@@ -63,7 +63,7 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
         <section className="flex-1 text-xs font-normal bg-gray-100 pl-4 pr-4 pb-4 rounded-md">
             {/* Dark overlay */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-40 z-40 pointer-events-none"></div>
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-40 pointer-events-none"></div>
             )}
 
             <form
@@ -198,7 +198,9 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                             Confirm Deletion
                         </h2>
                         <p className="text-sm mb-4">
-                            Are you sure you want to delete this todo item?
+                            Are you sure you want to delete the todo item:
+                            <br />
+                            <strong>{title}</strong> ?
                         </p>
                         <div className="flex justify-end gap-2">
                             <button
