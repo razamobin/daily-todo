@@ -8,7 +8,7 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
     const [goal, setGoal] = useState(todo.goal);
     const [description, setDescription] = useState(todo.description || "");
     const [itemNotes, setItemNotes] = useState(todo.notes || "");
-    const [isModalOpen, setIsModalOpen] = useState(false); // State to manage modal visibility
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         if (isModalOpen) {
@@ -16,6 +16,7 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
         } else {
             document.body.classList.remove("overflow-hidden");
         }
+
         return () => {
             document.body.classList.remove("overflow-hidden");
         };
@@ -60,10 +61,17 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
 
     return (
         <section className="flex-1 text-xs font-normal bg-gray-100 pl-4 pr-4 pb-4 rounded-md">
+            {/* Dark overlay */}
+            {isModalOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-70 z-40 pointer-events-none"></div>
+            )}
+
             <form
                 id="updateTodoForm"
                 onSubmit={handleSubmit}
-                className="w-full max-w-[540px] mx-auto p-2 grid gap-2"
+                className={`w-full max-w-[540px] mx-auto p-2 grid gap-2 ${
+                    isModalOpen ? "opacity-25 pointer-events-none" : ""
+                }`}
             >
                 <div className="form-row flex items-center gap-2">
                     <input
@@ -72,7 +80,9 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Edit Todo"
                         required
-                        className="p-2 text-xs border border-gray-300 rounded flex-1"
+                        className={`p-2 text-xs border border-gray-300 rounded flex-1 ${
+                            isModalOpen ? "bg-gray-400" : ""
+                        }`}
                         disabled={isFinalized}
                     />
                     <div className="goal-container flex items-center gap-1">
@@ -83,7 +93,9 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                                 setGoal(parseInt(e.target.value, 10))
                             }
                             required
-                            className="w-16 p-2 text-xs border border-gray-300 rounded"
+                            className={`w-16 p-2 text-xs border border-gray-300 rounded ${
+                                isModalOpen ? "bg-gray-400" : ""
+                            }`}
                             disabled={isFinalized}
                         >
                             {Array.from({ length: 24 }, (_, i) => (
@@ -109,7 +121,9 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                         value={itemNotes}
                         onChange={(e) => setItemNotes(e.target.value)}
                         placeholder="Edit Notes"
-                        className="p-2 text-xs border border-gray-300 rounded flex-1"
+                        className={`p-2 text-xs border border-gray-300 rounded flex-1 ${
+                            isModalOpen ? "bg-gray-400" : ""
+                        }`}
                         rows="3"
                         disabled={isFinalized}
                     />
@@ -126,7 +140,9 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="Edit Description"
-                        className="p-2 text-xs border border-gray-300 rounded flex-1"
+                        className={`p-2 text-xs border border-gray-300 rounded flex-1 ${
+                            isModalOpen ? "bg-gray-400" : ""
+                        }`}
                         rows="5"
                         disabled={isFinalized}
                     />
@@ -137,6 +153,8 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                         onClick={openModal}
                         className={`bg-red-500 text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-red-700 flex items-center justify-center ${
                             isFinalized ? "opacity-50 cursor-not-allowed" : ""
+                        } ${
+                            isModalOpen ? "opacity-25 pointer-events-none" : ""
                         }`}
                         disabled={isFinalized}
                     >
@@ -146,7 +164,11 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                         <button
                             type="button"
                             onClick={onCancel}
-                            className="bg-white text-black border border-black p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-200"
+                            className={`bg-white text-black border border-black p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-200 ${
+                                isModalOpen
+                                    ? "opacity-25 pointer-events-none"
+                                    : ""
+                            }`}
                         >
                             Cancel
                         </button>
@@ -155,6 +177,10 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
                             className={`bg-black text-white p-2 px-4 rounded cursor-pointer text-xs hover:bg-gray-800 ${
                                 isFinalized
                                     ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                            } ${
+                                isModalOpen
+                                    ? "opacity-25 pointer-events-none"
                                     : ""
                             }`}
                             disabled={isFinalized}
@@ -166,7 +192,7 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
             </form>
 
             {isModalOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
                     <div className="bg-white p-4 rounded shadow-lg max-w-sm w-full">
                         <h2 className="text-lg font-semibold mb-4">
                             Confirm Deletion
