@@ -235,7 +235,9 @@ NEXT July 3 2024
             click and drag is drag and drop
 
 ---
-    **show a warning modal upon clicking delete. cancel, delete, this cannot be undone
+    x show a warning modal upon clicking delete. cancel, delete, this cannot be undone
+
+    **why is sort index getting larger and larger???
 ---
     **share on youtube. walkthrough the code, and how people can get it working locally
         record a screenshare youtube video on my mac laptop
@@ -245,6 +247,8 @@ NEXT July 3 2024
         it will get 100k views
 
     **share on skool. people will like this
+
+    **share to skool. apply.
 ---
 
     **make it live in prod

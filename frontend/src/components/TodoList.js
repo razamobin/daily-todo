@@ -59,15 +59,19 @@ function TodoList({
         groupedTodos[dayNumber] = reorderedTodos;
 
         // Flatten the grouped todos back into a single array
-        const newTodos = Object.values(groupedTodos).flat();
+        const newTodos = Object.keys(groupedTodos).reduce((acc, day) => {
+            return acc.concat(groupedTodos[day]);
+        }, []);
 
         setTodos(newTodos);
 
-        // Create the JSON object mapping todo id to new sort index
-        const sortIndexMap = newTodos.reduce((acc, todo, index) => {
-            acc[todo.id] = index;
-            return acc;
-        }, {});
+        // Create the JSON object mapping todo id to new sort index for each day
+        const sortIndexMap = {};
+        Object.keys(groupedTodos).forEach((day) => {
+            groupedTodos[day].forEach((todo, index) => {
+                sortIndexMap[todo.id] = index;
+            });
+        });
 
         // Save the new order to the backend
         axios
