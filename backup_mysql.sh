@@ -4,7 +4,7 @@
 DB_USER="user"
 DB_PASSWORD="password"
 DB_NAME="todo_db"
-BACKUP_DIR="/Users/rmobin/Dropbox/2024aiagents/daily-todo/dbbackups"  # Change this to your desired backup directory
+BACKUP_DIR="/Users/rmobin/Dropbox/2024aiagents/daily-todos/dbbackups"  # Change this to your desired backup directory
 DATE=$(date +"%Y%m%d%H%M")
 BACKUP_FILE="$BACKUP_DIR/$DB_NAME-$DATE.sql"
 

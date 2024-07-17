@@ -247,21 +247,43 @@ NEXT July 3 2024
 ---
 
     **share to skool. apply.
-        *update screenshot to have bold text
+        x update screenshot to have bold text
 
-        *pick a gpt 4o example message
+        x pick a gpt 4o example message
 
         *add a intermediate page introducing myself
             fell in love with coding 2 events. high school calculus graphing calculator program. euler's formula. did it all for you, anyone who had my program aced that part of the test.
-                study abroad in hong kong, learn about the internet class, build our own web server, java. 
+                study abroad in hong kong, took a ee class to learn about the internet, build our own web server, java. fell in love. switched to software systems. rest is history.
                 2000 and 2004
-                i am an artist a creative. just want to write code in peace (6 hours a day) see it in my mission
+                i am an artist a creative. just want to write code in peace (6 hours a day) see it in my mission. 
+                    peace and quiet and build things w code.
                 here is the app i build
                     github repo link
                     *link in prod, here is a login for skool, i preloaded a bunch of todos, feel free to play around with it
+                            add
+                            edit
+                            drag and drop
+                            finalize next day
+                            ai encouragement message
+                            study the code if you like
                         need to push it to prod. JOB NOT FINISHED
                         gp5 3.5 is free. gpt4o - $30/month? $40?
                     would love to chat about the app, my design decisions, and more generally what i'm looking for, how i can help, what you need at skool
+                        chat about skool, what you're looking for, what you need. how i can help. what kind of help do you need on the engineering side. what are you struggling with?
+    **make it live in prod
+        AWS
+
+        prod config - cookies secure true, strict on same site, etc. uwsgi.
+
+        fix mysql passwords, etc. how to generate and store those in prod?
+
+        domains
+            dailytodos.ai - main domain
+            samethingeveryday.ai
+
+        *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
+            plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
+            am walk, pm walk like clockwork
 
     **share on youtube. walkthrough the code, and how people can get it working locally
         record a screenshare youtube video on my mac laptop
@@ -273,26 +295,18 @@ NEXT July 3 2024
     **share with new society community. people will like this
         talk about it with David
 
-    **make it live in prod
-        AWS
-
-        prod config - cookies secure true, strict on same site, etc. uwsgi.
-
-        domains
-            dailytodos.ai - main domain
-            samethingeveryday.ai
-
-        *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
-            plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
-            am walk, pm walk like clockwork
-
 ---
+    *finalize - opens final text area for notes on the day, reflections, etc. move day
+        assess the day. what you can improve on. what you did well. how was your sleep. then finalize.
+
     *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
+
+    read only view so i can see what Dad is doing. follow a person's health journey
 ---
-    finalize - opens final text area for notes on the day, reflections, etc. move day
 
     where can you talk about your sleep?
 
+    ai can encourage you, but so can your friends and family. comments etc. so have a way for people to have a read-only look at your todos, and your own notes. blood sugar. and leave encouraging comments.
 
     make profile page smaller text, wider, bigger text area for mission, etc. match daily todo styling/look
 
