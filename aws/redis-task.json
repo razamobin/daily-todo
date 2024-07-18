@@ -1,0 +1,29 @@
+{
+  "family": "redis-task",
+  "containerDefinitions": [
+    {
+      "name": "redis",
+      "image": "redis:7.2-alpine",
+      "essential": true,
+      "memory": 256,
+      "cpu": 256,
+      "portMappings": [
+        {
+          "containerPort": 6379,
+          "hostPort": 6379
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "redis_data",
+          "containerPath": "/data"
+        }
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "name": "redis_data"
+    }
+  ]
+}

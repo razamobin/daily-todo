@@ -1,0 +1,66 @@
+{
+  "family": "mysql-task",
+  "containerDefinitions": [
+    {
+      "name": "mysql",
+      "image": "mysql:latest",
+      "essential": true,
+      "memory": 512,
+      "cpu": 256,
+      "environment": [
+        {
+          "name": "MYSQL_ROOT_PASSWORD",
+          "value": "rootpassword"
+        },
+        {
+          "name": "MYSQL_DATABASE",
+          "value": "mydatabase"
+        },
+        {
+          "name": "MYSQL_USER",
+          "value": "myuser"
+        },
+        {
+          "name": "MYSQL_PASSWORD",
+          "value": "mypassword"
+        }
+      ],
+      "portMappings": [
+        {
+          "containerPort": 3306,
+          "hostPort": 3306
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "mysql_data",
+          "containerPath": "/var/lib/mysql"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/mysql",
+          "awslogs-region": "us-west-2",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "mysql_data",
+      "host": {
+        "sourcePath": "/ecs/mysql_data"
+      }
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::476729447436:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::476729447436:role/ecsTaskExecutionRole",
+  "requiresCompatibilities": [
+    "EC2"
+  ],
+  "networkMode": "bridge",
+  "cpu": "256",
+  "memory": "512"
+}
