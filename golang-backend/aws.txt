@@ -1,0 +1,9 @@
+docker build -t golang-backend .
+aws ecr create-repository --repository-name golang-backend
+docker tag golang-backend:latest 476729447436.dkr.ecr.us-west-2.amazonaws.com/golang-backend:latest
+docker push 476729447436.dkr.ecr.us-west-2.amazonaws.com/golang-backend:latest
+<create task definition using that image>
+aws ecs register-task-definition --cli-input-json file://golang-backend-task.json
+aws ecs create-service --cluster my-ecs-cluster --service-name golang-backend-service --task-definition golang-backend-task:1 --desired-count 1
+aws ecs update-service --cluster my-ecs-cluster --service golang-backend-service --desired-count 0
+aws ecs update-service --cluster my-ecs-cluster --service golang-backend-service --task-definition golang-backend-task:2 --desired-count 1
