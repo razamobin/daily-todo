@@ -235,7 +235,15 @@ func getRecentTodosForUser(userID int) ([]Todo, bool, int, map[int]bool, bool, i
 
 func main() {
     var err error
-    db, err = sql.Open("mysql", "user:password@tcp(mysql:3306)/todo_db")
+
+    dbUser := os.Getenv("DB_USER")
+    dbPassword := os.Getenv("DB_PASSWORD")
+    dbHost := os.Getenv("DB_HOST")
+    dbPort := os.Getenv("DB_PORT")
+    dbName := os.Getenv("DB_NAME")
+
+    dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUser, dbPassword, dbHost, dbPort, dbName)
+    db, err = sql.Open("mysql", dsn)
     if err != nil {
         log.Fatal(err)
     }

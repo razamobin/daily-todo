@@ -272,8 +272,27 @@ NEXT July 3 2024
                         chat about skool, what you're looking for, what you need. how i can help. what kind of help do you need on the engineering side. what are you struggling with?
     **make it live in prod
         AWS
+            networking - vpc, subnet, internet gateway, security groups
+            log policies, services can all write to cloud logging
+            create log group for eachs service
+            ECS cluster
+            add EC2 instances to clusters. tasks will be sent out to them as needed
+            redis is vanilla, easy
+
+            mysql, create docker image with mysql 8.0, and my.cnf that turns off RSA
+                tag, push, etc
+                need to grant priveleges i think
+            mysql client - community edition 8.0. use 2023 gpg key
+
+            bastion machine, so we can disable ssh to all the rest
+                git on here w the code
+                flyway on here. config to point to mysql, disable ssl stuff
+                    flyway.url=jdbc:mysql://10.0.1.94:3306/todo_db?useSSL=false&requireSSL=false&allowPublicKeyRetrieval=true
+                    flyway.schemas=todo_db
+                    flyway.locations=filesystem:./migrations
 
         prod config - cookies secure true, strict on same site, etc. uwsgi.
+            boolean config? 
 
         fix mysql passwords, etc. how to generate and store those in prod?
 
@@ -298,6 +317,19 @@ NEXT July 3 2024
 ---
     *finalize - opens final text area for notes on the day, reflections, etc. move day
         assess the day. what you can improve on. what you did well. how was your sleep. then finalize.
+        REFLECT ON THE DAY. new db table. and include in user-mission context to AI
+
+    you want to be able to ask AI, hey what was the longest streak of "# focused 25 timers" 10 hours a day? 
+        give AI tools, to make db queries against your data
+
+    chat with the AI agent
+
+    release to prod script. github actions, trigger upon push to main
+
+    sum up all my focused created hours a day and make it a # total each day. and show it prominently. graph it. so i know. be honest with your self. measure. you make what you measure.
+        most important number everyday. show it huge, graph it.
+
+    type all this stuff, submit, site says you are logged out, and need to log in. lost your form post data. fuck
 
     *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o
 
@@ -318,6 +350,8 @@ NEXT July 3 2024
 
     allow to n/a a todo if it doesn't apply to today (don't need to do dd work on saturday). then user-mission can filter it out if it was n/a.
         also maybe a same day todo, not to be copied to next day
+
+    put a circle blue dot next to any todo with updates for the day. so you can read your own daily journal notes later.
 ======
     *put label on daily message - message for most recent finalized day - july 7th 
         like what finalized day is this AI talking about, or starting at?

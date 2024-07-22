@@ -3,10 +3,10 @@ services:
         build: ./mysql
         container_name: mysql
         environment:
-            MYSQL_ROOT_PASSWORD: rootpassword
-            MYSQL_DATABASE: todo_db
-            MYSQL_USER: user
-            MYSQL_PASSWORD: password
+            DB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+            DB_NAME: ${DB_NAME}
+            DB_USER: ${DB_USER}
+            DB_PASSWORD: ${DB_PASSWORD}
         ports:
             - "3306:3306"
         volumes:
@@ -26,9 +26,14 @@ services:
         networks:
             - todo-net
         environment:
-            - REDIS_HOST=redis
-            - REDIS_PORT=6379
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
             - BEARER_TOKEN=${BEARER_TOKEN}
+            - DB_HOST=${DB_HOST}
+            - DB_PORT=${DB_PORT}
+            - DB_USER=${DB_USER}
+            - DB_PASSWORD=${DB_PASSWORD}
+            - DB_NAME=${DB_NAME}
 
     python-backend:
         build: ./python-backend
@@ -62,9 +67,9 @@ services:
         entrypoint:
             [
                 "flyway",
-                "-url=jdbc:mysql://mysql:3306/todo_db?useSSL=false&allowPublicKeyRetrieval=true",
-                "-user=user",
-                "-password=password",
+                "-url=jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true",
+                "-user=${DB_USER}",
+                "-password=${DB_PASSWORD}",
                 "-baselineOnMigrate=true",
                 "-locations=filesystem:/flyway/sql",
                 "migrate",
@@ -85,6 +90,9 @@ services:
             - redis_data:/data
         networks:
             - todo-net
+        environment:
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
 
 networks:
     todo-net:

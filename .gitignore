@@ -6,3 +6,4 @@ inspo
 apiref
 .DS_Store
 awsprivate
+*.pem
