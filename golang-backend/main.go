@@ -292,6 +292,7 @@ func main() {
     router.HandleFunc("/api/user-profile", UserProfileHandler).Methods("GET", "POST")
     router.HandleFunc("/api/finalize-day", FinalizeDayHandler).Methods("POST")
     router.HandleFunc("/api/todo-description", SaveOrUpdateTodoDescriptionHandler).Methods("POST")
+    router.HandleFunc("/health", HealthCheckHandler).Methods("GET")
 
     sessionRouter := sessionManager.LoadAndSave(router)
 
@@ -1213,4 +1214,60 @@ func SaveAssistantIDHandler(w http.ResponseWriter, r *http.Request) {
 
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("Assistant ID saved successfully"))
+}
+
+func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+    mysqlHost := os.Getenv("DB_HOST")
+    mysqlPort := os.Getenv("DB_PORT")
+    mysqlUser := os.Getenv("DB_USER")
+    mysqlDatabase := os.Getenv("DB_NAME")
+    redisHost := os.Getenv("REDIS_HOST")
+    redisPort := os.Getenv("REDIS_PORT")
+
+    // Check MySQL connection
+    mysqlErr := db.Ping()
+
+    // Check Redis connection
+    redisConn, err := redis.Dial("tcp", fmt.Sprintf("%s:%s", redisHost, redisPort))
+    if err != nil {
+        log.Printf("Failed to connect to Redis: %v", err)
+    }
+    defer redisConn.Close()
+    redisErr := redisConn.Err()
+
+    // Prepare the response
+    response := map[string]interface{}{
+        "mysql": map[string]string{
+            "host":     mysqlHost,
+            "port":     mysqlPort,
+            "user":     mysqlUser,
+            "database": mysqlDatabase,
+            "status": func() string {
+                if mysqlErr != nil {
+                    return "unhealthy"
+                }
+                return "healthy"
+            }(),
+        },
+        "redis": map[string]string{
+            "host": redisHost,
+            "port": redisPort,
+            "status": func() string {
+                if redisErr != nil {
+                    return "unhealthy"
+                }
+                return "healthy"
+            }(),
+        },
+    }
+
+    // Determine the overall health status
+    if mysqlErr != nil || redisErr != nil {
+        w.WriteHeader(http.StatusInternalServerError)
+    } else {
+        w.WriteHeader(http.StatusOK)
+    }
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(response)
 }
