@@ -270,8 +270,8 @@ NEXT July 3 2024
                         gp5 3.5 is free. gpt4o - $30/month? $40?
                     would love to chat about the app, my design decisions, and more generally what i'm looking for, how i can help, what you need at skool
                         chat about skool, what you're looking for, what you need. how i can help. what kind of help do you need on the engineering side. what are you struggling with?
-    **make it live in prod
-        AWS
+    **make it live in prod in AWS
+        x AWS conceptes
             networking - vpc, subnet, internet gateway, security groups
             log policies, services can all write to cloud logging
             create log group for eachs service
@@ -291,9 +291,38 @@ NEXT July 3 2024
                     flyway.schemas=todo_db
                     flyway.locations=filesystem:./migrations
 
-        prod config - cookies secure true, strict on same site, etc. uwsgi.
-            boolean config? 
+        x golang is live, works 100% nice
 
+===
+        python app in prod
+            x env vars refactor
+                x openai
+                x bearer token
+                x golang host and port
+            /health check - can it talk to openai and golang? and is bearer token set/not empty or null
+
+            rename to GOLANG_BACKEND
+
+            how to get prod python server? not dev mode server
+            docker image, tag, push, use in task definition
+
+        react go live in AWS
+            prod mode, not dev mode
+            move to vite instead of create react app? what is more standard
+
+        move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
+
+        RDS
+
+        elasticache
+
+        ip discovery, not hard coded ips. services can move around
+
+        point domain dailytodos.ai at my app
+
+        prod config - cookies secure true, strict on same site, etc. uwsgi.
+            boolean config? ENV vars would work i believe
+===
         fix mysql passwords, etc. how to generate and store those in prod?
 
         domains
