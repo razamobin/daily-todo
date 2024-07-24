@@ -320,13 +320,17 @@ script, less manual to debug AWS deployment
                 35.91.43.69:8080 (public golang)
                 35.91.43.69:5001 (public python)
 
-            /health check, can i talk to golang backend, and python backend
+                NEXT
+                fix CORS and i think it will work
+                    CORS to python and golang
+
+            x /health check, can i talk to golang backend, and python backend
 
         point domain dailytodos.ai at my app
 
         ip discovery, not hard coded ips. services can move around
 
-        need a prod release 
+        need a prod release script for new code - react, python, go and new sql flyway migrations
 
         move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
 
@@ -337,12 +341,12 @@ script, less manual to debug AWS deployment
 
         prod config - cookies secure true, strict on same site, etc. uwsgi.
             boolean config? ENV vars would work i believe
+
+        https for talking to python/golang
+
+        stable urls for them too. api1.dailytodos.ai/ api2.dailytodos.ai/
 ===
         fix mysql passwords, etc. how to generate and store those in prod?
-
-        domains
-            dailytodos.ai - main domain
-            samethingeveryday.ai
 
         *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
             plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
@@ -358,11 +362,11 @@ script, less manual to debug AWS deployment
     **share with new society community. people will like this
         talk about it with David
 
----
     *finalize - opens final text area for notes on the day, reflections, etc. move day
         assess the day. what you can improve on. what you did well. how was your sleep. then finalize.
         REFLECT ON THE DAY. new db table. and include in user-mission context to AI
 
+---
     you want to be able to ask AI, hey what was the longest streak of "# focused 25 timers" 10 hours a day? 
         give AI tools, to make db queries against your data
 
@@ -373,6 +377,7 @@ script, less manual to debug AWS deployment
     sum up all my focused created hours a day and make it a # total each day. and show it prominently. graph it. so i know. be honest with your self. measure. you make what you measure.
         most important number everyday. show it huge, graph it.
 
+---
     type all this stuff, submit, site says you are logged out, and need to log in. lost your form post data. fuck
 
     *use raza.mobin api key, and gpt3.5 and get some cc charges so i can get access to gpt4o

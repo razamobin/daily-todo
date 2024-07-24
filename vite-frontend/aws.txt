@@ -1,0 +1,9 @@
+docker build -t vite-react -f Dockerfile.prod .
+aws ecr create-repository --repository-name vite-react
+docker tag vite-react:latest 476729447436.dkr.ecr.us-west-2.amazonaws.com/vite-react:latest
+docker push 476729447436.dkr.ecr.us-west-2.amazonaws.com/vite-react:latest
+<create task definition using that image, make sure to set env vars>
+aws ecs register-task-definition --cli-input-json file://vite-react-task.json
+aws ecs create-service --cluster my-ecs-cluster --service-name vite-react-service --task-definition vite-react-task:1 --desired-count 1
+aws ecs update-service --cluster my-ecs-cluster --service vite-react-service --desired-count 0
+aws ecs update-service --cluster my-ecs-cluster --service vite-react-service --task-definition vite-react-task:2 --desired-count 1

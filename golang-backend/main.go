@@ -299,7 +299,11 @@ func main() {
 
     // Set up CORS headers
     corsHandler := handlers.CORS(
-        handlers.AllowedOrigins([]string{"http://localhost:3000"}),
+        handlers.AllowedOrigins([]string{
+            "http://localhost:3000", // Development
+            "http://35.91.43.69",    // Production React app
+            "http://35.91.43.69:8080", // Production Go backend
+        }),
         handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
         handlers.AllowedHeaders([]string{"Content-Type"}),
         handlers.AllowCredentials(), // Allow credentials to be sent
