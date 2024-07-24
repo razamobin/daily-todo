@@ -12,6 +12,8 @@ import AuthForm from "./components/AuthForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle } from "@fortawesome/free-solid-svg-icons";
 import ProfilePage from "./components/ProfilePage";
+import HealthCheck from "./components/HealthCheck";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 function App() {
     const { user, logout } = useContext(AuthContext);
@@ -154,7 +156,7 @@ function App() {
     };
 
     return (
-        <>
+        <Router>
             <div className="header-container w-full max-w-[540px] mx-auto">
                 <header className="header flex justify-between items-center border-b-2 border-current pb-1">
                     <h1 className="text-3xl">
@@ -188,9 +190,12 @@ function App() {
                 {renderAddUpdateTodoView()}
             </div>
             <div className="main-container w-[1300px] mx-auto grid grid-cols-[1fr_20px_540px_20px_1fr] grid-rows-auto gap-x-0 gap-y-[45px]">
-                {renderMainView()}
+                <Routes>
+                    <Route path="/health" element={<HealthCheck />} />
+                    <Route path="/" element={renderMainView()} />
+                </Routes>
             </div>
-        </>
+        </Router>
     );
 }
 
