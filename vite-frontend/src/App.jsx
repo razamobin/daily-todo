@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
 import { AuthContext } from "./context/AuthProvider";
 import { AppStateContext } from "./context/AppStateContext";
-import axios from "./axiosConfig";
+import { golangAxios, pythonAxios, pythonBackendUrl } from "./axiosConfig";
 import AddTodo from "./components/AddTodo";
 import TodoList from "./components/TodoList";
 import ReactMarkdown from "react-markdown";
@@ -32,7 +32,7 @@ function App() {
         (newDayNumber) => {
             if (!user) return;
             const eventSource = new EventSource(
-                `http://localhost:5001/api/daily-message?user_id=${user.id}&new_day_number=${newDayNumber}`,
+                `${pythonBackendUrl}/api/daily-message?user_id=${user.id}&new_day_number=${newDayNumber}`,
                 { withCredentials: true }
             );
 
@@ -58,8 +58,8 @@ function App() {
 
     useEffect(() => {
         if (!user) return;
-        axios
-            .get("http://localhost:8080/api/todos")
+        golangAxios
+            .get("/api/todos")
             .then((response) => {
                 setTodos(response.data.todos);
                 setFinalizedMap(response.data.finalized_map); // Set the finalized map
@@ -84,8 +84,8 @@ function App() {
     };
 
     const finalizeDay = (dayNumber) => {
-        axios
-            .post(`http://localhost:8080/api/finalize-day`, {
+        golangAxios
+            .post(`/api/finalize-day`, {
                 day_number: dayNumber,
             })
             .then((response) => {

@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import axios from "../axiosConfig";
+import { golangAxios } from "../axiosConfig";
 import { AppStateContext } from "./AppStateContext";
 
 const AuthContext = createContext();
@@ -31,10 +31,10 @@ const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const response = await axios.post(
-                "http://localhost:8080/api/login",
-                { email, password }
-            );
+            const response = await golangAxios.post("/api/login", {
+                email,
+                password,
+            });
             const userData = response.data;
             setUser(userData);
             console.log(userData);
@@ -47,7 +47,7 @@ const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await axios.post("http://localhost:8080/api/logout");
+            await golangAxios.post("/api/logout");
             setUser(null);
             resetAppState();
             localStorage.removeItem("user");
@@ -61,10 +61,11 @@ const AuthProvider = ({ children }) => {
 
     const signup = async (email, password, timezone) => {
         try {
-            const response = await axios.post(
-                "http://localhost:8080/api/signup",
-                { email, password, timezone }
-            );
+            const response = await golangAxios.post("/api/signup", {
+                email,
+                password,
+                timezone,
+            });
             const userData = response.data;
             setUser(userData);
             localStorage.setItem("user", JSON.stringify(userData));

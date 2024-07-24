@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "../axiosConfig";
+import { golangAxios } from "../axiosConfig";
 
 function AddTodo({ setTodos }) {
     const [title, setTitle] = useState("");
@@ -11,8 +11,8 @@ function AddTodo({ setTodos }) {
             title,
             goal: parseInt(goal, 10) || 1,
         };
-        axios
-            .post("http://localhost:8080/api/todos", todo)
+        golangAxios
+            .post("/api/todos", todo)
             .then((response) => {
                 setTodos((prevTodos) => [...prevTodos, response.data]);
                 setTitle("");

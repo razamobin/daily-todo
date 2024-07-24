@@ -1,18 +1,31 @@
 import axios from "axios";
-import { logout } from "./context/AuthProvider"; // Adjust the import based on your file structure
+import { logout } from "./context/AuthProvider";
 
-// Set default Axios configuration
-axios.defaults.withCredentials = true;
+const golangBackendUrl =
+    import.meta.env.VITE_GOLANG_BACKEND_URL || "http://localhost:8080";
+const pythonBackendUrl =
+    import.meta.env.VITE_PYTHON_BACKEND_URL || "http://localhost:5001";
 
-// Set up Axios interceptor
-axios.interceptors.response.use(
-    (response) => response,
-    (error) => {
-        if (error.response && error.response.status === 401) {
-            logout(); // Log the user out
+const golangAxios = axios.create({
+    baseURL: golangBackendUrl,
+    withCredentials: true,
+});
+
+const pythonAxios = axios.create({
+    baseURL: pythonBackendUrl,
+    withCredentials: true,
+});
+
+[golangAxios, pythonAxios].forEach((instance) => {
+    instance.interceptors.response.use(
+        (response) => response,
+        (error) => {
+            if (error.response && error.response.status === 401) {
+                logout();
+            }
+            return Promise.reject(error);
         }
-        return Promise.reject(error);
-    }
-);
+    );
+});
 
-export default axios;
+export { golangAxios, pythonAxios, pythonBackendUrl };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import { getTimeZones } from "@vvo/tzdb";
-import axios from "../axiosConfig";
+import { golangAxios } from "../axiosConfig";
 
 function ProfilePage() {
     const { updateUser } = useContext(AuthContext);
@@ -17,9 +17,7 @@ function ProfilePage() {
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-                const response = await axios.get(
-                    "http://localhost:8080/api/user-profile"
-                );
+                const response = await golangAxios.get("/api/user-profile");
                 const profileData = response.data;
                 setUsername(profileData.username);
                 setEmail(profileData.email);
@@ -37,15 +35,12 @@ function ProfilePage() {
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(
-                "http://localhost:8080/api/user-profile",
-                {
-                    username,
-                    email,
-                    timezone,
-                    mission,
-                }
-            );
+            const response = await golangAxios.post("/api/user-profile", {
+                username,
+                email,
+                timezone,
+                mission,
+            });
             console.log("response.data in profile page.js");
             console.log(response.data);
             updateUser(response.data);

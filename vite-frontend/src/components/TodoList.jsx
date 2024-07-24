@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "../axiosConfig";
+import { golangAxios } from "../axiosConfig";
 import UpdateTodo from "./UpdateTodo";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { AppStateContext } from "../context/AppStateContext";
@@ -24,8 +24,8 @@ function TodoList({
             newStatus = index + 1;
         }
         const updatedTodo = { ...todo, status: newStatus };
-        axios
-            .put(`http://localhost:8080/api/todos/${todo.id}`, updatedTodo)
+        golangAxios
+            .put(`/api/todos/${todo.id}`, updatedTodo)
             .then(() => {
                 setTodos((prevTodos) =>
                     prevTodos.map((t) => (t.id === todo.id ? updatedTodo : t))
@@ -74,8 +74,8 @@ function TodoList({
         });
 
         // Save the new order to the backend
-        axios
-            .post("http://localhost:8080/api/update-sort-indexes", sortIndexMap)
+        golangAxios
+            .post("/api/update-sort-indexes", sortIndexMap)
             .then((response) => console.log("Order saved:", response))
             .catch((error) => console.error("Error saving order:", error));
     };

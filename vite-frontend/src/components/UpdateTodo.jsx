@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "../axiosConfig";
+import { golangAxios } from "../axiosConfig";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
@@ -32,8 +32,8 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
             description,
             notes: itemNotes,
         };
-        axios
-            .put(`http://localhost:8080/api/todos/${todo.id}`, updatedTodo)
+        golangAxios
+            .put(`/api/todos/${todo.id}`, updatedTodo)
             .then((response) => {
                 setTodos((prevTodos) =>
                     prevTodos.map((t) => (t.id === todo.id ? response.data : t))
@@ -45,8 +45,8 @@ function UpdateTodo({ todo, setTodos, onCancel, isFinalized }) {
 
     const handleDelete = () => {
         if (isFinalized) return; // Prevent deletion if the day is finalized
-        axios
-            .delete(`http://localhost:8080/api/todos/${todo.id}`)
+        golangAxios
+            .delete(`/api/todos/${todo.id}`)
             .then(() => {
                 setTodos((prevTodos) =>
                     prevTodos.filter((t) => t.id !== todo.id)
