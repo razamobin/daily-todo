@@ -7,3 +7,4 @@ apiref
 .DS_Store
 awsprivate
 *.pem
+venv*

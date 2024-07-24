@@ -271,7 +271,7 @@ NEXT July 3 2024
                     would love to chat about the app, my design decisions, and more generally what i'm looking for, how i can help, what you need at skool
                         chat about skool, what you're looking for, what you need. how i can help. what kind of help do you need on the engineering side. what are you struggling with?
     **make it live in prod in AWS
-        x AWS conceptes
+        x AWS concepts
             networking - vpc, subnet, internet gateway, security groups
             log policies, services can all write to cloud logging
             create log group for eachs service
@@ -294,31 +294,42 @@ NEXT July 3 2024
         x golang is live, works 100% nice
 
 ===
-        python app in prod
+        x python app in prod
             x env vars refactor
                 x openai
                 x bearer token
                 x golang host and port
-            /health check - can it talk to openai and golang? and is bearer token set/not empty or null
+            x /health check - can it talk to openai and golang? and is bearer token set/not empty or null
 
-            rename to GOLANG_BACKEND
+            x rename to GOLANG_BACKEND
 
-            how to get prod python server? not dev mode server
-            docker image, tag, push, use in task definition
+            x how to get prod python server? not dev mode server
+                gunicorn
+
+            x docker image, tag, push, use in task definition
+
+        x why did golang get marked unhealthy? health checks works great for me in AWS...
+            python too? weird that health checks work, then get unhealthly later. doesn't make sense
+            health checks in AWS are retarded lol. works locally on instance, inside container too. but for amazon nope. works once, then fails forever. keeps killing healthy instances and starting up forever. insane behavior. wtf is this. UX is horrible. debug the health check before going on infinite restart loops lol wut.
+
+        ip discovery, not hard coded ips. services can move around
+
+        need a prod release script, less manual to debug AWS deployment
 
         react go live in AWS
             prod mode, not dev mode
             move to vite instead of create react app? what is more standard
 
+            /health check, can i talk to golang backend, and python backend
+
         move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
 
+        point domain dailytodos.ai at my app
+
+===
         RDS
 
         elasticache
-
-        ip discovery, not hard coded ips. services can move around
-
-        point domain dailytodos.ai at my app
 
         prod config - cookies secure true, strict on same site, etc. uwsgi.
             boolean config? ENV vars would work i believe

@@ -47,15 +47,15 @@ services:
         environment:
             - BEARER_TOKEN=${BEARER_TOKEN}
 
-    frontend:
+    vite-frontend:
         build:
-            context: ./frontend
+            context: ./vite-frontend
             dockerfile: Dockerfile.dev
-        container_name: frontend-app
+        container_name: vite-frontend-app
         ports:
             - "3000:3000"
         volumes:
-            - ./frontend:/app
+            - ./vite-frontend:/app
             - /app/node_modules
         environment:
             - CHOKIDAR_USEPOLLING=true

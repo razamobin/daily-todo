@@ -1,0 +1,9 @@
+docker build -t python-backend -f Dockerfile.prod .
+aws ecr create-repository --repository-name python-backend
+docker tag python-backend:latest 476729447436.dkr.ecr.us-west-2.amazonaws.com/python-backend:latest
+docker push 476729447436.dkr.ecr.us-west-2.amazonaws.com/python-backend:latest
+<create task definition using that image, make sure to set env vars, include /health check>
+aws ecs register-task-definition --cli-input-json file://python-backend-task.json
+aws ecs create-service --cluster my-ecs-cluster --service-name python-backend-service --task-definition python-backend-task:1 --desired-count 1
+aws ecs update-service --cluster my-ecs-cluster --service python-backend-service --desired-count 0
+aws ecs update-service --cluster my-ecs-cluster --service python-backend-service --task-definition python-backend-task:2 --desired-count 1

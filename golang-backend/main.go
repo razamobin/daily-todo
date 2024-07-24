@@ -17,6 +17,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gomodule/redigo/redis"
+	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/jmoiron/sqlx"
@@ -305,7 +306,7 @@ func main() {
     )
 
     fmt.Println("Starting server on :8080")
-    log.Fatal(http.ListenAndServe(":8080", corsHandler(sessionRouter)))
+    log.Fatal(http.ListenAndServe("0.0.0.0:8080", corsHandler(sessionRouter)))
 }
 
 func SaveOrUpdateTodoDescriptionHandler(w http.ResponseWriter, r *http.Request) {
@@ -1217,6 +1218,9 @@ func SaveAssistantIDHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+    uuid := uuid.New()
+    fmt.Println("Health check called ", uuid)
+
     mysqlHost := os.Getenv("DB_HOST")
     mysqlPort := os.Getenv("DB_PORT")
     mysqlUser := os.Getenv("DB_USER")
@@ -1260,6 +1264,8 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
             }(),
         },
     }
+
+    fmt.Println("Sending health check response ", uuid)
 
     // Determine the overall health status
     if mysqlErr != nil || redisErr != nil {

@@ -36,7 +36,7 @@ class GetUserMission(OpenAISchema):
         token = os.getenv('BEARER_TOKEN', '')
         headers = {'Authorization': f'Bearer {token}'}
         response = requests.get(
-            f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/user-mission?user_id={self.user_id}',
+            f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/user-mission?user_id={self.user_id}',
             headers=headers)
         if response.status_code != 200:
             return f"Error: Failed to fetch the user mission, Status Code: {response.status_code}"
@@ -47,8 +47,8 @@ class GetUserMission(OpenAISchema):
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
 
-BACKEND_HOST = os.getenv('BACKEND_HOST', 'golang-backend')
-BACKEND_PORT = os.getenv('BACKEND_PORT', '8080')
+GOLANG_BACKEND_HOST = os.getenv('GOLANG_BACKEND_HOST', 'golang-backend')
+GOLANG_BACKEND_PORT = os.getenv('GOLANG_BACKEND_PORT', '8080')
 
 
 def forward_request_with_session_cookie(url, method='GET', json=None):
@@ -69,7 +69,8 @@ def forward_request_with_session_cookie(url, method='GET', json=None):
 @app.route('/')
 def home():
     response = forward_request_with_session_cookie(
-        f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/logged-in-user')
+        f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/logged-in-user'
+    )
     if response.status_code != 200:
         print('home')
         print(response.status_code)
@@ -261,7 +262,8 @@ def get_completion_stream(client, message, agent, funcs, thread, q,
 def daily_message():
     # Get the logged-in user
     response = forward_request_with_session_cookie(
-        f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/logged-in-user')
+        f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/logged-in-user'
+    )
     if response.status_code == 401:
 
         @stream_with_context
@@ -290,7 +292,7 @@ def daily_message():
 
     # Check if a message already exists for the given user and new_day_number
     response = forward_request_with_session_cookie(
-        f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/get-saved-assistant-message?day_number={new_day_number}'
+        f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/get-saved-assistant-message?day_number={new_day_number}'
     )
     if response.status_code == 200:
         existing_message = response.json().get('message')
@@ -311,7 +313,8 @@ def daily_message():
 
     # Fetch the user's first name
     response = forward_request_with_session_cookie(
-        f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/user-first-name')
+        f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/user-first-name'
+    )
     if response.status_code != 200:
         return jsonify(
             error="Failed to fetch user's first name"), response.status_code
@@ -321,7 +324,8 @@ def daily_message():
         return jsonify(error="User's first name not found"), 404
 
     response = forward_request_with_session_cookie(
-        f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/latest-thread')
+        f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/latest-thread'
+    )
     if response.status_code != 200:
         return jsonify(
             error="Failed to fetch latest thread ID"), response.status_code
@@ -343,7 +347,7 @@ def daily_message():
         print(f"thread_id: {thread_id}")
         # Save thread id to db for this user
         save_thread_response = forward_request_with_session_cookie(
-            f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/user-thread',
+            f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/user-thread',
             method='POST',
             json={'thread_id': thread_id})
         if save_thread_response.status_code != 200:
@@ -352,7 +356,7 @@ def daily_message():
 
     # get openai assistant
     response = forward_request_with_session_cookie(
-        f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/assistant-id')
+        f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/assistant-id')
     if response.status_code != 200:
         return jsonify(
             error="Failed to fetch assistant ID"), response.status_code
@@ -372,7 +376,7 @@ def daily_message():
     token = os.getenv('BEARER_TOKEN', '')
     headers = {'Authorization': f'Bearer {token}'}
     response = requests.get(
-        f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/user-mission?user_id={user_id}',
+        f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/user-mission?user_id={user_id}',
         headers=headers)
     if response.status_code != 200:
         return jsonify(error="Failed to fetch user mission and history"
@@ -422,7 +426,7 @@ def daily_message():
 
         # Save the full message to the database
         save_message_response = forward_request_with_session_cookie(
-            f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/save-assistant-message',
+            f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/save-assistant-message',
             method='POST',
             json={
                 'day_number': new_day_number,
@@ -442,7 +446,7 @@ def create_assistant():
 
     # Check if an assistant already exists in the database
     response = forward_request_with_session_cookie(
-        f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/assistant-id')
+        f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/assistant-id')
     if response.status_code == 200:
         assistant_id = response.json().get('assistant_id')
         if assistant_id:
@@ -490,7 +494,7 @@ def create_assistant():
 
     # Save the assistant_id to the MySQL database
     response = forward_request_with_session_cookie(
-        f'http://{BACKEND_HOST}:{BACKEND_PORT}/api/save-assistant-id',
+        f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/api/save-assistant-id',
         method='POST',
         json={'assistant_id': assistant_id})
     if response.status_code != 200:
@@ -506,8 +510,8 @@ def health_check():
     health_status = {
         "golang_backend": {
             "status": "unhealthy",
-            "host": BACKEND_HOST,
-            "port": BACKEND_PORT,
+            "host": GOLANG_BACKEND_HOST,
+            "port": GOLANG_BACKEND_PORT,
             "response_length": 0
         },
         "openai_api": {
@@ -522,8 +526,9 @@ def health_check():
 
     # Check Golang backend connection
     try:
-        response = requests.get(f'http://{BACKEND_HOST}:{BACKEND_PORT}/health',
-                                timeout=5)
+        response = requests.get(
+            f'http://{GOLANG_BACKEND_HOST}:{GOLANG_BACKEND_PORT}/health',
+            timeout=5)
         if response.status_code == 200:
             health_status["golang_backend"]["status"] = "healthy"
             health_status["golang_backend"]["response_length"] = len(
