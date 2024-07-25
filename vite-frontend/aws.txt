@@ -6,4 +6,11 @@ docker push 476729447436.dkr.ecr.us-west-2.amazonaws.com/vite-react:latest
 aws ecs register-task-definition --cli-input-json file://vite-react-task.json
 aws ecs create-service --cluster my-ecs-cluster --service-name vite-react-service --task-definition vite-react-task:1 --desired-count 1
 aws ecs update-service --cluster my-ecs-cluster --service vite-react-service --desired-count 0
-aws ecs update-service --cluster my-ecs-cluster --service vite-react-service --task-definition vite-react-task:2 --desired-count 1
+aws ecs update-service --cluster my-ecs-cluster --service vite-react-service --task-definition vite-react-task:4 --desired-count 1
+
+aws ecs update-service \
+  --cluster my-ecs-cluster \
+  --service vite-react-service \
+  --task-definition vite-react-task:4 \
+  --desired-count 1 \
+  --load-balancers "targetGroupArn=arn:aws:elasticloadbalancing:us-west-2:476729447436:targetgroup/react-tg/a8755b70c62c752a,containerName=vite-react,containerPort=80"

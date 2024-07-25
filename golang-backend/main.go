@@ -306,6 +306,7 @@ func main() {
             "http://35.91.43.69:8080", // Production Go backend
             "http://35.162.224.19", 
             "http://35.162.224.19:8080", 
+            "http://app-backend-lb-330001835.us-west-2.elb.amazonaws.com", // Add this line
         }),
         handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
         handlers.AllowedHeaders([]string{"Content-Type"}),

@@ -313,7 +313,7 @@ NEXT July 3 2024
             health checks in AWS are retarded lol. works locally on instance, inside container too. but for amazon nope. works once, then fails forever. keeps killing healthy instances and starting up forever. insane behavior. wtf is this. UX is horrible. debug the health check before going on infinite restart loops lol wut.
 script, less manual to debug AWS deployment
 
-        *react go live in AWS
+        x react go live in AWS
             x move to vite instead of create react app? what is more standard
 
             x docker file for prod mode, not dev mode
@@ -323,17 +323,20 @@ script, less manual to debug AWS deployment
                 x fix CORS and i think it will work
                     x golang
 
-                CORS to python too
+                x CORS to python too
 
             x /health check, can i talk to golang backend, and python backend
 
-        *ip discovery, not hard coded ips. services can move around
+        x ip discovery, not hard coded ips. services can move around
+
+        *fix login session cookies - ip on react app, lb on golang and python
 
         *point domain dailytodos.ai at my app
-            static ip for dailytodos.ai to react app
+            static ip for dailytodos.ai to react app. use same lb?
 
         *https for talking to python/golang
-            and https://dailytodos.ai
+
+        *https for main site: https://dailytodos.ai
 ===
         *RDS
 
