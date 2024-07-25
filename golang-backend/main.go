@@ -294,6 +294,7 @@ func main() {
     router.HandleFunc("/api/finalize-day", FinalizeDayHandler).Methods("POST")
     router.HandleFunc("/api/todo-description", SaveOrUpdateTodoDescriptionHandler).Methods("POST")
     router.HandleFunc("/health", HealthCheckHandler).Methods("GET")
+    router.HandleFunc("/lbhealth", LBHealthCheckHandler).Methods("GET")
 
     sessionRouter := sessionManager.LoadAndSave(router)
 
@@ -303,6 +304,8 @@ func main() {
             "http://localhost:3000", // Development
             "http://35.91.43.69",    // Production React app
             "http://35.91.43.69:8080", // Production Go backend
+            "http://35.162.224.19", 
+            "http://35.162.224.19:8080", 
         }),
         handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
         handlers.AllowedHeaders([]string{"Content-Type"}),
@@ -758,6 +761,12 @@ func GetLatestThreadIDHandler(w http.ResponseWriter, r *http.Request) {
     response := map[string]*string{"thread_id": threadID}
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
+}
+
+func LBHealthCheckHandler(w http.ResponseWriter, r *http.Request) {
+
+    w.WriteHeader(http.StatusOK)
+    w.Write([]byte("healthy"))
 }
 
 func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {

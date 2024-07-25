@@ -6,4 +6,11 @@ docker push 476729447436.dkr.ecr.us-west-2.amazonaws.com/golang-backend:latest
 aws ecs register-task-definition --cli-input-json file://golang-backend-task.json
 aws ecs create-service --cluster my-ecs-cluster --service-name golang-backend-service --task-definition golang-backend-task:1 --desired-count 1
 aws ecs update-service --cluster my-ecs-cluster --service golang-backend-service --desired-count 0
-aws ecs update-service --cluster my-ecs-cluster --service golang-backend-service --task-definition golang-backend-task:2 --desired-count 1
+aws ecs update-service --cluster my-ecs-cluster --service golang-backend-service --task-definition golang-backend-task:10 --desired-count 1 --service-registries "[{\"registryArn\":\"arn:aws:servicediscovery:us-west-2:476729447436:service/srv-yq4t26ib63thodxl\",\"containerName\":\"golang-backend\",\"containerPort\":8080}]"
+
+aws ecs update-service \
+  --cluster my-ecs-cluster \
+  --service golang-backend-service \
+  --task-definition golang-backend-task:12 \
+  --desired-count 1 \
+  --load-balancers "targetGroupArn=arn:aws:elasticloadbalancing:us-west-2:476729447436:targetgroup/golang-tg/655b326cc6fa234f,containerName=golang-backend,containerPort=8080"

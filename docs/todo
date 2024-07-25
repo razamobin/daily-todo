@@ -316,19 +316,21 @@ script, less manual to debug AWS deployment
         react go live in AWS
             x move to vite instead of create react app? what is more standard
 
-            docker file for prod mode, not dev mode
-                35.91.43.69:8080 (public golang)
-                35.91.43.69:5001 (public python)
+            x docker file for prod mode, not dev mode
+                x 35.91.43.69:8080 (public golang)
+                x 35.91.43.69:5001 (public python)
 
-                NEXT
-                fix CORS and i think it will work
-                    CORS to python and golang
+                x fix CORS and i think it will work
+                    x golang
+
+                CORS to python too
 
             x /health check, can i talk to golang backend, and python backend
 
         point domain dailytodos.ai at my app
 
         ip discovery, not hard coded ips. services can move around
+            static ip for dailytodos.ai to react app
 
         need a prod release script for new code - react, python, go and new sql flyway migrations
 
@@ -339,18 +341,21 @@ script, less manual to debug AWS deployment
 
         elasticache
 
-        prod config - cookies secure true, strict on same site, etc. uwsgi.
-            boolean config? ENV vars would work i believe
-
         https for talking to python/golang
 
         stable urls for them too. api1.dailytodos.ai/ api2.dailytodos.ai/
-===
-        fix mysql passwords, etc. how to generate and store those in prod?
 
+        prod config - cookies secure true, strict on same site, etc.
+            boolean to say use prod settings? ENV vars would work i believe
+
+===
         *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
             plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
             am walk, pm walk like clockwork
+===
+        standardize task def file names etc. clean it all up. consistent.
+
+        fix mysql passwords, etc. how to generate and store those in prod?
 
     **share on youtube. walkthrough the code, and how people can get it working locally
         record a screenshare youtube video on my mac laptop
