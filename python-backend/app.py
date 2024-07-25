@@ -45,7 +45,20 @@ class GetUserMission(OpenAISchema):
 
 
 app = Flask(__name__)
-CORS(app, supports_credentials=True)
+CORS(
+    app,
+    resources={
+        r"/*": {
+            "origins": [
+                "http://localhost:3000",  # Development
+                "http://35.91.43.69",  # Production React app
+                "http://35.91.43.69:8080",  # Production Go backend
+                "http://35.162.224.19",
+                "http://35.162.224.19:8080",
+            ]
+        }
+    },
+    supports_credentials=True)
 
 GOLANG_BACKEND_HOST = os.getenv('GOLANG_BACKEND_HOST', 'golang-backend')
 GOLANG_BACKEND_PORT = os.getenv('GOLANG_BACKEND_PORT', '8080')
@@ -562,6 +575,11 @@ def health_check():
                   and health_status["bearer_token"]["status"] == "set")
 
     return jsonify(health_status), 200 if is_healthy else 500
+
+
+@app.route('/lbhealth', methods=['GET'])
+def lb_health_check():
+    return "healthy", 200
 
 
 if __name__ == '__main__':
