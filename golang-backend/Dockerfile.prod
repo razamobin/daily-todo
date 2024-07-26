@@ -12,6 +12,6 @@ RUN go build -o /todo-backend
 
 EXPOSE 8080
 
-ENV GO_ENV=dev
+ENV GO_ENV=production
 
 CMD ["/todo-backend"]

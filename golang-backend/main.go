@@ -269,8 +269,15 @@ func main() {
     sessionManager.IdleTimeout = 12 * time.Hour
     sessionManager.Cookie.Name = "session_id"
     sessionManager.Cookie.HttpOnly = true
-    sessionManager.Cookie.Secure = false // Set to true in production
-    sessionManager.Cookie.SameSite = http.SameSiteLaxMode // set to strict mode in prod
+    sessionManager.Cookie.SameSite = http.SameSiteLaxMode
+
+    // Check if we're in production
+    if os.Getenv("GO_ENV") == "production" {
+        sessionManager.Cookie.Domain = ".dailytodos.ai"
+        sessionManager.Cookie.Secure = true
+    } else {
+        sessionManager.Cookie.Secure = false
+    }
 
     router := mux.NewRouter()
     router.HandleFunc("/api/signup", SignUpHandler).Methods("POST")
@@ -1241,6 +1248,7 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
     mysqlDatabase := os.Getenv("DB_NAME")
     redisHost := os.Getenv("REDIS_HOST")
     redisPort := os.Getenv("REDIS_PORT")
+    goEnv := os.Getenv("GO_ENV") // Get the GO_ENV value
 
     // Check MySQL connection
     mysqlErr := db.Ping()
@@ -1277,6 +1285,7 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
                 return "healthy"
             }(),
         },
+        "environment": goEnv, // Add the GO_ENV value to the response
     }
 
     fmt.Println("Sending health check response ", uuid)

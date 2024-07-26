@@ -251,6 +251,8 @@ NEXT July 3 2024
 
         x pick a gpt 4o example message
 
+        *clean up docker first time experience. instructions. fill in .env.example will all vars, etc
+
         *add a intermediate page introducing myself
             fell in love with coding 2 events. high school calculus graphing calculator program. euler's formula. did it all for you, anyone who had my program aced that part of the test.
                 study abroad in hong kong, took a ee class to learn about the internet, build our own web server, java. fell in love. switched to software systems. rest is history.
@@ -270,7 +272,7 @@ NEXT July 3 2024
                         gp5 3.5 is free. gpt4o - $30/month? $40?
                     would love to chat about the app, my design decisions, and more generally what i'm looking for, how i can help, what you need at skool
                         chat about skool, what you're looking for, what you need. how i can help. what kind of help do you need on the engineering side. what are you struggling with?
-    **make it live in prod in AWS
+    x make it live in prod in AWS
         x AWS concepts
             networking - vpc, subnet, internet gateway, security groups
             log policies, services can all write to cloud logging
@@ -347,10 +349,10 @@ script, less manual to debug AWS deployment
             x add https listeners for ALB
 
 ===
-        * test python hitting golang in prod
+        *test python hitting golang in prod
 
             like getting the logged in user and all that. is it working?
-                add to health check?
+                add to health check
 
             finalize day and get new message, does that work in prod?
 
@@ -368,6 +370,8 @@ script, less manual to debug AWS deployment
 
 ===
         need a prod release script for new code - react, python, go and new sql flyway migrations
+
+        update password area on profile page
 
         *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
             plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
