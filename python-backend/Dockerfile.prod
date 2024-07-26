@@ -11,5 +11,5 @@ COPY . .
 # Expose the port that Gunicorn will listen on
 EXPOSE 5001
 
-# Use Gunicorn to run the application
-CMD ["gunicorn", "--workers", "4", "--threads", "2", "--bind", "0.0.0.0:5001", "app:app"]
+# Use Gunicorn to run the application with increased keep-alive timeout
+CMD ["gunicorn", "--workers", "4", "--threads", "2", "--bind", "0.0.0.0:5001", "--keep-alive", "320", "--timeout", "320", "app:app"]

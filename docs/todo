@@ -363,20 +363,25 @@ script, less manual to debug AWS deployment
                 for python hitting golang. right now all users are http for python hitting golang. fix to https? make it a prod config?
 
 ===
-        **intermittent CORS error dailytodos talking to api2. weird. doesn't make sense. why intermittent?
+        x intermittent CORS error dailytodos talking to api2. weird. doesn't make sense. why intermittent?
             because of long event stream, maybe python doesn't send the CORS headers in that case?
             504 gateway timeout doesn't have CORS headers, that makes sense. root cause is python takes a long time to reply
+            ALB to 5 min (300 seconds). python keep alive to 5min 20 seconds (320)
+                see if that helps
+                seems to help, waited longer than 1 min so that's good
 
-        **open ai api error this morning too, wtf?
+        x open ai api error this morning too, wtf?
             assistant > The server had an error processing your request. Sorry about that! You can retry your request, or contact us through our help center at help.openai.com if you keep seeing this error. (Please include the request ID req_5625d3658cd720cbc08e4b0bdecb403a in your email.)
 
         **fix styling when 0 days of todos, or 1 day of todos
             grid thing i think. maybe fixed width all the way?
+            also a problem on my main account with lots of data. something went wrong in prod vs dev with the styling/grid widths...
 
         **disable add todo if you already finalized the latest day (lol)
+            and add unfinalize button. so user is not stuck on the app lol
+===
 
         merge todo history and todo importance. easier to connect the todo item with why it is important. do that for the most recent finalized day. other days it will know from the 1st day
-===
 
         *RDS
             and backups
