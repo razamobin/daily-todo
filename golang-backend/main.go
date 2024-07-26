@@ -302,11 +302,11 @@ func main() {
     corsHandler := handlers.CORS(
         handlers.AllowedOrigins([]string{
             "http://localhost:3000", // Development
-            "http://35.91.43.69",    // Production React app
-            "http://35.91.43.69:8080", // Production Go backend
-            "http://35.162.224.19", 
-            "http://35.162.224.19:8080", 
-            "http://app-backend-lb-330001835.us-west-2.elb.amazonaws.com", // Add this line
+            "http://app-backend-lb-330001835.us-west-2.elb.amazonaws.com",
+            "https://dailytodos.ai",
+            "https://www.dailytodos.ai",
+            "https://api1.dailytodos.ai",
+            "https://api2.dailytodos.ai",
         }),
         handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
         handlers.AllowedHeaders([]string{"Content-Type"}),

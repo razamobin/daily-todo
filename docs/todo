@@ -329,28 +329,34 @@ script, less manual to debug AWS deployment
 
         x ip discovery, not hard coded ips. services can move around
 
-        *fix login session cookies - ip on react app, lb on golang and python
+        x fix login session cookies - ip on react app, lb on golang and python
 
-        *point domain dailytodos.ai at my app
-            static ip for dailytodos.ai to react app. use same lb?
+        x point domain dailytodos.ai at my app
+            x static ip for dailytodos.ai to react app. use same lb? yep
+
+        x stable urls for them too. api1.dailytodos.ai/ api2.dailytodos.ai/
 
         *https for talking to python/golang
+            api1.dailytodos.ai
+            api2.dailytodos.ai
+            add CORS to python and golang
+            add 443 to security group
 
         *https for main site: https://dailytodos.ai
+            x add https listeners for ALB
 ===
-        *RDS
+        *prod config - cookies secure true, strict on same site, etc.
+            boolean to say use prod settings? ENV vars would work i believe
+            https in prod for api1, api2. http in dev is ok
+
+        *move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
 
         *elasticache
 
-        *move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
-       
-        *prod config - cookies secure true, strict on same site, etc.
-            boolean to say use prod settings? ENV vars would work i believe
+        *RDS
 
 ===
         need a prod release script for new code - react, python, go and new sql flyway migrations
-
-        stable urls for them too. api1.dailytodos.ai/ api2.dailytodos.ai/
 
         *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
             plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion

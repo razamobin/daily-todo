@@ -45,21 +45,20 @@ class GetUserMission(OpenAISchema):
 
 
 app = Flask(__name__)
-CORS(
-    app,
-    resources={
-        r"/*": {
-            "origins": [
-                "http://localhost:3000",  # Development
-                "http://35.91.43.69",  # Production React app
-                "http://35.91.43.69:8080",  # Production Go backend
-                "http://35.162.224.19",
-                "http://35.162.224.19:8080",
-                "http://app-backend-lb-330001835.us-west-2.elb.amazonaws.com",  # Add this line
-            ]
-        }
-    },
-    supports_credentials=True)
+CORS(app,
+     resources={
+         r"/*": {
+             "origins": [
+                 "http://localhost:3000",
+                 "http://app-backend-lb-330001835.us-west-2.elb.amazonaws.com",
+                 "https://dailytodos.ai",
+                 "https://www.dailytodos.ai",
+                 "https://api1.dailytodos.ai",
+                 "https://api2.dailytodos.ai",
+             ]
+         }
+     },
+     supports_credentials=True)
 
 GOLANG_BACKEND_HOST = os.getenv('GOLANG_BACKEND_HOST', 'golang-backend')
 GOLANG_BACKEND_PORT = os.getenv('GOLANG_BACKEND_PORT', '8080')
