@@ -363,17 +363,27 @@ script, less manual to debug AWS deployment
                 for python hitting golang. right now all users are http for python hitting golang. fix to https? make it a prod config?
 
 ===
+        **intermittent CORS error dailytodos talking to api2. weird. doesn't make sense. why intermittent?
+            because of long event stream, maybe python doesn't send the CORS headers in that case?
+            504 gateway timeout doesn't have CORS headers, that makes sense. root cause is python takes a long time to reply
+
+        **open ai api error this morning too, wtf?
+            assistant > The server had an error processing your request. Sorry about that! You can retry your request, or contact us through our help center at help.openai.com if you keep seeing this error. (Please include the request ID req_5625d3658cd720cbc08e4b0bdecb403a in your email.)
+
         **fix styling when 0 days of todos, or 1 day of todos
             grid thing i think. maybe fixed width all the way?
 
         **disable add todo if you already finalized the latest day (lol)
+
+        merge todo history and todo importance. easier to connect the todo item with why it is important. do that for the most recent finalized day. other days it will know from the 1st day
 ===
+
+        *RDS
+            and backups
 
         *move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
 
         *elasticache
-
-        *RDS
 
 ===
         need a prod release script for new code - react, python, go and new sql flyway migrations

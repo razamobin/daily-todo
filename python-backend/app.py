@@ -81,15 +81,7 @@ def forward_request_with_session_cookie(path, method='GET', json=None):
 
 @app.route('/')
 def home():
-    response = forward_request_with_session_cookie('/api/logged-in-user')
-    if response.status_code != 200:
-        print('home')
-        print(response.status_code)
-        return jsonify(
-            error="Failed to fetch logged in user"), response.status_code
-    print(response.json())
-    return jsonify(message="Hello from the Python backend!",
-                   user=response.json())
+    return jsonify(message="Hello from the Python backend!")
 
 
 def get_completion_stream(client, message, agent, funcs, thread, q,
@@ -579,6 +571,13 @@ def health_check():
                   and health_status["bearer_token"]["status"] == "set")
 
     return jsonify(health_status), 200 if is_healthy else 500
+
+
+@app.after_request
+def after_request(response):
+    print(f"Request from: {request.origin}")
+    print(f"Response headers: {response.headers}")
+    return response
 
 
 if __name__ == '__main__':
