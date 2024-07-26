@@ -336,19 +336,30 @@ script, less manual to debug AWS deployment
 
         x stable urls for them too. api1.dailytodos.ai/ api2.dailytodos.ai/
 
-        *https for talking to python/golang
-            api1.dailytodos.ai
-            api2.dailytodos.ai
-            add CORS to python and golang
+        x https for talking to python/golang
+            x api1.dailytodos.ai
+            x api2.dailytodos.ai
+            x add CORS to python and golang
             add 443 to security group
+                already
 
-        *https for main site: https://dailytodos.ai
+        x https for main site: https://dailytodos.ai
             x add https listeners for ALB
+
 ===
+        * test python hitting golang in prod
+
+            like getting the logged in user and all that. is it working?
+                add to health check?
+
+            finalize day and get new message, does that work in prod?
+
         *prod config - cookies secure true, strict on same site, etc.
             boolean to say use prod settings? ENV vars would work i believe
             https in prod for api1, api2. http in dev is ok
+                for python hitting golang. right now all users are http for python hitting golang. fix to https? make it a prod config?
 
+===
         *move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
 
         *elasticache
