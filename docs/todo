@@ -349,19 +349,26 @@ script, less manual to debug AWS deployment
             x add https listeners for ALB
 
 ===
-        *test python hitting golang in prod
+        x test python hitting golang in prod
 
             like getting the logged in user and all that. is it working?
                 add to health check
 
-            finalize day and get new message, does that work in prod?
+            x finalize day and get new message, does that work in prod?
+                yes it does!
 
-        *prod config - cookies secure true, strict on same site, etc.
+        x prod config - cookies secure true, strict on same site, etc.
             boolean to say use prod settings? ENV vars would work i believe
             https in prod for api1, api2. http in dev is ok
                 for python hitting golang. right now all users are http for python hitting golang. fix to https? make it a prod config?
 
 ===
+        **fix styling when 0 days of todos, or 1 day of todos
+            grid thing i think. maybe fixed width all the way?
+
+        **disable add todo if you already finalized the latest day (lol)
+===
+
         *move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
 
         *elasticache
@@ -393,6 +400,7 @@ script, less manual to debug AWS deployment
 
     *finalize - opens final text area for notes on the day, reflections, etc. move day
         assess the day. what you can improve on. what you did well. how was your sleep. then finalize.
+            what are you grateful for?
         REFLECT ON THE DAY. new db table. and include in user-mission context to AI
 
 ---
@@ -400,6 +408,8 @@ script, less manual to debug AWS deployment
         give AI tools, to make db queries against your data
 
     chat with the AI agent
+
+    day number - save their sign up day. current day # is global, so subtract sign up day, and you get their actual day. 1st day is not day 40. it's day 0!
 
     release to prod script. github actions, trigger upon push to main
 
