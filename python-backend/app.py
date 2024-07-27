@@ -494,7 +494,7 @@ def create_assistant():
          """achieve their mission and goals in life. Always return your messages in markdown """
          """format. Be sure to escape special characters when referencing a user's todo """
          """items to avoid formatting issues."""),
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         tools=[
             #   {
             #       "type": "function",

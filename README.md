@@ -14,7 +14,7 @@ visit the live site: [https://dailytodos.ai](https://dailytodos.ai)
 
 2. create your .env at the root of the project. you can copy .env.example as a reference and make some tweaks:
 
-    - OPENAI_API_KEY='sk-my-project-123'
+    - OPENAI_API_KEY='sk-my-project-123' (make sure your account is funded!)
     - BEARER_TOKEN: a shared secret between the golang and python backends
     - there are a bunch more vars but you can leave the rest as is if you just want to get started
 
@@ -24,7 +24,7 @@ visit the live site: [https://dailytodos.ai](https://dailytodos.ai)
     docker compose up --build
     ```
 
-4. create the AI assistant with curl:
+4. create the AI assistant with curl (uses gpt-4o-mini, edit in python-backend/app.py to change):
 
     ```
     curl -X POST http://localhost:5001/api/create-assistant

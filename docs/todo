@@ -382,24 +382,47 @@ script, less manual to debug AWS deployment
             had to remove the ```markdwon lol. looks good now. works in prod. pretty slick la verdad. definitely getting new opportunities from this.
 
 ===
-        start state with docker locally - update instructions. env.example, etc
+        x start state with docker locally - update instructions. env.example, etc
 
-        youtube video explaining the app, and intro to me. link the github and the prod site
+        **youtube video explaining the app, and intro to me. link the github and the prod site
+            with my face and smile in the corner
+            raza writes code
+            use ai to create the channel under raza.mobin@gmail.com, thumbnail, scrip etc. 30-60 seconds easy. share screen
 
-        add skool test data/account, simple link to log in
+        **add skool test data/account, simple link to log in so they can play with it, apply
 
-        algoexpert
+        **algoexpert
+            do it for 1-2 weeks, and just go apply lol
 
 ===
 
+        make the user mission more english, so easier for llm to understand
+            the user did 10 out of 10 on this, here are their notes. it's important to them because x. this was july 16th for the user. etc etc. better text to llm means better responses from llm.
+
+        user-mission - merge todo history and todo importance. easier for AI (even human reader) to connect the todo item with why it is important. do that for the most recent finalized day. other days it will know from the 1st day
+
+        debug why it thinks i didn't go to the gym wtf
+            today is not finalized so don't reference today
+            said day 41 2 days in a row, weird lol
+            but at least markdown worked!
+
+        with gpt4o-mini, can turn on chat, it will be cheap enough i think.
+
+        costs me $100/month to run as is. can i get paying customers to add up to that? then it pays for itself and i can try to grow it. is it adding that much value to people's lives? i would say so.
+            it has added to my life. so much more productive now. spend $100 make $50M
+
         **disable add todo if you already finalized the latest day (lol)
             and add unfinalize button. so user is not stuck on the app lol
+
+        have optional todos, so not a big deal if you skip it (magnesium before bed and bonus focused timers)
+
+        *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
+            plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
+            am walk, pm walk like clockwork
 ===
 
         *RDS
             and backups
-
-        user-mission - merge todo history and todo importance. easier for AI (even human reader) to connect the todo item with why it is important. do that for the most recent finalized day. other days it will know from the 1st day
 
         *move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
 
@@ -410,9 +433,6 @@ script, less manual to debug AWS deployment
 
         update password area on profile page
 
-        *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
-            plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
-            am walk, pm walk like clockwork
 ===
         standardize task def file names etc. clean it all up. consistent.
 
