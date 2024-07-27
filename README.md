@@ -40,12 +40,24 @@
     - you can click any todo and add today's notes for the todo
     - you can also add why this todo is important to you and your mission
     - you can add a mission on the profile page
-    - this is extra context so that the AI can learn more about you provide more personalized messages :D
+    - all of this is extra context so the AI can understand you better and provide the best daily messages :D
 
-to access MySQL:
+# to access MySQL:
 
 ```
 docker exec -it mysql mysql -u user -p
+```
+
+```
+use todo_db;
+```
+
+```
+select * from users;
+```
+
+```
+select * from daily_todos;
 ```
 
 ## project layout
