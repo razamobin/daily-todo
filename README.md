@@ -39,7 +39,7 @@
 11. BONUS
     - you can click any todo and add today's notes for the todo
     - you can also add why this todo is important to you and your mission
-    - you can add a mission on the profile page
+    - you can add a mission on the profile page (click your name in the header)
     - all of this is extra context so the AI can understand you better and provide the best daily messages :D
 
 ### to access MySQL:
