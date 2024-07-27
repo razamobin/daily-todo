@@ -262,6 +262,21 @@ def get_completion_stream(client, message, agent, funcs, thread, q,
     q.put("yield: Stream ended.\n")
 
 
+def clean_markdown(message: str) -> str:
+    """
+    Remove markdown code block syntax from the start and end of the string.
+    
+    Args:
+    message (str): The input markdown string.
+    
+    Returns:
+    str: The cleaned markdown string.
+    """
+    message = re.sub(r'^```markdown\s*', '', message)
+    message = re.sub(r'\s*```$', '', message)
+    return message
+
+
 @app.route('/api/daily-message', methods=['GET'])
 def daily_message():
     # Get the logged-in user
@@ -301,7 +316,8 @@ def daily_message():
 
             @stream_with_context
             def generate():
-                escaped_message = existing_message.replace('\n', '\\n')
+                cleaned_message = clean_markdown(existing_message)
+                escaped_message = cleaned_message.replace('\n', '\\n')
                 yield f"data: {escaped_message}\n\n"
                 yield "event: end\ndata: END\n\n"
 
@@ -416,11 +432,9 @@ def daily_message():
 
         # Retrieve the full message from the full_message_queue
         full_message = full_message_queue.get(block=True)
-        print('1', full_message)
 
-        # Remove markdown code block syntax only at the start and end of the string
-        full_message = re.sub(r'^```markdown\s*', '', full_message)
-        full_message = re.sub(r'\s*```$', '', full_message)
+        print('1', full_message)
+        full_message = clean_markdown(full_message)
         print('2', full_message)
 
         # Save the full message to the database
