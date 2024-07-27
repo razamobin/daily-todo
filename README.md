@@ -4,7 +4,7 @@
 
 visit the live site: [https://dailytodos.ai](https://dailytodos.ai)
 
-## Run a dev version locally
+## run a dev version locally
 
 1. clone the repo:
 
@@ -38,7 +38,7 @@ visit the live site: [https://dailytodos.ai](https://dailytodos.ai)
 10. repeat forever and do the most important things every day for the rest of your life :D (and don't get distracted by social media and AI driven distractions)
 11. BONUS
     - you can click any todo and add today's notes for the todo
-    - you can also add why this todo is important to you an your mission
+    - you can also add why this todo is important to you and your mission
     - you can add a mission on the profile page
     - this is extra context so that the AI can learn more about you provide more personalized messages :D
 
