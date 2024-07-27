@@ -2,7 +2,7 @@
 
 ![App Screenshot](assets/images/screen3.png)
 
-visit the live site: [https://dailytodos.ai](https://dailytodos.ai)
+## visit the live site: [https://dailytodos.ai](https://dailytodos.ai)
 
 ## run a dev version locally
 
