@@ -42,7 +42,7 @@
     - you can add a mission on the profile page
     - all of this is extra context so the AI can understand you better and provide the best daily messages :D
 
-# to access MySQL:
+### to access MySQL:
 
 ```
 docker exec -it mysql mysql -u user -p
