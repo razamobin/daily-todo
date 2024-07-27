@@ -19,6 +19,7 @@ from openai.types.beta.threads.runs import RunStep
 from openai.types.beta.threads.runs import FunctionToolCallDelta
 from openai.types.beta.assistant_stream_event import AssistantStreamEvent
 from typing_extensions import override
+import re
 
 from pydantic import Field
 from instructor import OpenAISchema
@@ -377,7 +378,7 @@ def daily_message():
     user_mission_history = response.json()
     user_mission_history_str = json.dumps(user_mission_history)
 
-    print(user_mission_history_str)
+    #print(user_mission_history_str)
 
     q = queue.Queue()
     full_message_queue = queue.Queue()  # New queue for the full message
@@ -415,6 +416,12 @@ def daily_message():
 
         # Retrieve the full message from the full_message_queue
         full_message = full_message_queue.get(block=True)
+        print('1', full_message)
+
+        # Remove markdown code block syntax only at the start and end of the string
+        full_message = re.sub(r'^```markdown\s*', '', full_message)
+        full_message = re.sub(r'\s*```$', '', full_message)
+        print('2', full_message)
 
         # Save the full message to the database
         save_message_response = forward_request_with_session_cookie(

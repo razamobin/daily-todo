@@ -4,7 +4,7 @@ import { AppStateContext } from "./context/AppStateContext";
 import { golangAxios, pythonAxios, pythonBackendUrl } from "./axiosConfig";
 import AddTodo from "./components/AddTodo";
 import TodoList from "./components/TodoList";
-import ReactMarkdown from "react-markdown";
+import Markdown from "react-markdown";
 import rehypeReact from "rehype-react";
 import remarkGfm from "remark-gfm"; // Optional: for GitHub flavored markdown
 import remarkBreaks from "remark-breaks"; // Plugin to convert newlines to <br>
@@ -118,7 +118,7 @@ function App() {
                     <>
                         {dailyMessage && (
                             <div className="daily-message col-start-5 col-end-6 row-start-1 row-span-10 text-sm">
-                                {dailyMessage}
+                                <Markdown>{dailyMessage}</Markdown>
                             </div>
                         )}
                         <TodoList
