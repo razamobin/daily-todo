@@ -1,4 +1,4 @@
-# daily-todo
+# daily-todo - daily todos app with AI encouragement by Raza 
 
 ![App Screenshot](assets/images/screen3.png)
 
@@ -32,7 +32,11 @@
 8. come tomorrow - new set of todos are copied from previous day and ready to be checked off
 9. you can finalize any day, and whenever a day is finalized, the AI will be called to come up with an encouraging message for you! (gotta be patient though, AI takes its time)
 10. repeat forever and do the most important things every day for the rest of your life :D (and don't get distracted by social media and AI driven distractions)
-11. BONUS - you can click any todo and add today's notes for the todo, you can also add why this todo is important to you an your mission. you can add a mission on the profile page :D AI can use all this context about you to provide you more personalized messages 
+11. BONUS 
+    - you can click any todo and add today's notes for the todo
+    - you can also add why this todo is important to you an your mission
+    - you can add a mission on the profile page
+    - this is extra context so that the AI can learn more about you provide more personalized messages :D
 
 to access MySQL:
 
