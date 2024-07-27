@@ -38,15 +38,23 @@ function App() {
                 { withCredentials: true }
             );
 
+            const cleanMarkdownStart = (message) => {
+                return message.replace(/^```markdown\s*/, "");
+            };
+
             eventSource.onmessage = (event) => {
                 const unescapedMessage = event.data.replace(/\\n/g, "\n");
-                setDailyMessage(
-                    (prevMessage) => prevMessage + unescapedMessage
-                );
+                setDailyMessage((prevMessage) => {
+                    const combinedMessage = prevMessage + unescapedMessage;
+                    return cleanMarkdownStart(combinedMessage);
+                });
             };
 
             eventSource.addEventListener("end", function (event) {
                 console.log("Stream ended");
+                setDailyMessage((prevMessage) =>
+                    prevMessage.replace(/\s*```$/, "")
+                );
                 eventSource.close();
             });
 
@@ -55,7 +63,7 @@ function App() {
                 eventSource.close();
             };
         },
-        [user, setDailyMessage]
+        [user, setDailyMessage, pythonBackendUrl]
     );
 
     useEffect(() => {
