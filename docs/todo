@@ -373,18 +373,21 @@ script, less manual to debug AWS deployment
         x open ai api error this morning too, wtf?
             assistant > The server had an error processing your request. Sorry about that! You can retry your request, or contact us through our help center at help.openai.com if you keep seeing this error. (Please include the request ID req_5625d3658cd720cbc08e4b0bdecb403a in your email.)
 
+===
         **fix styling when 0 days of todos, or 1 day of todos
             grid thing i think. maybe fixed width all the way?
             also a problem on my main account with lots of data. something went wrong in prod vs dev with the styling/grid widths...
+
+            remove all react markdown and see what it looks like in dev
 
         **disable add todo if you already finalized the latest day (lol)
             and add unfinalize button. so user is not stuck on the app lol
 ===
 
-        merge todo history and todo importance. easier to connect the todo item with why it is important. do that for the most recent finalized day. other days it will know from the 1st day
-
         *RDS
             and backups
+
+        user-mission - merge todo history and todo importance. easier for AI (even human reader) to connect the todo item with why it is important. do that for the most recent finalized day. other days it will know from the 1st day
 
         *move secrets out to AWS secrets, and fetch to create task definition files that i am able to check in
 

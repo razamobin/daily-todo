@@ -11,6 +11,6 @@ aws ecs update-service --cluster my-ecs-cluster --service vite-react-service --t
 aws ecs update-service \
   --cluster my-ecs-cluster \
   --service vite-react-service \
-  --task-definition vite-react-task:5 \
+  --task-definition vite-react-task:6 \
   --desired-count 1 \
   --load-balancers "targetGroupArn=arn:aws:elasticloadbalancing:us-west-2:476729447436:targetgroup/react-tg/a8755b70c62c752a,containerName=vite-react,containerPort=80"

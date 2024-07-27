@@ -4,7 +4,7 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+RUN npm ci  # Use 'npm ci' instead of 'npm install' for more reproducible builds
 
 COPY . .
 

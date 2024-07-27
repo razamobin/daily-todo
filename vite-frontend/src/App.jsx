@@ -118,19 +118,7 @@ function App() {
                     <>
                         {dailyMessage && (
                             <div className="daily-message col-start-5 col-end-6 row-start-1 row-span-10 text-sm">
-                                <ReactMarkdown
-                                    children={dailyMessage}
-                                    remarkPlugins={[remarkGfm, remarkBreaks]} // Optional: for GitHub flavored markdown
-                                    rehypePlugins={[
-                                        [
-                                            rehypeReact,
-                                            {
-                                                createElement:
-                                                    React.createElement,
-                                            },
-                                        ],
-                                    ]}
-                                />
+                                {dailyMessage}
                             </div>
                         )}
                         <TodoList
