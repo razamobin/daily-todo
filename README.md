@@ -2,27 +2,25 @@
 
 ![App Screenshot](assets/images/screen3.png)
 
-1. Clone the repo:
+1. clone the repo:
 
     ```
     git clone https://github.com/razamobin/daily-todo.git
     ```
 
-2. Create your .env at the root of the project with the following environment variables:
+2. create your .env at the root of the project. you can copy .env.example as a reference and make some tweaks:
 
     - OPENAI_API_KEY='sk-my-project-123'
     - BEARER_TOKEN: a shared secret between the golang and python backends
-    - (Add any other required environment variables here)
+    - there are a bunch more vars but you can leave the rest as is if you just want to get started
 
-    Use .env.example as a reference.
-
-3. Run Docker Compose to build and start the app:
+3. run Docker Compose to build and start the app:
 
     ```
     docker compose up --build
     ```
 
-4. Create the AI assistant with curl:
+4. create the AI assistant with curl:
 
     ```
     curl -X POST http://localhost:5001/api/create-assistant
@@ -35,7 +33,7 @@
 9. you can finalize any day, and whenever a day is finalized, the AI will be called to come up with an encouraging message for you! (gotta be patient though, AI takes its time)
 10. repeat forever and do the most important things every day for the rest of your life :D (and don't get distracted by social media and AI driven distractions)
 
-To access MySQL:
+to access MySQL:
 
 ```
 docker exec -it mysql mysql -u user -p
@@ -43,9 +41,10 @@ docker exec -it mysql mysql -u user -p
 
 ## project layout
 
-1. vite-frontend (react app build with vite)
+1. vite-frontend (react app built with vite)
 2. golang-backend (for db and session biz logic)
 3. python-backend (for AI API calls logic)
+    - you can make tweaks to the AI assistant instructions here
 4. mysql
 5. flyway for sql migrations
 6. redis for session storage
