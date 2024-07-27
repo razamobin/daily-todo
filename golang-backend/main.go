@@ -815,10 +815,20 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, fmt.Sprintf("Failed to fetch user timezone: %v", err), http.StatusInternalServerError)
         return
     }
-    currentDayNumber := calculateDayNumber(currentTime, userTimezone)
+
+    loc, err := time.LoadLocation(userTimezone)
+    if err != nil {
+        http.Error(w, fmt.Sprintf("Failed to load user timezone: %v", err), http.StatusInternalServerError)
+        return
+    }
+
+    currentTimeInUserTZ := currentTime.In(loc)
+    humanReadableDate := currentTimeInUserTZ.Format("Monday January 2, 2006")
+
+    //currentDayNumber := calculateDayNumber(currentTime, userTimezone)
 
     // Fetch the most recent 7 finalized days of todos
-    todos, todoImportance, err := getMostRecentFinalizedDaysTodos(userID)
+    todos, todoImportance, err := getMostRecentFinalizedDaysTodos(userID, userTimezone)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to fetch todos: %v", err), http.StatusInternalServerError)
         return
@@ -826,16 +836,17 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
 
     response := map[string]interface{}{
         "mission":            mission,
-        "todos_history":              todos,
+        "todos_history":      todos,
         "todo_importance":    todoImportance,
-        "current_day_number": currentDayNumber,
+        "todays_date":       humanReadableDate,
+        //"current_day_number": currentDayNumber,
     }
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
 }
 
 // Helper function to fetch the most recent 7 finalized days of todos
-func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, map[string]string, error) {
+func getMostRecentFinalizedDaysTodos(userID int, userTimezone string) ([]map[string]interface{}, []map[string]string, error) {
     // Fetch the 7 most recent finalized days
     rows, err := db.Query(`
         SELECT day_number 
@@ -859,7 +870,7 @@ func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, map[
     }
 
     if len(dayNumbers) == 0 {
-        return []map[string]interface{}{}, map[string]string{}, nil
+        return []map[string]interface{}{}, []map[string]string{}, nil
     }
 
     // Fetch todos for the 7 most recent finalized days
@@ -884,61 +895,49 @@ func getMostRecentFinalizedDaysTodos(userID int) ([]map[string]interface{}, map[
     defer rows.Close()
 
     todos := []map[string]interface{}{}
-    todoImportance := make(map[string]string)
+    todoImportance := []map[string]string{}
+    addedTodoItems := make(map[string]bool)
+
     for rows.Next() {
         var dayNumber, status, goal int
         var title string
         var description, notes sql.NullString
-        // Use sql.NullString to handle NULL values in the description and notes columns
         if err := rows.Scan(&dayNumber, &title, &status, &goal, &description, &notes); err != nil {
             return nil, nil, fmt.Errorf("failed to scan todo: %w", err)
         }
+
+        humanReadableDate, err := calculateDateFromDayNumber(dayNumber, userTimezone)
+        if err != nil {
+            return nil, nil, fmt.Errorf("failed to calculate date: %w", err)
+        }
+
+        var progress string
+        if status == 0 {
+            progress = "did not do"
+        } else if status == goal {
+            progress = fmt.Sprintf("100%% complete, %d out of %d", status, goal)
+        } else {
+            progress = fmt.Sprintf("partially complete, %d out of %d", status, goal)
+        }
         todo := map[string]interface{}{
-            "day_number": dayNumber,
-            "title":      title,
-            "progress":   fmt.Sprintf("%d out of %d", status, goal),
+            "date": humanReadableDate,
+            "todo_item": title,
+            "progress": progress,
         }
         if notes.Valid {
             todo["notes"] = notes.String
         }
         todos = append(todos, todo)
-        if description.Valid {
-            todoImportance[title] = description.String
+        
+        if description.Valid && !addedTodoItems[title] {
+            todoImportance = append(todoImportance, map[string]string{
+                "todo_item": title,
+                "why_it_is_important": description.String,
+            })
+            addedTodoItems[title] = true
         }
     }
     return todos, todoImportance, nil
-}
-
-// Helper function to fetch the last 7 days of todos excluding the current day
-func getLast7DaysTodos(userID int, upToDayNumber int) ([]map[string]interface{}, error) {
-    rows, err := db.Query(`
-        SELECT dt.day_number, dt.title, dt.status, dt.goal 
-        FROM daily_todos dt
-        JOIN finalized_days fd ON dt.user_id = fd.user_id AND dt.day_number = fd.day_number
-        WHERE dt.user_id = ? 
-        AND dt.day_number BETWEEN ? AND ?
-        AND dt.deleted = 0
-        AND fd.finalized = TRUE
-        ORDER BY dt.day_number DESC, dt.sort_index ASC`, userID, upToDayNumber-6, upToDayNumber)
-    if err != nil {
-        return nil, fmt.Errorf("failed to fetch todos: %w", err)
-    }
-    defer rows.Close()
-
-    todos := []map[string]interface{}{}
-    for rows.Next() {
-        var dayNumber, status, goal int
-        var title string
-        if err := rows.Scan(&dayNumber, &title, &status, &goal); err != nil {
-            return nil, fmt.Errorf("failed to scan todo: %w", err)
-        }
-        todos = append(todos, map[string]interface{}{
-            "day_number": dayNumber,
-            "title":      title,
-            "progress":   fmt.Sprintf("%d out of %d", status, goal),
-        })
-    }
-    return todos, nil
 }
 
 func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
@@ -1299,4 +1298,24 @@ func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
+}
+
+// Calculate the date for a given day number in the user's timezone
+func calculateDateFromDayNumber(dayNumber int, timezone string) (string, error) {
+    loc, err := time.LoadLocation(timezone)
+    if err != nil {
+        return "", fmt.Errorf("error loading location: %v", err)
+    }
+
+    // Adjust the reference date to midnight in the user's timezone
+    adjustedReferenceDate := time.Date(referenceDate.Year(), referenceDate.Month(), referenceDate.Day(), 0, 0, 0, 0, loc)
+
+    // Calculate the date by adding (dayNumber - 1) days to the reference date
+    // We subtract 1 because day 1 corresponds to the reference date itself
+    targetDate := adjustedReferenceDate.AddDate(0, 0, dayNumber-1)
+
+    // Format the date in a human-readable form
+    humanReadableDate := targetDate.Format("Monday January 2, 2006")
+
+    return humanReadableDate, nil
 }

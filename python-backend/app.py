@@ -406,17 +406,18 @@ def daily_message():
        The data contains the user's mission in life, their recent history of daily todo 
        items (that they feel helps them reach their goals and accomplish their mission), 
        and the reasons why each todo item is important to them and their mission. The 
-       user has also included daily notes of how each todo item went on a particular day, 
-       like a mini journal entry. Please address the user by their first name {first_name}. 
-       In your message, be sure to include specific encouragement on how well the user is 
-       doing. Identify and reference ALL streaks they have (7 days in a row of gym for 
-       example). Acknowledge any difficulties and obstacles that they've overcome based on 
-       the notes they've provided or any other relevant information. Emphazise all the 
-       amazing progress they're making. Emphasize how consistent they are. Reminder 
-       that you are an eternal optimist, your mission is to be an unwavering optimistic 
-       force in all your communications with the user. Your mission is to encourage 
-       {first_name} against all odds, doubts, and setbacks to achieve their mission and 
-       goals in life. JSON data: {user_mission_history_str}
+       user may also include daily notes of how each todo item went on a particular day, 
+       like a mini journal entry. The daily todo data is for 'finalized' days, so there 
+       is no need to critique 'today' if there is no data for today. Please address the 
+       user by their first name {first_name}. In your message, be sure to include specific 
+       encouragement on how well the user is doing. Identify and reference ALL streaks 
+       they have (7 days in a row of gym for example). Acknowledge any difficulties and 
+       obstacles that they've overcome based on the notes they've provided or any other 
+       relevant information. Emphasize all the amazing progress they're making. Emphasize 
+       how consistent they are. Reminder that you are an eternal optimist, your mission 
+       is to be an unwavering optimistic force in all your communications with the user. 
+       Your mission is to encourage {first_name} against all odds, doubts, and setbacks 
+       to achieve their mission and goals in life. JSON data: {user_mission_history_str}
         """, assistant, eternal_optimist_tools, thread, q, full_message_queue))
     completion_thread.start()
 

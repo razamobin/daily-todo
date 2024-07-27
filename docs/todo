@@ -384,16 +384,47 @@ script, less manual to debug AWS deployment
 ===
         x start state with docker locally - update instructions. env.example, etc
 
+        x move to Raza openai keys, and use gpt-4o-mini
+
+        x add skool test data/account
+            x sync up with devs - what can go live today?
+            x 1hr brainstorm how to make devs even more productive, remove obstacles
+            x code reviews
+            x design reviews
+            x sync up with product manager - roadmap
+            x sync up with customer support - high priorty bugs
+            x sync up with CEO - hiring
+            x sync up with finance - budget
+            x minimum 1hr of AI R&D - keep up with bleeding edge
+            x # 25m coding sessions to stay sharp (3)
+            x hire Raza - seems like a 10x developer! 😉
+
+===
+        **don't say day 42 lol. this is a brand new user. just day 42 of the app.
+            change the user mission data to not have day numbers, just give the day july 26th 2024. and clear user threads to reset the message for skool. and clear saved_assistant_messages.
+
+            curl -X GET 'http://localhost:8080/api/user-mission?user_id=1' \
+            -H 'Authorization: Bearer allyourbasearebelongtous' \
+            -H 'Cookie: session_id=KsPvw-Hojn3-Ia5ZsCtKRE_fdB_u1Tw2fQqRLz65bGw'
+
+        **simple ?skool=true link and it logs them in so they can play with it
+            x i'll put in daily notes, important notes. mission in profile
+            an easy link that logs them into this account, they can see the history. 
+
         **youtube video explaining the app, and intro to me. link the github and the prod site
             with my face and smile in the corner
             raza writes code
             use ai to create the channel under raza.mobin@gmail.com, thumbnail, scrip etc. 30-60 seconds easy. share screen
+                link to skool login on my app
 
-        **add skool test data/account, simple link to log in so they can play with it, apply
+        **land on dailytodos.ai/skool intro text, youtube video embedded. links to github. my email address to contact.
+            built this to learn react, golang, ai assistants api, AWS. filled it in with some data for you. let me know how you like it.
+            i use it daily to make sure i do all the things i need to do for my health (autoimmune condition), and be productive coding building
+            coding since high school. at deepdyve 16 years. time for the next adventure. loyal. smart. can build. design sense. let me code un-interrupted for 6-9 hours a day i'll be happy. creative/artist more than manager
+            fell in love w coding - high school graphing calculator program rieman sums calc and visualization. hk class on the internet. learned the entire stack, built a web server. this is so cool lol.
 
         **algoexpert
             do it for 1-2 weeks, and just go apply lol
-
 ===
 
         make the user mission more english, so easier for llm to understand
@@ -406,10 +437,15 @@ script, less manual to debug AWS deployment
             said day 41 2 days in a row, weird lol
             but at least markdown worked!
 
+        *finalize - opens final text area for notes on the day, reflections, etc. move day
+            assess the day. what you can improve on. what you did well. how was your sleep. then finalize.
+                what are you grateful for?
+            REFLECT ON THE DAY. new db table. and include in user-mission context to AI
+
         with gpt4o-mini, can turn on chat, it will be cheap enough i think.
 
         costs me $100/month to run as is. can i get paying customers to add up to that? then it pays for itself and i can try to grow it. is it adding that much value to people's lives? i would say so.
-            it has added to my life. so much more productive now. spend $100 make $50M
+            it has added to my life. so much more productive now. spend $100 make $10M
 
         **disable add todo if you already finalized the latest day (lol)
             and add unfinalize button. so user is not stuck on the app lol
@@ -447,11 +483,6 @@ script, less manual to debug AWS deployment
 
     **share with new society community. people will like this
         talk about it with David
-
-    *finalize - opens final text area for notes on the day, reflections, etc. move day
-        assess the day. what you can improve on. what you did well. how was your sleep. then finalize.
-            what are you grateful for?
-        REFLECT ON THE DAY. new db table. and include in user-mission context to AI
 
 ---
     you want to be able to ask AI, hey what was the longest streak of "# focused 25 timers" 10 hours a day? 
@@ -896,3 +927,35 @@ daily todo app for people doing gut cleanse protocol
     for people trying to control their blood sugar
 
     ai encouragement / friends-family encouragement
+
+---
+mysql> select * from assistants;
++----+-------------------------------+---------------------+---------------------+
+| id | assistant_id                  | created_at          | updated_at          |
++----+-------------------------------+---------------------+---------------------+
+|  1 | asst_cs0fTtHaMaDhonWgkkdvc1wi | 2024-07-04 15:41:53 | 2024-07-04 15:41:53 |
++----+-------------------------------+---------------------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> select * from user_threads;
++----+---------+---------------------------------+---------------------+---------------------+
+| id | user_id | thread_id                       | created_at          | updated_at          |
++----+---------+---------------------------------+---------------------+---------------------+
+|  1 |       1 | thread_15jyLDRpeS5dp8e9dMARsy6y | 2024-07-04 15:42:18 | 2024-07-04 15:42:18 |
+|  2 |       5 | thread_1vwRoTiSsxC6XC3YtGHKvuyV | 2024-07-04 15:53:44 | 2024-07-04 15:53:44 |
+|  3 |       5 | thread_a6FHZv040CmpOv1z54oqFkuW | 2024-07-04 15:53:44 | 2024-07-04 15:53:44 |
+|  4 |       5 | thread_MqTqe3t12pGKhULAlWeJT8T4 | 2024-07-04 15:53:44 | 2024-07-04 15:53:44 |
+|  5 |      17 | thread_mcJT2iHaBhVF77ChtwjJigla | 2024-07-05 14:12:25 | 2024-07-05 14:12:25 |
+|  6 |      17 | thread_a0fqtMkEtCmkZHtjGUACiY5i | 2024-07-05 14:12:25 | 2024-07-05 14:12:25 |
+|  7 |      19 | thread_y5AD2t1SYp5MwsXwHTmJYVrh | 2024-07-13 00:17:24 | 2024-07-13 00:17:24 |
+|  8 |      19 | thread_e9167C8QFyC3H3K5T0g40kUQ | 2024-07-13 00:17:24 | 2024-07-13 00:17:24 |
+|  9 |      19 | thread_vEAF2ut42ouFfm9bbuNXc0NQ | 2024-07-13 00:17:24 | 2024-07-13 00:17:24 |
+| 10 |      19 | thread_nymKo2KVEM0fhxvs3HMx58J6 | 2024-07-13 00:17:24 | 2024-07-13 00:17:24 |
+| 11 |      20 | thread_cVm02H98CLLpYnua4wdL6eIl | 2024-07-13 00:48:25 | 2024-07-13 00:48:25 |
+| 12 |      20 | thread_Y1IJKwPhdsvEv5S3GfOQiEVO | 2024-07-13 00:48:25 | 2024-07-13 00:48:25 |
+| 13 |      20 | thread_afRcKus6OTLjia3SnLtmJmyb | 2024-07-13 00:48:25 | 2024-07-13 00:48:25 |
+| 14 |      20 | thread_LhSkUX4p60X1EPCFTugEeGFe | 2024-07-13 00:48:25 | 2024-07-13 00:48:25 |
+| 15 |      20 | thread_q9cRXSWnCj0GXGEydvnWIp6e | 2024-07-13 00:48:25 | 2024-07-13 00:48:25 |
+| 16 |      21 | thread_SONkyVjgcnAxk5adPRGagcfq | 2024-07-27 13:46:21 | 2024-07-27 13:46:21 |
++----+---------+---------------------------------+---------------------+---------------------+
+16 rows in set (0.00 sec)
