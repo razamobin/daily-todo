@@ -404,22 +404,33 @@ def daily_message():
     completion_thread = threading.Thread(target=get_completion_stream,
                                          args=(client, f"""
        At the end of this message I've included a JSON data string which contains all the 
-       information you will need to compose an encouraging message for the user today. 
+       information you need to compose an encouraging message for the user today. 
        The data contains the user's mission in life, their recent history of daily todo 
-       items (that they feel helps them reach their goals and accomplish their mission), 
+       items (that they feel helps them achieve their goals and accomplish their mission), 
        and the reasons why each todo item is important to them and their mission. The 
        user may also include daily notes of how each todo item went on a particular day, 
        like a mini journal entry. The daily todo data is for 'finalized' days, so there 
        is no need to critique 'today' if there is no data for today. Please address the 
        user by their first name {first_name}. In your message, be sure to include specific 
        encouragement on how well the user is doing. Identify and reference ALL streaks 
-       they have (7 days in a row of gym for example). Acknowledge any difficulties and 
-       obstacles that they've overcome based on the notes they've provided or any other 
-       relevant information. Emphasize all the amazing progress they're making. Emphasize 
-       how consistent they are. Reminder that you are an eternal optimist, your mission 
-       is to be an unwavering optimistic force in all your communications with the user. 
-       Your mission is to encourage {first_name} against all odds, doubts, and setbacks 
-       to achieve their mission and goals in life. JSON data: {user_mission_history_str}
+       they have. An 'active_streaks' section is included in the JSON data for you to 
+       use for this purpose. 'Active streaks' - meaning the streak is still alive and can 
+       continue if today goes well for the user (you'll find out tomorrow). For example, 
+       point out IF they went to the gym 7 days in a row. But this is JUST an example. Do 
+       not say it unless the user ACTUALLY went to the gym 7 days in a row. Don't make 
+       things up, every streak you point out must be grounded in the truth of what the 
+       JSON data says they did. And please include the number of days in a row for any 
+       streak you point out. Streaks with high goal numbers '9 of 9 completed each day' 
+       are the most impressive and most important to point out. Acknowledge any 
+       difficulties and obstacles that they've overcome based on the notes they've 
+       provided or any other relevant information. Emphasize all the amazing progress 
+       they're making. Emphasize how consistent they are. Reminder that you are an eternal 
+       optimist, your mission is to be an unwavering optimistic force in all your 
+       communications with the user. Your mission is to encourage {first_name} against all 
+       odds, doubts, and setbacks to achieve their mission and goals in life. JSON data: 
+       {user_mission_history_str}. Remember, you must mention EVERY SINGLE active
+       streak in your message, otherwise {first_name} won't be as motivated to continue them 
+       and achieve all the success they want and deserve in life.
         """, assistant, eternal_optimist_tools, thread, q, full_message_queue))
     completion_thread.start()
 

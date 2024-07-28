@@ -406,27 +406,41 @@ script, less manual to debug AWS deployment
             -H 'Authorization: Bearer allyourbasearebelongtous' \
             -H 'Cookie: session_id=KsPvw-Hojn3-Ia5ZsCtKRE_fdB_u1Tw2fQqRLz65bGw'
 
-===
-        **simple ?skool=true link and it logs them in so they can play with it
+        x simple ?skool=true link and it logs them in so they can play with it
             x i'll put in daily notes, important notes. mission in profile
             x an easy link that logs them into this account, they can see the history. 
             x golang endpoint /api/portfolio-login
-            commit, deploy new golang and react to prod. test in prod. done.
+            x commit, deploy new golang and react to prod. test in prod. done.
 
-        **intro text on dailytodos.ai/skool , youtube video embedded. links to github. my email address to contact.
-            built this to learn react, golang, ai assistants api, AWS. filled it in with some data for you. let me know how you like it.
-            i use it daily to make sure i do all the things i need to do for my health (autoimmune condition), and be productive coding building
-            coding since high school. at deepdyve 16 years. time for the next adventure. loyal. smart. can build. design sense. let me code un-interrupted for 6-9 hours a day i'll be happy. creative/artist more than manager
-            fell in love w coding - high school graphing calculator program rieman sums calc and visualization. hk class on the internet. learned the entire stack, built a web server. this is so cool lol.
+===
+        **have golang calculate all steaks more than 1 day. and let AI judge which ones to highlight. longest ones, but also the hard ones (creative focus sessions). gym
+            x you know a todo is the same if the todo text matches or it is joined to the same todo importance
+            good fix. release go and python to prod now
+                test in prod - delete my message from today and see what it comes up with
 
+        **intro text on dailytodos.ai/skool
+            *text introduce myself
+                built this to learn react, golang, ai assistants api, AWS. filled it in with some data for you. let me know how you like it.
+                i use it daily to make sure i do all the things i need to do for my health (autoimmune condition), and be productive coding building
+                coding since high school. at deepdyve 16 years. time for the next adventure. loyal. smart. can build. design sense. let me code un-interrupted for 6-9 hours a day i'll be happy. creative/artist more than manager
+                fell in love w coding - high school graphing calculator program rieman sums calc and visualization. hk class on the internet. learned the entire stack, built a web server. this is so cool lol.
+
+            *link to github. 
+            *my email address to contact.
+            *youtube video intro
+           
         **youtube video explaining the app, and intro to me. link the github and the prod site
+            shave of course lol, then film yt video. use phone camera, use laptop camera, just get it done
             with my face and smile in the corner
             raza writes code
             use ai to create the channel under raza.mobin@gmail.com, thumbnail, scrip etc. 30-60 seconds easy. share screen
+                unlisted video
                 link to skool login on my app
 ===
-        **algoexpert
+        **algoexpert, design past and present skool features at scale
             do it for 1-2 weeks, and just go apply lol
+            study like hell. this is a step up in terms of difficulty
+            study 4 hours a day for a week
 ===
 
         make the user mission more english, so easier for llm to understand
@@ -434,9 +448,16 @@ script, less manual to debug AWS deployment
 
         user-mission - merge todo history and todo importance. easier for AI (even human reader) to connect the todo item with why it is important. do that for the most recent finalized day. other days it will know from the 1st day
 
+        archive a todo. bring it back later (like chicken soup)
+
+        mark as optional - means it won't get marked as "did not do"
+
+        sat sun todos, m - f todos. template basically.
+
+        why does it think i went to gym 7 days in a row?
+
         debug why it thinks i didn't go to the gym wtf
             today is not finalized so don't reference today
-            said day 41 2 days in a row, weird lol
             but at least markdown worked!
 
         *finalize - opens final text area for notes on the day, reflections, etc. move day

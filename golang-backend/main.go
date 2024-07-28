@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -859,10 +860,10 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
     currentTimeInUserTZ := currentTime.In(loc)
     humanReadableDate := currentTimeInUserTZ.Format("Monday January 2, 2006")
 
-    //currentDayNumber := calculateDayNumber(currentTime, userTimezone)
+    currentDayNumber := calculateDayNumber(currentTime, userTimezone)
 
-    // Fetch the most recent 7 finalized days of todos
-    todos, todoImportance, err := getMostRecentFinalizedDaysTodos(userID, userTimezone)
+    // Fetch the most recent 7 finalized days of todos and calculate streaks
+    todos, todoImportance, streaks, err := getMostRecentFinalizedDaysTodos(userID, userTimezone, currentDayNumber)
     if err != nil {
         http.Error(w, fmt.Sprintf("Failed to fetch todos: %v", err), http.StatusInternalServerError)
         return
@@ -872,15 +873,15 @@ func GetUserMissionHandler(w http.ResponseWriter, r *http.Request) {
         "mission":            mission,
         "todos_history":      todos,
         "todo_importance":    todoImportance,
-        "todays_date":       humanReadableDate,
-        //"current_day_number": currentDayNumber,
+        "todays_date":        humanReadableDate,
+        "active_streaks":     streaks,
     }
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
 }
 
-// Helper function to fetch the most recent 7 finalized days of todos
-func getMostRecentFinalizedDaysTodos(userID int, userTimezone string) ([]map[string]interface{}, []map[string]string, error) {
+// Helper function to fetch the most recent 7 finalized days of todos and calculate streaks
+func getMostRecentFinalizedDaysTodos(userID int, userTimezone string, currentDayNumber int) ([]map[string]interface{}, []map[string]string, []map[string]interface{}, error) {
     // Fetch the 7 most recent finalized days
     rows, err := db.Query(`
         SELECT day_number 
@@ -890,7 +891,7 @@ func getMostRecentFinalizedDaysTodos(userID int, userTimezone string) ([]map[str
         ORDER BY day_number DESC
         LIMIT 7`, userID)
     if err != nil {
-        return nil, nil, fmt.Errorf("failed to fetch finalized days: %w", err)
+        return nil, nil, nil, fmt.Errorf("failed to fetch finalized days: %w", err)
     }
     defer rows.Close()
 
@@ -898,18 +899,18 @@ func getMostRecentFinalizedDaysTodos(userID int, userTimezone string) ([]map[str
     for rows.Next() {
         var dayNumber int
         if err := rows.Scan(&dayNumber); err != nil {
-            return nil, nil, fmt.Errorf("failed to scan day number: %w", err)
+            return nil, nil, nil, fmt.Errorf("failed to scan day number: %w", err)
         }
         dayNumbers = append(dayNumbers, dayNumber)
     }
 
     if len(dayNumbers) == 0 {
-        return []map[string]interface{}{}, []map[string]string{}, nil
+        return []map[string]interface{}{}, []map[string]string{}, []map[string]interface{}{}, nil
     }
 
     // Fetch todos for the 7 most recent finalized days
     query, args, err := sqlx.In(`
-        SELECT dt.day_number, dt.title, dt.status, dt.goal, td.description, ttn.notes
+        SELECT dt.day_number, dt.title, dt.status, dt.goal, td.description, ttn.notes, dt.todo_description_id
         FROM daily_todos dt
         LEFT JOIN todo_descriptions td ON dt.todo_description_id = td.id
         LEFT JOIN todays_todo_notes ttn ON dt.id = ttn.daily_todo_id
@@ -918,31 +919,35 @@ func getMostRecentFinalizedDaysTodos(userID int, userTimezone string) ([]map[str
         AND dt.deleted = 0
         ORDER BY dt.day_number DESC, dt.sort_index ASC`, userID, dayNumbers)
     if err != nil {
-        return nil, nil, fmt.Errorf("failed to build query: %w", err)
+        return nil, nil, nil, fmt.Errorf("failed to build query: %w", err)
     }
 
     query = sqlx.Rebind(sqlx.QUESTION, query)
     rows, err = db.Query(query, args...)
     if err != nil {
-        return nil, nil, fmt.Errorf("failed to fetch todos: %w", err)
+        return nil, nil, nil, fmt.Errorf("failed to fetch todos: %w", err)
     }
     defer rows.Close()
 
     todos := []map[string]interface{}{}
     todoImportance := []map[string]string{}
     addedTodoItems := make(map[string]bool)
+    todoStreaks := make(map[string][]int)
+    todoTitles := make(map[string]string)
+    todoGoals := make(map[string]int)
 
     for rows.Next() {
         var dayNumber, status, goal int
         var title string
         var description, notes sql.NullString
-        if err := rows.Scan(&dayNumber, &title, &status, &goal, &description, &notes); err != nil {
-            return nil, nil, fmt.Errorf("failed to scan todo: %w", err)
+        var todoDescriptionID sql.NullInt64
+        if err := rows.Scan(&dayNumber, &title, &status, &goal, &description, &notes, &todoDescriptionID); err != nil {
+            return nil, nil, nil, fmt.Errorf("failed to scan todo: %w", err)
         }
 
         humanReadableDate, err := calculateDateFromDayNumber(dayNumber, userTimezone)
         if err != nil {
-            return nil, nil, fmt.Errorf("failed to calculate date: %w", err)
+            return nil, nil, nil, fmt.Errorf("failed to calculate date: %w", err)
         }
 
         var progress string
@@ -970,8 +975,55 @@ func getMostRecentFinalizedDaysTodos(userID int, userTimezone string) ([]map[str
             })
             addedTodoItems[title] = true
         }
+
+        // Calculate streaks
+        todoKey := title
+        if todoDescriptionID.Valid {
+            todoKey = fmt.Sprintf("%d", todoDescriptionID.Int64)
+        }
+        // Store the title and goal only if we haven't seen this todoKey before
+        if _, exists := todoTitles[todoKey]; !exists {
+            todoTitles[todoKey] = title
+            todoGoals[todoKey] = goal
+        }
+        if status == goal {
+            todoStreaks[todoKey] = append(todoStreaks[todoKey], dayNumber)
+        }
     }
-    return todos, todoImportance, nil
+
+    // Process streaks
+    streaks := []map[string]interface{}{}
+    for todoKey, streak := range todoStreaks {
+        fmt.Printf("todoKey: %s, streak: %v\n", todoTitles[todoKey], streak)
+        if len(streak) > 1 {
+            sort.Sort(sort.Reverse(sort.IntSlice(streak)))
+            
+            // Check if the streak includes either the current day or the day before
+            if streak[0] < currentDayNumber-1 {
+                continue // Skip this streak as it's not active
+            }
+            
+            activeStreakLength := 1
+            for i := 1; i < len(streak); i++ {
+                if streak[i-1] == streak[i]+1 {
+                    activeStreakLength++
+                } else {
+                    break  // Stop counting as soon as we find a gap
+                }
+            }
+            if activeStreakLength > 1 {
+                streakLengthString := fmt.Sprintf("%d days", activeStreakLength)
+                statusString := fmt.Sprintf("%d of %d completed each day", todoGoals[todoKey], todoGoals[todoKey])
+                streaks = append(streaks, map[string]interface{}{
+                    "todo_item": todoTitles[todoKey], // Use the stored title
+                    "streak_length": streakLengthString,
+                    "status": statusString,
+                })
+            }
+        }
+    }
+
+    return todos, todoImportance, streaks, nil
 }
 
 func GetRecentTodosHandler(w http.ResponseWriter, r *http.Request) {
