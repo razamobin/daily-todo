@@ -11,7 +11,7 @@ aws ecs update-service --cluster my-ecs-cluster --service golang-backend-service
 aws ecs update-service \
   --cluster my-ecs-cluster \
   --service golang-backend-service \
-  --task-definition golang-backend-task:15 \
+  --task-definition golang-backend-task:16 \
   --desired-count 1 \
   --load-balancers "targetGroupArn=arn:aws:elasticloadbalancing:us-west-2:476729447436:targetgroup/golang-tg/655b326cc6fa234f,containerName=golang-backend,containerPort=8080"
 

@@ -399,30 +399,32 @@ script, less manual to debug AWS deployment
             x # 25m coding sessions to stay sharp (3)
             x hire Raza - seems like a 10x developer! 😉
 
-===
-        **don't say day 42 lol. this is a brand new user. just day 42 of the app.
+        x don't say day 42 lol. this is a brand new user. just day 42 of the app.
             change the user mission data to not have day numbers, just give the day july 26th 2024. and clear user threads to reset the message for skool. and clear saved_assistant_messages.
 
             curl -X GET 'http://localhost:8080/api/user-mission?user_id=1' \
             -H 'Authorization: Bearer allyourbasearebelongtous' \
             -H 'Cookie: session_id=KsPvw-Hojn3-Ia5ZsCtKRE_fdB_u1Tw2fQqRLz65bGw'
 
+===
         **simple ?skool=true link and it logs them in so they can play with it
             x i'll put in daily notes, important notes. mission in profile
-            an easy link that logs them into this account, they can see the history. 
+            x an easy link that logs them into this account, they can see the history. 
+            x golang endpoint /api/portfolio-login
+            commit, deploy new golang and react to prod. test in prod. done.
+
+        **intro text on dailytodos.ai/skool , youtube video embedded. links to github. my email address to contact.
+            built this to learn react, golang, ai assistants api, AWS. filled it in with some data for you. let me know how you like it.
+            i use it daily to make sure i do all the things i need to do for my health (autoimmune condition), and be productive coding building
+            coding since high school. at deepdyve 16 years. time for the next adventure. loyal. smart. can build. design sense. let me code un-interrupted for 6-9 hours a day i'll be happy. creative/artist more than manager
+            fell in love w coding - high school graphing calculator program rieman sums calc and visualization. hk class on the internet. learned the entire stack, built a web server. this is so cool lol.
 
         **youtube video explaining the app, and intro to me. link the github and the prod site
             with my face and smile in the corner
             raza writes code
             use ai to create the channel under raza.mobin@gmail.com, thumbnail, scrip etc. 30-60 seconds easy. share screen
                 link to skool login on my app
-
-        **land on dailytodos.ai/skool intro text, youtube video embedded. links to github. my email address to contact.
-            built this to learn react, golang, ai assistants api, AWS. filled it in with some data for you. let me know how you like it.
-            i use it daily to make sure i do all the things i need to do for my health (autoimmune condition), and be productive coding building
-            coding since high school. at deepdyve 16 years. time for the next adventure. loyal. smart. can build. design sense. let me code un-interrupted for 6-9 hours a day i'll be happy. creative/artist more than manager
-            fell in love w coding - high school graphing calculator program rieman sums calc and visualization. hk class on the internet. learned the entire stack, built a web server. this is so cool lol.
-
+===
         **algoexpert
             do it for 1-2 weeks, and just go apply lol
 ===

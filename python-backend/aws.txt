@@ -11,6 +11,6 @@ aws ecs update-service --cluster my-ecs-cluster --service python-backend-service
 aws ecs update-service \
   --cluster my-ecs-cluster \
   --service python-backend-service \
-  --task-definition python-backend-task:15 \
+  --task-definition python-backend-task:16 \
   --desired-count 1 \
   --load-balancers "targetGroupArn=arn:aws:elasticloadbalancing:us-west-2:476729447436:targetgroup/python-tg/384c202f3de2a6e7,containerName=python-backend,containerPort=5001"
