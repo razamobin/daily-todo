@@ -418,6 +418,9 @@ script, less manual to debug AWS deployment
             good fix. release go and python to prod now
                 test in prod - delete my message from today and see what it comes up with
 
+        dont flash login screen before todos load
+        dont flash empty profile before profile loads
+
         **intro text on dailytodos.ai/skool
             *text introduce myself
                 built this to learn react, golang, ai assistants api, AWS. filled it in with some data for you. let me know how you like it.

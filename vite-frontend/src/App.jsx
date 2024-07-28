@@ -26,11 +26,13 @@ function AppContent() {
     } = useContext(AppStateContext);
     const { routeView } = useParams();
     const [finalizedMap, setFinalizedMap] = useState({});
+    const [initialCheckDone, setInitialCheckDone] = useState(false);
 
     const isPortfolioView = routeView === "skool";
 
     useEffect(() => {
-        // Check if user is logged in
+        if (initialCheckDone) return;
+
         golangAxios
             .get("/api/logged-in-user")
             .then((response) => {
@@ -54,8 +56,11 @@ function AppContent() {
             })
             .catch((error) => {
                 console.error("Error checking login status:", error);
+            })
+            .finally(() => {
+                setInitialCheckDone(true);
             });
-    }, [isPortfolioView, portfolioLogin]);
+    }, [initialCheckDone, isPortfolioView, portfolioLogin, golangAxios]);
 
     const fetchDailyMessage = useCallback(
         (newDayNumber) => {

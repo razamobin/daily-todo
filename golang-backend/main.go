@@ -1013,7 +1013,12 @@ func getMostRecentFinalizedDaysTodos(userID int, userTimezone string, currentDay
             }
             if activeStreakLength > 1 {
                 streakLengthString := fmt.Sprintf("%d days", activeStreakLength)
-                statusString := fmt.Sprintf("%d of %d completed each day", todoGoals[todoKey], todoGoals[todoKey])
+                var statusString string
+                if todoGoals[todoKey] == 1 {
+                    statusString = "completed each day"
+                } else {
+                    statusString = fmt.Sprintf("%d of %d completed each day", todoGoals[todoKey], todoGoals[todoKey])
+                }
                 streaks = append(streaks, map[string]interface{}{
                     "todo_item": todoTitles[todoKey], // Use the stored title
                     "streak_length": streakLengthString,
