@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { golangAxios } from "../axiosConfig";
 import { AppStateContext } from "./AppStateContext";
+import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -9,6 +10,7 @@ let globalLogout; // Define a top-level variable to hold the logout function
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const { resetAppState } = useContext(AppStateContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
@@ -29,6 +31,11 @@ const AuthProvider = ({ children }) => {
         };
     }, []);
 
+    const portfolioLogin = (userData) => {
+        setUser(userData);
+        localStorage.setItem("user", JSON.stringify(userData));
+    };
+
     const login = async (email, password) => {
         try {
             const response = await golangAxios.post("/api/login", {
@@ -45,12 +52,15 @@ const AuthProvider = ({ children }) => {
         }
     };
 
-    const logout = async () => {
+    const logout = async (isPortfolioView = false) => {
         try {
             await golangAxios.post("/api/logout");
             setUser(null);
             resetAppState();
             localStorage.removeItem("user");
+            if (isPortfolioView) {
+                navigate("/");
+            }
         } catch (error) {
             console.error("Logout failed:", error);
         }
@@ -85,7 +95,7 @@ const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider
-            value={{ user, updateUser, login, logout, signup }}
+            value={{ user, updateUser, login, logout, signup, portfolioLogin }}
         >
             {children}
         </AuthContext.Provider>

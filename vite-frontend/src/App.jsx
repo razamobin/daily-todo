@@ -1,22 +1,19 @@
 import React, { useEffect, useContext, useState, useCallback } from "react";
+import { Route, Routes, useParams } from "react-router-dom";
 import { AuthContext } from "./context/AuthProvider";
 import { AppStateContext } from "./context/AppStateContext";
-import { golangAxios, pythonAxios, pythonBackendUrl } from "./axiosConfig";
+import { golangAxios, pythonBackendUrl } from "./axiosConfig";
 import AddTodo from "./components/AddTodo";
 import TodoList from "./components/TodoList";
 import Markdown from "react-markdown";
-import rehypeReact from "rehype-react";
-import remarkGfm from "remark-gfm"; // Optional: for GitHub flavored markdown
-import remarkBreaks from "remark-breaks"; // Plugin to convert newlines to <br>
 import AuthForm from "./components/AuthForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircle } from "@fortawesome/free-solid-svg-icons";
 import ProfilePage from "./components/ProfilePage";
 import HealthCheck from "./components/HealthCheck";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-function App() {
-    const { user, logout } = useContext(AuthContext);
+function AppContent() {
+    const { user, logout, login, portfolioLogin } = useContext(AuthContext);
     const {
         todos,
         setTodos,
@@ -27,8 +24,24 @@ function App() {
         view,
         setView,
     } = useContext(AppStateContext);
-
+    const { routeView } = useParams();
     const [finalizedMap, setFinalizedMap] = useState({});
+
+    const isPortfolioView = routeView === "skool";
+
+    useEffect(() => {
+        if (isPortfolioView && !user) {
+            // Automatically log in to a special account
+            golangAxios
+                .post("/api/portfolio-login")
+                .then((response) => {
+                    portfolioLogin(response.data);
+                })
+                .catch((error) =>
+                    console.error("Error logging in portfolio viewer:", error)
+                );
+        }
+    }, [isPortfolioView, user, portfolioLogin]);
 
     const fetchDailyMessage = useCallback(
         (newDayNumber) => {
@@ -109,51 +122,30 @@ function App() {
             .catch((error) => console.error("Error finalizing day:", error));
     };
 
-    const renderAddUpdateTodoView = () => {
-        if (user) {
-            if (view === "todos") {
-                return <AddTodo setTodos={setTodos} />;
-            }
-        } else {
-            return <AuthForm />;
-        }
-    };
-
-    const renderMainView = () => {
-        if (user) {
-            if (view === "todos") {
-                return (
-                    <>
-                        {dailyMessage && (
-                            <div className="daily-message col-start-5 col-end-6 row-start-1 row-span-10 text-sm">
-                                <Markdown>{dailyMessage}</Markdown>
-                            </div>
-                        )}
-                        <TodoList
-                            todos={todos}
-                            setTodos={setTodos}
-                            onEditTodo={handleEditTodo}
-                            finalizedMap={finalizedMap} // Pass the finalized map
-                            finalizeDay={finalizeDay} // Pass the finalizeDay function
-                            handleCancelUpdate={handleCancelUpdate}
-                        />
-                    </>
-                );
-            } else if (view === "profile") {
-                return <ProfilePage />;
-            }
-        } else {
-            return <></>;
-        }
-    };
-
     const toggleView = () => {
         setView((prevView) => (prevView === "todos" ? "profile" : "todos"));
     };
 
+    const handleLogout = () => {
+        logout(isPortfolioView);
+    };
+
     return (
-        <Router>
+        <>
             <div className="header-container w-full max-w-[540px] mx-auto">
+                {isPortfolioView && (
+                    <div className="portfolio-info bg-blue-100 p-4 mb-4 rounded">
+                        <h2 className="text-xl font-bold mb-2">
+                            Welcome to my Daily Todo App!
+                        </h2>
+                        <p>
+                            This app showcases my skills in React, Go, and
+                            Python. It features real-time updates, user
+                            authentication, and integration with AI for daily
+                            messages.
+                        </p>
+                    </div>
+                )}
                 <header className="header flex justify-between items-center border-b-2 border-current pb-1">
                     <h1 className="text-3xl">
                         daily <span>todos</span>
@@ -175,7 +167,7 @@ function App() {
                             />{" "}
                             {/* Font Awesome icon */}
                             <button
-                                onClick={logout}
+                                onClick={handleLogout}
                                 className="btn-logout hover:underline"
                             >
                                 logout
@@ -183,15 +175,39 @@ function App() {
                         </div>
                     )}
                 </header>
-                {renderAddUpdateTodoView()}
+                {user && view === "todos" && <AddTodo setTodos={setTodos} />}
+                {!user && <AuthForm />}
             </div>
             <div className="main-container w-[1300px] mx-auto grid grid-cols-[1fr_20px_540px_20px_1fr] grid-rows-auto gap-x-0 gap-y-[45px]">
-                <Routes>
-                    <Route path="/health" element={<HealthCheck />} />
-                    <Route path="/" element={renderMainView()} />
-                </Routes>
+                {user && view === "todos" && (
+                    <>
+                        {dailyMessage && (
+                            <div className="daily-message col-start-5 col-end-6 row-start-1 row-span-10 text-sm">
+                                <Markdown>{dailyMessage}</Markdown>
+                            </div>
+                        )}
+                        <TodoList
+                            todos={todos}
+                            setTodos={setTodos}
+                            onEditTodo={handleEditTodo}
+                            finalizedMap={finalizedMap}
+                            finalizeDay={finalizeDay}
+                            handleCancelUpdate={handleCancelUpdate}
+                        />
+                    </>
+                )}
+                {user && view === "profile" && <ProfilePage />}
             </div>
-        </Router>
+        </>
+    );
+}
+
+function App() {
+    return (
+        <Routes>
+            <Route path="/health" element={<HealthCheck />} />
+            <Route path="/:routeView?/*" element={<AppContent />} />
+        </Routes>
     );
 }
 
