@@ -413,14 +413,15 @@ script, less manual to debug AWS deployment
             x commit, deploy new golang and react to prod. test in prod. done.
 
 ===
-        **have golang calculate all steaks more than 1 day. and let AI judge which ones to highlight. longest ones, but also the hard ones (creative focus sessions). gym
+        **have golang calculate all streaks more than 1 day. and let AI judge which ones to highlight. longest ones, but also the hard ones (creative focus sessions). gym
             x you know a todo is the same if the todo text matches or it is joined to the same todo importance
-            good fix. release go and python to prod now
-                test in prod - delete my message from today and see what it comes up with
+            x good fix. release go and python to prod now
+                x test in prod - delete my message from today and see what it comes up with
 
-        dont flash login screen before todos load
-        dont flash empty profile before profile loads
+        x dont flash login screen before todos load
+        x dont flash empty profile before profile loads
 
+===
         **intro text on dailytodos.ai/skool
             *text introduce myself
                 built this to learn react, golang, ai assistants api, AWS. filled it in with some data for you. let me know how you like it.
