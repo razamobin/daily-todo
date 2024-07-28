@@ -8,7 +8,12 @@ import TodoList from "./components/TodoList";
 import Markdown from "react-markdown";
 import AuthForm from "./components/AuthForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+    faCircle,
+    faMinus,
+    faPlus,
+    faSpinner,
+} from "@fortawesome/free-solid-svg-icons";
 import ProfilePage from "./components/ProfilePage";
 import HealthCheck from "./components/HealthCheck";
 
@@ -30,6 +35,7 @@ function AppContent() {
     const [isLoading, setIsLoading] = useState(true);
     const [isPortfolioInfoExpanded, setIsPortfolioInfoExpanded] =
         useState(true);
+    const [isDailyMessageLoading, setIsDailyMessageLoading] = useState(false);
 
     const isPortfolioView = routeView === "skool";
 
@@ -65,6 +71,7 @@ function AppContent() {
     const fetchDailyMessage = useCallback(
         (newDayNumber) => {
             if (!user) return;
+            setIsDailyMessageLoading(true);
             const eventSource = new EventSource(
                 `${pythonBackendUrl}/api/daily-message?user_id=${user.id}&new_day_number=${newDayNumber}`,
                 { withCredentials: true }
@@ -80,6 +87,7 @@ function AppContent() {
                     const combinedMessage = prevMessage + unescapedMessage;
                     return cleanMarkdownStart(combinedMessage);
                 });
+                setIsDailyMessageLoading(false); // Set loading to false after receiving the first message
             };
 
             eventSource.addEventListener("end", function (event) {
@@ -87,11 +95,13 @@ function AppContent() {
                 setDailyMessage((prevMessage) =>
                     prevMessage.replace(/\s*```$/, "")
                 );
+                setIsDailyMessageLoading(false);
                 eventSource.close();
             });
 
             eventSource.onerror = (error) => {
                 console.error("Error fetching daily message:", error);
+                setIsDailyMessageLoading(false);
                 eventSource.close();
             };
         },
@@ -157,7 +167,7 @@ function AppContent() {
         <>
             <div className="header-container w-full max-w-[540px] mx-auto">
                 {isPortfolioView && (
-                    <div className="portfolio-info bg-blue-100 p-8 mb-4 mt-4 rounded">
+                    <div className="portfolio-info bg-blue-100 p-6 mb-4 mt-4 rounded">
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold">
                                 Hi Skool, my name is Raza!
@@ -299,11 +309,16 @@ function AppContent() {
             <div className="main-container w-[1300px] mx-auto grid grid-cols-[1fr_20px_540px_20px_1fr] grid-rows-auto gap-x-0 gap-y-[45px]">
                 {user && view === "todos" && (
                     <>
-                        {dailyMessage && (
+                        {isDailyMessageLoading ? (
+                            <div className="daily-message-loading col-start-5 col-end-6 row-start-1 row-span-10 text-sm">
+                                <FontAwesomeIcon icon={faSpinner} spin />{" "}
+                                Loading daily message...
+                            </div>
+                        ) : dailyMessage ? (
                             <div className="daily-message col-start-5 col-end-6 row-start-1 row-span-10 text-sm">
                                 <Markdown>{dailyMessage}</Markdown>
                             </div>
-                        )}
+                        ) : null}
                         <TodoList
                             todos={todos}
                             setTodos={setTodos}

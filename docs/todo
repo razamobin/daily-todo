@@ -424,16 +424,16 @@ script, less manual to debug AWS deployment
 ===
         **intro text on dailytodos.ai/skool
             *text introduce myself
-                built this to learn react, golang, ai assistants api, AWS. filled it in with some data for you. let me know how you like it.
-                i use it daily to make sure i do all the things i need to do for my health (autoimmune condition), and be productive coding building
-                coding since high school. at deepdyve 16 years. time for the next adventure. loyal. smart. can build. design sense. let me code un-interrupted for 6-9 hours a day i'll be happy. creative/artist more than manager
-                fell in love w coding - high school graphing calculator program rieman sums calc and visualization. hk class on the internet. learned the entire stack, built a web server. this is so cool lol.
+                x built this to learn react, golang, ai assistants api, AWS. filled it in with some data for you. let me know how you like it.
+                x i use it daily to make sure i do all the things i need to do for my health (autoimmune condition), and be productive coding building
+                x coding since high school. at deepdyve 16 years. time for the next adventure. loyal. smart. can build. design sense. let me code un-interrupted for 6-9 hours a day i'll be happy. creative/artist more than manager
+                x fell in love w coding - high school graphing calculator program rieman sums calc and visualization. hk class on the internet. learned the entire stack, built a web server. this is so cool lol.
 
-            *link to github. 
-            *my email address to contact.
-            *youtube video intro
+            x link to github. 
+            x my email address to contact.
+            ?youtube video intro
            
-        **youtube video explaining the app, and intro to me. link the github and the prod site
+        ?youtube video explaining the app, and intro to me. link the github and the prod site
             shave of course lol, then film yt video. use phone camera, use laptop camera, just get it done
             with my face and smile in the corner
             raza writes code
@@ -441,10 +441,20 @@ script, less manual to debug AWS deployment
                 unlisted video
                 link to skool login on my app
 ===
+
+        **loading animation for daily message so it's a good exp for skool when they click finalize
+
         **algoexpert, design past and present skool features at scale
             do it for 1-2 weeks, and just go apply lol
             study like hell. this is a step up in terms of difficulty
             study 4 hours a day for a week
+            design a complicated part of their site
+                notifications
+                    show number for every user
+                    send email
+                    clear the number
+                real time dashboard
+                    user sign ups
 ===
 
         make the user mission more english, so easier for llm to understand
