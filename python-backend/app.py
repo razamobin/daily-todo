@@ -281,19 +281,21 @@ def clean_markdown(message: str) -> str:
 def daily_message():
     # Get the logged-in user
     response = forward_request_with_session_cookie('/api/logged-in-user')
-    if response.status_code == 401:
+    if response.status_code != 200:
+        return jsonify(
+            error="Failed to fetch logged in user"), response.status_code
+
+    user_data = response.json()
+    if not user_data.get('loggedIn'):
 
         @stream_with_context
         def generate():
             yield "event: end\ndata: END\n\n"
 
         return Response(generate(), content_type='text/event-stream')
-    elif response.status_code != 200:
-        return jsonify(
-            error="Failed to fetch logged in user"), response.status_code
 
-    user_data = response.json()
-    user_id = user_data.get('id')
+    user = user_data.get('user')
+    user_id = user.get('id')
     if not user_id:
         return jsonify(error="User ID not found"), 400
 
@@ -579,10 +581,12 @@ def health_check():
     user_response = forward_request_with_session_cookie('/api/logged-in-user')
     if user_response.status_code == 200:
         user_data = user_response.json()
-        health_status["logged_in_user"]["status"] = "logged in"
-        health_status["logged_in_user"]["user_info"] = user_data
-    elif user_response.status_code == 401:
-        health_status["logged_in_user"]["status"] = "not logged in"
+        if user_data.get('loggedIn'):
+            health_status["logged_in_user"]["status"] = "logged in"
+            health_status["logged_in_user"]["user_info"] = user_data.get(
+                'user')
+        else:
+            health_status["logged_in_user"]["status"] = "not logged in"
     else:
         health_status["logged_in_user"][
             "status"] = f"error: {user_response.status_code}"

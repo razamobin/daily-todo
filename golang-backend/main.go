@@ -656,7 +656,11 @@ func LogoutHandler(w http.ResponseWriter, r *http.Request) {
 func LoggedInUserHandler(w http.ResponseWriter, r *http.Request) {
     userID, err := GetUserIDFromSession(r)
     if err != nil {
-        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
+        // User is not logged in
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(map[string]interface{}{
+            "loggedIn": false,
+        })
         return
     }
 
@@ -664,15 +668,23 @@ func LoggedInUserHandler(w http.ResponseWriter, r *http.Request) {
     err = db.QueryRow("SELECT id, email, timezone, username FROM users WHERE id = ?", userID).Scan(&user.ID, &user.Email, &user.Timezone, &user.Username)
     if err != nil {
         if err == sql.ErrNoRows {
-            http.Error(w, "User not found", http.StatusNotFound)
+            // User not found in database
+            w.Header().Set("Content-Type", "application/json")
+            json.NewEncoder(w).Encode(map[string]interface{}{
+                "loggedIn": false,
+            })
         } else {
             http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
         }
         return
     }
 
+    // User is logged in
     w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(user)
+    json.NewEncoder(w).Encode(map[string]interface{}{
+        "loggedIn": true,
+        "user":     user,
+    })
 }
 
 // Example handler to get a session value

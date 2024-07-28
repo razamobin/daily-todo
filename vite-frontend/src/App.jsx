@@ -30,18 +30,32 @@ function AppContent() {
     const isPortfolioView = routeView === "skool";
 
     useEffect(() => {
-        if (isPortfolioView && !user) {
-            // Automatically log in to a special account
-            golangAxios
-                .post("/api/portfolio-login")
-                .then((response) => {
-                    portfolioLogin(response.data);
-                })
-                .catch((error) =>
-                    console.error("Error logging in portfolio viewer:", error)
-                );
-        }
-    }, [isPortfolioView, user, portfolioLogin]);
+        // Check if user is logged in
+        golangAxios
+            .get("/api/logged-in-user")
+            .then((response) => {
+                if (response.data.loggedIn) {
+                    // User is logged in, do nothing
+                } else if (isPortfolioView) {
+                    // User is not logged in and it's a portfolio view
+                    golangAxios
+                        .post("/api/portfolio-login")
+                        .then((response) => {
+                            portfolioLogin(response.data);
+                        })
+                        .catch((error) =>
+                            console.error(
+                                "Error logging in portfolio viewer:",
+                                error
+                            )
+                        );
+                }
+                // If not portfolio view and not logged in, do nothing (let user log in manually)
+            })
+            .catch((error) => {
+                console.error("Error checking login status:", error);
+            });
+    }, [isPortfolioView, portfolioLogin]);
 
     const fetchDailyMessage = useCallback(
         (newDayNumber) => {
