@@ -27,12 +27,14 @@ function AppContent() {
     const { routeView } = useParams();
     const [finalizedMap, setFinalizedMap] = useState({});
     const [initialCheckDone, setInitialCheckDone] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     const isPortfolioView = routeView === "skool";
 
     useEffect(() => {
         if (initialCheckDone) return;
 
+        setIsLoading(true);
         golangAxios
             .get("/api/logged-in-user")
             .then((response) => {
@@ -40,25 +42,21 @@ function AppContent() {
                     // User is logged in, do nothing
                 } else if (isPortfolioView) {
                     // User is not logged in and it's a portfolio view
-                    golangAxios
-                        .post("/api/portfolio-login")
-                        .then((response) => {
-                            portfolioLogin(response.data);
-                        })
-                        .catch((error) =>
-                            console.error(
-                                "Error logging in portfolio viewer:",
-                                error
-                            )
-                        );
+                    return golangAxios.post("/api/portfolio-login");
                 }
-                // If not portfolio view and not logged in, do nothing (let user log in manually)
+                return null;
+            })
+            .then((response) => {
+                if (response) {
+                    portfolioLogin(response.data);
+                }
             })
             .catch((error) => {
                 console.error("Error checking login status:", error);
             })
             .finally(() => {
                 setInitialCheckDone(true);
+                setIsLoading(false);
             });
     }, [initialCheckDone, isPortfolioView, portfolioLogin, golangAxios]);
 
@@ -149,6 +147,10 @@ function AppContent() {
         logout(isPortfolioView);
     };
 
+    if (isLoading) {
+        return <></>;
+    }
+
     return (
         <>
             <div className="header-container w-full max-w-[540px] mx-auto">
@@ -195,7 +197,7 @@ function AppContent() {
                     )}
                 </header>
                 {user && view === "todos" && <AddTodo setTodos={setTodos} />}
-                {!user && <AuthForm />}
+                {!user && !isLoading && <AuthForm />}
             </div>
             <div className="main-container w-[1300px] mx-auto grid grid-cols-[1fr_20px_540px_20px_1fr] grid-rows-auto gap-x-0 gap-y-[45px]">
                 {user && view === "todos" && (
