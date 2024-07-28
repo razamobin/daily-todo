@@ -8,7 +8,7 @@ import TodoList from "./components/TodoList";
 import Markdown from "react-markdown";
 import AuthForm from "./components/AuthForm";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircle } from "@fortawesome/free-solid-svg-icons";
+import { faCircle, faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import ProfilePage from "./components/ProfilePage";
 import HealthCheck from "./components/HealthCheck";
 
@@ -28,6 +28,8 @@ function AppContent() {
     const [finalizedMap, setFinalizedMap] = useState({});
     const [initialCheckDone, setInitialCheckDone] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isPortfolioInfoExpanded, setIsPortfolioInfoExpanded] =
+        useState(true);
 
     const isPortfolioView = routeView === "skool";
 
@@ -155,80 +157,111 @@ function AppContent() {
         <>
             <div className="header-container w-full max-w-[540px] mx-auto">
                 {isPortfolioView && (
-                    <div className="portfolio-info bg-blue-100 p-5 mb-4 rounded">
-                        <h2 className="text-xl font-bold mb-2">
-                            Hi Skool, my name is Raza!
-                        </h2>
-                        <p>
-                            I built this <strong>daily todo app</strong>, with
-                            AI encouragement, as a way to learn React, Golang,
-                            and the OpenAI Assistants API. I ended up deploying
-                            it to prod using AWS, so I learned that too :D
-                        </p>
-                        <p className="mt-4">
-                            I've logged you into a demo account and filled in
-                            some relevant data. Let me know how you like it!
-                        </p>
-                        <p className="mt-4">
-                            You can add your own todos, check them off, and you
-                            can click any todo to add more details &mdash; like
-                            a daily journal. You can finalize the day once
-                            you're done, and the AI will generate an encouraging
-                            message for you.
-                        </p>
-                        <p className="mt-4">
-                            I use the app daily to make sure I stay on top of my
-                            daily health routines as well as my daily coding
-                            routine. I would love to talk more about Skool and
-                            the backend engineering position you have available.
-                            You can reach me via:
-                        </p>
-                        <ul className="mt-4 list-disc list-inside">
-                            <li>
-                                Email:{" "}
-                                <a
-                                    href="mailto:raza.mobin@gmail.com"
-                                    className="text-blue-600 hover:underline"
-                                >
-                                    raza.mobin@gmail.com
-                                </a>
-                            </li>
-                            <li>
-                                LinkedIn:{" "}
-                                <a
-                                    href="https://www.linkedin.com/in/razamobin"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 hover:underline"
-                                >
-                                    linkedin.com/in/razamobin
-                                </a>
-                            </li>
-                            <li>
-                                GitHub:{" "}
-                                <a
-                                    href="https://github.com/razamobin/daily-todo"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 hover:underline"
-                                >
-                                    github.com/razamobin/daily-todo
-                                </a>
-                            </li>
-                            <li>
-                                Piano IG:{" "}
-                                <a
-                                    href="https://www.instagram.com/p/B6_DES1H5tQ"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-600 hover:underline"
-                                >
-                                    instagram.com/p/B6_DES1H5tQ
-                                </a>
-                            </li>
-                        </ul>
-                        <p className="mt-4">Talk soon!</p>
-                        <p>Raza</p>
+                    <div className="portfolio-info bg-blue-100 p-8 mb-4 mt-4 rounded">
+                        <div className="flex justify-between items-center">
+                            <h2 className="text-xl font-bold">
+                                Hi Skool, my name is Raza!
+                            </h2>
+                            <button
+                                onClick={() =>
+                                    setIsPortfolioInfoExpanded(
+                                        !isPortfolioInfoExpanded
+                                    )
+                                }
+                                className="text-blue-600 hover:text-blue-800"
+                                aria-label={
+                                    isPortfolioInfoExpanded
+                                        ? "Collapse"
+                                        : "Expand"
+                                }
+                            >
+                                <FontAwesomeIcon
+                                    icon={
+                                        isPortfolioInfoExpanded
+                                            ? faMinus
+                                            : faPlus
+                                    }
+                                />
+                            </button>
+                        </div>
+                        {isPortfolioInfoExpanded && (
+                            <>
+                                <p className="mt-4">
+                                    I built this <strong>daily todo app</strong>
+                                    , with AI encouragement, as a way to learn
+                                    React, Golang, and the OpenAI Assistants
+                                    API. I ended up deploying it to prod using
+                                    AWS, so I learned that too :D
+                                </p>
+                                <p className="mt-4">
+                                    I've logged you into a demo account and
+                                    filled in some relevant data. Let me know
+                                    how you like it!
+                                </p>
+                                <p className="mt-4">
+                                    You can add your own todos, check them off,
+                                    and you can click any todo to add more
+                                    details &mdash; like a daily journal. You
+                                    can finalize the day once you're done, and
+                                    the AI will generate an encouraging message
+                                    for you.
+                                </p>
+                                <p className="mt-4">
+                                    I use the app daily to make sure I stay on
+                                    top of my daily health routines as well as
+                                    my daily coding routine. I would love to
+                                    talk more about Skool and the backend
+                                    engineering position you have available. You
+                                    can reach me via:
+                                </p>
+                                <ul className="mt-4 list-disc list-inside">
+                                    <li>
+                                        Email:{" "}
+                                        <a
+                                            href="mailto:raza.mobin@gmail.com"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            raza.mobin@gmail.com
+                                        </a>
+                                    </li>
+                                    <li>
+                                        LinkedIn:{" "}
+                                        <a
+                                            href="https://www.linkedin.com/in/razamobin"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            linkedin.com/in/razamobin
+                                        </a>
+                                    </li>
+                                    <li>
+                                        GitHub:{" "}
+                                        <a
+                                            href="https://github.com/razamobin/daily-todo"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            github.com/razamobin/daily-todo
+                                        </a>
+                                    </li>
+                                    <li>
+                                        Piano IG:{" "}
+                                        <a
+                                            href="https://www.instagram.com/p/B6_DES1H5tQ"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            instagram.com/p/B6_DES1H5tQ
+                                        </a>
+                                    </li>
+                                </ul>
+                                <p className="mt-4">Talk soon!</p>
+                                <p>Raza</p>
+                            </>
+                        )}
                     </div>
                 )}
                 <header className="header flex justify-between items-center border-b-2 border-current pb-1">
