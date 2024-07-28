@@ -11,6 +11,7 @@ function ProfilePage() {
     const [mission, setMission] = useState("");
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     const timeZones = getTimeZones();
 
@@ -26,6 +27,8 @@ function ProfilePage() {
             } catch (error) {
                 console.error("Failed to fetch user profile:", error);
                 setError("Failed to load profile. Please try again.");
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -50,6 +53,10 @@ function ProfilePage() {
             setError("Failed to update profile. Please try again.");
         }
     };
+
+    if (isLoading) {
+        return <></>;
+    }
 
     return (
         <div className="profile-container col-start-3 col-end-4 flex items-center justify-center py-12">
