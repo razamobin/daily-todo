@@ -63,7 +63,7 @@ const AuthForm = () => {
     };
 
     return (
-        <div className="auth-container flex items-center justify-center py-12">
+        <div className="auth-container flex items-center justify-center py-12 col-start-3 col-end-4">
             <div className="border border-black p-8 w-full max-w-md">
                 <h2 className="text-2xl font-bold mb-6 text-center">
                     {isLoginForm ? "Login" : "Sign Up"}

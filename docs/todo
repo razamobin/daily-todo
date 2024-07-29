@@ -442,20 +442,31 @@ script, less manual to debug AWS deployment
                 link to skool login on my app
 ===
 
-        **loading animation for daily message so it's a good exp for skool when they click finalize
+        x loading animation for daily message so it's a good exp for skool when they click finalize
+
+        **make site look correct work on mobile browsers
 
         **algoexpert, design past and present skool features at scale
             do it for 1-2 weeks, and just go apply lol
             study like hell. this is a step up in terms of difficulty
             study 4 hours a day for a week
-            design a complicated part of their site
+            design a complicated part of their site. high scale.
                 notifications
                     show number for every user
                     send email
                     clear the number
                 real time dashboard
                     user sign ups
+
+        SUBMIT https://dailytodos.ai/skool
+
 ===
+        come in on /skool - login in and redirect to /
+            if /:token not skool, redirect to / w no login
+            cleaner more elegant design
+            my intro text shows for skool user (always?)
+
+        need different agents for each theme of the daily message. 1 for streaks. 1 for set backs. 1 for final message, etc. then agent to combine all the messages.
 
         make the user mission more english, so easier for llm to understand
             the user did 10 out of 10 on this, here are their notes. it's important to them because x. this was july 16th for the user. etc etc. better text to llm means better responses from llm.

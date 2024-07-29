@@ -165,9 +165,11 @@ function AppContent() {
 
     return (
         <>
-            <div className="header-container w-full max-w-[540px] mx-auto">
+            <div className="header-container w-[1300px] mx-auto grid grid-cols-[1fr_20px_540px_20px_1fr] grid-rows-auto gap-x-0 gap-y-[0px]">
+                <div className="col-start-1 col-end-2"></div>
+                <div className="col-start-5 col-end-6"></div>
                 {isPortfolioView && (
-                    <div className="portfolio-info bg-blue-100 p-6 mb-4 mt-4 rounded">
+                    <div className="portfolio-info bg-blue-100 p-6 mb-4 mt-4 rounded col-start-3 col-end-4">
                         <div className="flex justify-between items-center">
                             <h2 className="text-xl font-bold">
                                 Hi Skool, my name is Raza!
@@ -274,7 +276,7 @@ function AppContent() {
                         )}
                     </div>
                 )}
-                <header className="header flex justify-between items-center border-b-2 border-current pb-1">
+                <header className="header flex justify-between items-center border-b-2 border-current pb-1 col-start-3 col-end-4">
                     <h1 className="text-3xl">
                         daily <span>todos</span>
                     </h1>

@@ -22,7 +22,7 @@ function AddTodo({ setTodos }) {
     };
 
     return (
-        <section className="add-todo mt-2 mb-2">
+        <section className="add-todo mt-2 mb-2 col-start-3 col-end-4">
             <form
                 id="addTodoForm"
                 onSubmit={handleSubmit}
