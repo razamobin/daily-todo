@@ -444,8 +444,9 @@ script, less manual to debug AWS deployment
 
         x loading animation for daily message so it's a good exp for skool when they click finalize
 
-        **make site look correct work on mobile browsers
+        x make site look correct work on mobile browsers
 
+===
         **algoexpert, design past and present skool features at scale
             do it for 1-2 weeks, and just go apply lol
             study like hell. this is a step up in terms of difficulty
@@ -460,6 +461,25 @@ script, less manual to debug AWS deployment
 
         SUBMIT https://dailytodos.ai/skool
 
+===
+        *finalize - opens final text area for notes on the day, reflections, etc. move day
+            assess the day. what you can improve on. what you did well. how was your sleep. then finalize.
+                what are you grateful for?
+            REFLECT ON THE DAY. new db table. and include in user-mission context to AI
+
+        *new thread every time, see if AI stops saying trends from previous day. need new comments bro. use today's data.
+
+        *change delete to archive. and add easy way to un-archive - like un-archive magnesium before bed 1 last dose.
+
+        *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
+            plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
+            am walk, pm walk like clockwork
+
+        *regular mysql db backups / use RDS
+
+        *yt video - market myself and the project
+
+        *coding challenges
 ===
         come in on /skool - login in and redirect to /
             if /:token not skool, redirect to / w no login
@@ -500,9 +520,6 @@ script, less manual to debug AWS deployment
 
         have optional todos, so not a big deal if you skip it (magnesium before bed and bonus focused timers)
 
-        *have Dad use it - my health mission is to control blood sugar, and do the daily habits that keep it under control
-            plan out meals 1 2 3. eat the foods that you know work for you - energy, blood sugar, heart, digestion
-            am walk, pm walk like clockwork
 ===
 
         *RDS

@@ -261,12 +261,12 @@ function AppContent() {
                                     <li>
                                         Piano IG:{" "}
                                         <a
-                                            href="https://www.instagram.com/p/B6_DES1H5tQ"
+                                            href="https://www.instagram.com/p/CYR11PapuHK/"
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-blue-600 hover:underline"
                                         >
-                                            instagram.com/p/B6_DES1H5tQ
+                                            instagram.com/p/CYR11PapuHK
                                         </a>
                                     </li>
                                 </ul>

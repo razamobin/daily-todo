@@ -340,32 +340,30 @@ def daily_message():
     if not first_name:
         return jsonify(error="User's first name not found"), 404
 
-    response = forward_request_with_session_cookie('/api/latest-thread')
-    if response.status_code != 200:
-        return jsonify(
-            error="Failed to fetch latest thread ID"), response.status_code
+    #response = forward_request_with_session_cookie('/api/latest-thread')
+    #if response.status_code != 200:
+    #    return jsonify(
+    #        error="Failed to fetch latest thread ID"), response.status_code
 
-    thread_id = response.json().get('thread_id')
-    #if thread_id is None:
-    #    return jsonify(message="No thread found for the user", thread_id=None)
+    #thread_id = response.json().get('thread_id')
 
     client = Client(api_key=os.getenv('OPENAI_API_KEY'))
 
     resume_thread: bool = False
-    if thread_id:
-        thread = client.beta.threads.retrieve(thread_id=thread_id)
-        resume_thread = True
-    else:
-        resume_thread = False
-        thread = client.beta.threads.create()
-        thread_id = thread.id
-        print(f"thread_id: {thread_id}")
-        # Save thread id to db for this user
-        save_thread_response = forward_request_with_session_cookie(
-            '/api/user-thread', method='POST', json={'thread_id': thread_id})
-        if save_thread_response.status_code != 200:
-            return jsonify(error="Failed to save thread ID"
-                           ), save_thread_response.status_code
+    #if thread_id:
+    #    thread = client.beta.threads.retrieve(thread_id=thread_id)
+    #    resume_thread = True
+    #else:
+    resume_thread = False
+    thread = client.beta.threads.create()
+    thread_id = thread.id
+    print(f"thread_id: {thread_id}")
+    # Save thread id to db for this user
+    #save_thread_response = forward_request_with_session_cookie(
+    #    '/api/user-thread', method='POST', json={'thread_id': thread_id})
+    #if save_thread_response.status_code != 200:
+    #    return jsonify(error="Failed to save thread ID"
+    #                   ), save_thread_response.status_code
 
     # get openai assistant
     response = forward_request_with_session_cookie('/api/assistant-id')
