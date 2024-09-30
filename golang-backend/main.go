@@ -285,6 +285,7 @@ func main() {
     router.HandleFunc("/api/login", LoginHandler).Methods("POST")
     router.HandleFunc("/api/logout", LogoutHandler).Methods("POST")
     router.HandleFunc("/api/portfolio-login", PortfolioLoginHandler).Methods("POST")
+    router.HandleFunc("/api/demo-login", DemoLoginHandler).Methods("POST")
     router.HandleFunc("/api/logged-in-user", LoggedInUserHandler).Methods("GET")
     router.HandleFunc("/api/todos", GetRecentTodosHandler).Methods("GET")
     router.HandleFunc("/api/todos", CreateOrUpdateTodayTodo).Methods("POST")
@@ -324,6 +325,27 @@ func main() {
 
     fmt.Println("Starting server on :8080")
     log.Fatal(http.ListenAndServe("0.0.0.0:8080", corsHandler(sessionRouter)))
+}
+
+func DemoLoginHandler(w http.ResponseWriter, r *http.Request) {
+    demoEmail := "demo@mailinator.com"
+
+    var user User
+    err := db.QueryRow("SELECT id, email, timezone, username FROM users WHERE email = ?", demoEmail).Scan(&user.ID, &user.Email, &user.Timezone, &user.Username)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            http.Error(w, "Demo user not found", http.StatusNotFound)
+        } else {
+            http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+        }
+        return
+    }
+
+    sessionManager.Put(r.Context(), "userID", user.ID)
+    log.Printf("Demo user ID %d set in session", user.ID)
+
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(user)
 }
 
 func PortfolioLoginHandler(w http.ResponseWriter, r *http.Request) {

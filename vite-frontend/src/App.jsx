@@ -38,6 +38,7 @@ function AppContent() {
     const [isDailyMessageLoading, setIsDailyMessageLoading] = useState(false);
 
     const isPortfolioView = routeView === "skool";
+    const isDemoView = routeView === "demo";
 
     useEffect(() => {
         if (initialCheckDone) return;
@@ -51,6 +52,9 @@ function AppContent() {
                 } else if (isPortfolioView) {
                     // User is not logged in and it's a portfolio view
                     return golangAxios.post("/api/portfolio-login");
+                } else if (isDemoView) {
+                    // User is not logged in and it's a demo view
+                    return golangAxios.post("/api/demo-login");
                 }
                 return null;
             })
@@ -66,7 +70,13 @@ function AppContent() {
                 setInitialCheckDone(true);
                 setIsLoading(false);
             });
-    }, [initialCheckDone, isPortfolioView, portfolioLogin, golangAxios]);
+    }, [
+        initialCheckDone,
+        isPortfolioView,
+        isDemoView,
+        portfolioLogin,
+        golangAxios,
+    ]);
 
     const fetchDailyMessage = useCallback(
         (newDayNumber) => {
