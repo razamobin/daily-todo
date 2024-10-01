@@ -62,7 +62,7 @@ function ProfilePage() {
         <div className="profile-container col-start-3 col-end-4 flex items-center justify-center py-12">
             <div className="border border-black p-8 w-full max-w-md">
                 <h2 className="text-2xl font-bold mb-6 text-center">
-                    Edit Profile
+                    Edit Your Profile
                 </h2>
                 <form onSubmit={handleUpdateProfile}>
                     <div className="mb-4">
@@ -129,10 +129,11 @@ function ProfilePage() {
                         </label>
                         <textarea
                             id="mission"
-                            className="border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+                            className="border border-black rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none min-h-[160px]"
                             placeholder="Enter your mission"
                             value={mission}
                             onChange={(e) => setMission(e.target.value)}
+                            rows="10"
                         />
                     </div>
                     {error && <div className="text-red-500 mb-4">{error}</div>}
