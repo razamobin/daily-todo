@@ -12,35 +12,44 @@
     git clone https://github.com/razamobin/daily-todo.git
     ```
 
-2. create your .env at the root of the project. you can copy .env.example as a reference and make some tweaks:
+2. Create `.env` at the repository root using `.env.example`. Keep your existing
+   database settings if you already started the app. Set `OPENAI_API_KEY` to an
+   API key with billing and access to your selected model, and set a shared
+   `BEARER_TOKEN` for the Go and Python backends.
 
-    - OPENAI_API_KEY='sk-my-project-123' (make sure your account is funded!)
-    - BEARER_TOKEN: a shared secret between the golang and python backends
-    - there are a bunch more vars but you can leave the rest as is if you just want to get started
+   The AI settings are:
 
-3. run Docker Compose to build and start the app:
+   ```dotenv
+   OPENAI_MODEL=gpt-5.6-luna
+   OPENAI_REASONING_EFFORT=low
+   OPENAI_MAX_OUTPUT_TOKENS=4096
+   OPENAI_TIMEOUT_SECONDS=90
+   ```
 
-    ```
-    docker compose up --build
-    ```
+   See [AI configuration and testing](docs/ai-migration.md) for model choices,
+   configuration validation, and troubleshooting. The key stays in the Python
+   backend; never put it in a `VITE_` variable.
 
-4. create the AI assistant with curl (uses gpt-4o-mini, edit in python-backend/app.py to change):
+3. Build and start:
 
-    ```
-    curl -X POST http://localhost:5001/api/create-assistant
-    ```
+   ```bash
+   docker compose up --build
+   ```
 
-5. create a new user by signing up on the frontend http://localhost:3000
-6. you can add todos for today
-7. check off todos as you do them
-8. come tomorrow - new set of todos are copied from previous day and ready to be checked off
-9. you can finalize any day, and whenever a day is finalized, the AI will be called to come up with an encouraging message for you! (gotta be patient though, AI takes its time)
-10. repeat forever and do the most important things every day for the rest of your life :D (and don't get distracted by social media and AI driven distractions)
-11. BONUS
-    - you can click any todo and add today's notes for the todo
-    - you can also add why this todo is important to you and your mission
-    - you can add a mission on the profile page (click your name in the header)
-    - all of this is extra context so the AI can understand you better and provide the best daily messages :D
+   Wait for Flyway migrations and the backends to finish starting. Assistant
+   provisioning is no longer required. The former `/api/create-assistant`
+   endpoint returns HTTP 410 with an explanation.
+
+4. Open http://localhost:3000 and sign up. Add your mission on the profile page
+   and create your daily todos. You can also add why each todo matters and notes
+   about how it went.
+5. Check off todos and finalize a day. Your encouragement streams into the page
+   and is saved to MySQL. Reloading that day reuses the saved message. If
+   generation or saving fails, the page shows an error and a retry button.
+
+When upgrading an existing installation, use the same `.env` and Docker volumes.
+This AI update needs no new database migration and preserves saved messages.
+The old assistant/thread tables remain as historical data and are unused.
 
 ### to access MySQL:
 
@@ -65,7 +74,7 @@ select * from daily_todos;
 1. vite-frontend (react app built with vite)
 2. golang-backend (for db and session biz logic)
 3. python-backend (for AI API calls logic)
-    - you can make tweaks to the AI assistant instructions here
+    - edit `python-backend/prompts/daily_encouragement.md` to change the encouragement instructions
 4. mysql
 5. flyway for sql migrations
-6. redis for session storage
+6. redis for session storage and coordination of daily AI requests

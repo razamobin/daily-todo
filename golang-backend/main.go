@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,7 +17,7 @@ import (
 
 	"github.com/alexedwards/scs/redisstore"
 	"github.com/alexedwards/scs/v2"
-	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-sql-driver/mysql"
 	"github.com/gomodule/redigo/redis"
 	"github.com/google/uuid"
 	"github.com/gorilla/handlers"
@@ -291,15 +292,11 @@ func main() {
     router.HandleFunc("/api/todos", CreateOrUpdateTodayTodo).Methods("POST")
     router.HandleFunc("/api/todos/{id}", UpdateTodo).Methods("PUT")
     router.HandleFunc("/api/todos/{id}", DeleteTodoHandler).Methods("DELETE")
-    router.HandleFunc("/api/latest-thread", GetLatestThreadIDHandler).Methods("GET")
     router.HandleFunc("/api/user-mission", GetUserMissionHandler).Methods("GET")
-    router.HandleFunc("/api/user-thread", SaveUserThreadHandler).Methods("POST")
     router.HandleFunc("/api/user-first-name", GetUserFirstNameHandler).Methods("GET")
     router.HandleFunc("/api/save-assistant-message", SaveAssistantMessageHandler).Methods("POST")
     router.HandleFunc("/api/get-saved-assistant-message", GetSavedAssistantMessageHandler).Methods("GET")
     router.HandleFunc("/api/update-sort-indexes", UpdateSortIndexesHandler).Methods("POST")
-    router.HandleFunc("/api/assistant-id", GetAssistantIDHandler).Methods("GET")
-    router.HandleFunc("/api/save-assistant-id", SaveAssistantIDHandler).Methods("POST")
     router.HandleFunc("/api/user-profile", UserProfileHandler).Methods("GET", "POST")
     router.HandleFunc("/api/finalize-day", FinalizeDayHandler).Methods("POST")
     router.HandleFunc("/api/todo-description", SaveOrUpdateTodoDescriptionHandler).Methods("POST")
@@ -604,7 +601,13 @@ func SignUpHandler(w http.ResponseWriter, r *http.Request) {
     result, err := db.Exec("INSERT INTO users (email, password_hash, timezone, username) VALUES (?, ?, ?, ?)",
         credentials.Email, string(hashedPassword), credentials.Timezone, username)
     if err != nil {
-        http.Error(w, fmt.Sprintf("Failed to create user: %v", err), http.StatusInternalServerError)
+        var mysqlError *mysql.MySQLError
+        if errors.As(err, &mysqlError) && mysqlError.Number == 1062 {
+            http.Error(w, "Email already exists. Please log in or use a different email address.", http.StatusConflict)
+            return
+        }
+        log.Printf("Signup database failure: %T", err)
+        http.Error(w, "Could not create your account. Please retry shortly.", http.StatusInternalServerError)
         return
     }
 
@@ -767,63 +770,6 @@ func GetUserFirstNameHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     response := map[string]string{"first_name": firstName}
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(response)
-}
-
-func SaveUserThreadHandler(w http.ResponseWriter, r *http.Request) {
-    userID, err := GetUserIDFromSession(r)
-    if err != nil {
-        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
-        return
-    }
-
-    var input struct {
-        ThreadID string `json:"thread_id"`
-    }
-
-    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
-
-    _, err = db.Exec(`
-        INSERT INTO user_threads (user_id, thread_id, created_at, updated_at)
-        VALUES (?, ?, NOW(), NOW())
-        ON DUPLICATE KEY UPDATE updated_at = NOW()`,
-        userID, input.ThreadID)
-    if err != nil {
-        http.Error(w, fmt.Sprintf("Failed to save user thread: %v", err), http.StatusInternalServerError)
-        return
-    }
-
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("User thread saved successfully"))
-}
-
-
-func GetLatestThreadIDHandler(w http.ResponseWriter, r *http.Request) {
-    userID, err := GetUserIDFromSession(r)
-    if err != nil {
-        http.Error(w, "Unauthorized: No user logged in", http.StatusUnauthorized)
-        return
-    }
-
-    var threadID *string
-    err = db.QueryRow("SELECT thread_id FROM user_threads WHERE user_id = ? ORDER BY created_at DESC LIMIT 1", userID).Scan(&threadID)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            response := map[string]*string{"thread_id": nil}
-            w.Header().Set("Content-Type", "application/json")
-            json.NewEncoder(w).Encode(response)
-            return
-        } else {
-            http.Error(w, fmt.Sprintf("Failed to fetch thread ID: %v", err), http.StatusInternalServerError)
-            return
-        }
-    }
-
-    response := map[string]*string{"thread_id": threadID}
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
 }
@@ -1253,6 +1199,7 @@ func SaveAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
     var input struct {
         DayNumber int    `json:"day_number"`
         Message   string `json:"message"`
+        Replace   bool   `json:"replace"`
     }
 
     if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -1260,17 +1207,18 @@ func SaveAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    _, err = db.Exec(`
-        INSERT INTO saved_assistant_messages (user_id, day_number, message, created_at)
-        VALUES (?, ?, ?, NOW())`,
-        userID, input.DayNumber, input.Message)
-    if err != nil {
-        http.Error(w, fmt.Sprintf("Failed to save assistant message: %v", err), http.StatusInternalServerError)
+    if input.DayNumber < 0 || strings.TrimSpace(input.Message) == "" {
+        http.Error(w, "A nonnegative day and nonempty message are required", http.StatusBadRequest)
         return
     }
 
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("Assistant message saved successfully"))
+    message, err := saveDailyMessage(r.Context(), db, userID, input.DayNumber, input.Message, input.Replace)
+    if err != nil {
+        http.Error(w, "Could not save daily message", http.StatusInternalServerError)
+        return
+    }
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(map[string]string{"message": message})
 }
 
 func GetSavedAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
@@ -1293,7 +1241,7 @@ func GetSavedAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
     }
 
     var message string
-    err = db.QueryRow("SELECT message FROM saved_assistant_messages WHERE user_id = ? AND day_number = ?", userID, dayNumber).Scan(&message)
+    err = db.QueryRow("SELECT message FROM saved_assistant_messages WHERE user_id = ? AND day_number = ? ORDER BY id ASC LIMIT 1", userID, dayNumber).Scan(&message)
     if err != nil {
         if err == sql.ErrNoRows {
             http.Error(w, "message not found", http.StatusNotFound)
@@ -1307,47 +1255,6 @@ func GetSavedAssistantMessageHandler(w http.ResponseWriter, r *http.Request) {
     response := map[string]string{"message": message}
     w.Header().Set("Content-Type", "application/json")
     json.NewEncoder(w).Encode(response)
-}
-
-func GetAssistantIDHandler(w http.ResponseWriter, r *http.Request) {
-    var assistantID string
-    err := db.QueryRow("SELECT assistant_id FROM assistants ORDER BY created_at DESC LIMIT 1").Scan(&assistantID)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            http.Error(w, "assistant not found", http.StatusNotFound)
-            return
-        } else {
-            http.Error(w, fmt.Sprintf("Failed to fetch assistant ID: %v", err), http.StatusInternalServerError)
-            return
-        }
-    }
-
-    response := map[string]string{"assistant_id": assistantID}
-    w.Header().Set("Content-Type", "application/json")
-    json.NewEncoder(w).Encode(response)
-}
-
-func SaveAssistantIDHandler(w http.ResponseWriter, r *http.Request) {
-    var input struct {
-        AssistantID string `json:"assistant_id"`
-    }
-
-    if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-        http.Error(w, "Invalid request payload", http.StatusBadRequest)
-        return
-    }
-
-    _, err := db.Exec(`
-        INSERT INTO assistants (assistant_id, created_at, updated_at)
-        VALUES (?, NOW(), NOW())`,
-        input.AssistantID)
-    if err != nil {
-        http.Error(w, fmt.Sprintf("Failed to save assistant ID: %v", err), http.StatusInternalServerError)
-        return
-    }
-
-    w.WriteHeader(http.StatusOK)
-    w.Write([]byte("Assistant ID saved successfully"))
 }
 
 func HealthCheckHandler(w http.ResponseWriter, r *http.Request) {

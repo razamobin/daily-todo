@@ -48,16 +48,16 @@ const AuthForm = () => {
             console.log(error);
             if (error.response) {
                 if (error.response.status === 409) {
-                    setError("Signup failed: Email already exists.");
+                    setError("Signup failed: Email already exists. Log in or use a different email address.");
                 } else if (error.response.status === 400) {
                     setError(
                         "Signup failed: Invalid email address or password."
                     );
                 } else {
-                    setError("Signup failed: An unexpected error occurred.");
+                    setError("Signup failed: The server could not create your account. Please retry shortly.");
                 }
             } else {
-                setError("Signup failed: An unexpected error occurred.");
+                setError("Signup failed: Could not reach the server. Check that the backend is running and try again.");
             }
         }
     };

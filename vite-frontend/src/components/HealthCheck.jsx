@@ -7,29 +7,16 @@ const HealthCheck = () => {
     useEffect(() => {
         const checkHealth = async () => {
             try {
-                const golangResponse = await golangAxios.get("/health");
-                const pythonResponse = await pythonAxios.get("/health");
-
-                console.log("Golang Response Data:", golangResponse.data);
-                console.log("Python Response Data:", pythonResponse.data);
-
-                if (
-                    golangResponse.status === 200 &&
-                    pythonResponse.status === 200
-                ) {
-                    setHealthStatus({
-                        golang:
-                            typeof golangResponse.data === "string"
-                                ? golangResponse.data.length
-                                : JSON.stringify(golangResponse.data).length,
-                        python:
-                            typeof pythonResponse.data === "string"
-                                ? pythonResponse.data.length
-                                : JSON.stringify(pythonResponse.data).length,
-                    });
-                } else {
-                    setHealthStatus({ error: "One or both services are down" });
-                }
+                const results = await Promise.allSettled([
+                    golangAxios.get("/health", { validateStatus: () => true }),
+                    pythonAxios.get("/health", { validateStatus: () => true }),
+                ]);
+                setHealthStatus(Object.fromEntries(results.map((result, index) => [
+                    index === 0 ? "golang" : "python",
+                    result.status === "fulfilled"
+                        ? { status: result.value.status, details: result.value.data }
+                        : { error: "Backend could not be reached" },
+                ])));
             } catch (error) {
                 setHealthStatus({ error: "Error checking health status" });
             }

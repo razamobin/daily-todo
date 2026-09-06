@@ -1,4 +1,5 @@
-import React, { useEffect, useContext, useState, useCallback } from "react";
+import React, { useEffect, useContext, useState, useCallback, useRef } from "react";
+import { openDailyMessageStream } from "./dailyMessageStream";
 import { Route, Routes, useParams } from "react-router-dom";
 import { AuthContext } from "./context/AuthProvider";
 import { AppStateContext } from "./context/AppStateContext";
@@ -36,6 +37,16 @@ function AppContent() {
     const [isPortfolioInfoExpanded, setIsPortfolioInfoExpanded] =
         useState(true);
     const [isDailyMessageLoading, setIsDailyMessageLoading] = useState(false);
+    const [dailyMessageError, setDailyMessageError] = useState("");
+    const closeDailyStream = useRef(null);
+    const lastRequestedDay = useRef(null);
+    const lastRegenerate = useRef(false);
+    const savedDailyMessage = useRef(null);
+    const [isDailyRequestActive, setIsDailyRequestActive] = useState(false);
+
+    useEffect(() => () => {
+        closeDailyStream.current?.();
+    }, [user?.id]);
 
     const isPortfolioView = routeView === "skool";
     const isDemoView = routeView === "demo";
@@ -79,50 +90,53 @@ function AppContent() {
     ]);
 
     const fetchDailyMessage = useCallback(
-        (newDayNumber) => {
+        (newDayNumber, regenerate = false) => {
             if (!user) return;
+            closeDailyStream.current?.();
+            setDailyMessage("");
+            setDailyMessageError("");
+            if (!Number.isInteger(newDayNumber) || newDayNumber < 0) {
+                setIsDailyMessageLoading(false);
+                return;
+            }
+            lastRequestedDay.current = newDayNumber;
+            lastRegenerate.current = regenerate;
+            const saved = savedDailyMessage.current;
+            const previousText = saved?.day === newDayNumber && saved?.userId === user.id ? saved.text : "";
             setIsDailyMessageLoading(true);
-            const eventSource = new EventSource(
-                `${pythonBackendUrl}/api/daily-message?user_id=${user.id}&new_day_number=${newDayNumber}`,
-                { withCredentials: true }
+            setIsDailyRequestActive(true);
+            closeDailyStream.current = openDailyMessageStream(
+                `${pythonBackendUrl}/api/daily-message?new_day_number=${newDayNumber}${regenerate ? "&regenerate=1" : ""}`,
+                {
+                    onDelta: (text) => {
+                        setDailyMessage((previous) => (previous + text).replace(/^```markdown\s*/, ""));
+                        setIsDailyMessageLoading(false);
+                    },
+                    onEnd: (text) => {
+                        savedDailyMessage.current = { day: newDayNumber, userId: user.id, text };
+                        setDailyMessage(text);
+                        setIsDailyMessageLoading(false);
+                        setIsDailyRequestActive(false);
+                    },
+                    onFailure: (message) => {
+                        setDailyMessage(previousText);
+                        setDailyMessageError(message);
+                        setIsDailyMessageLoading(false);
+                        setIsDailyRequestActive(false);
+                    },
+                }
             );
-
-            const cleanMarkdownStart = (message) => {
-                return message.replace(/^```markdown\s*/, "");
-            };
-
-            eventSource.onmessage = (event) => {
-                const unescapedMessage = event.data.replace(/\\n/g, "\n");
-                setDailyMessage((prevMessage) => {
-                    const combinedMessage = prevMessage + unescapedMessage;
-                    return cleanMarkdownStart(combinedMessage);
-                });
-                setIsDailyMessageLoading(false); // Set loading to false after receiving the first message
-            };
-
-            eventSource.addEventListener("end", function (event) {
-                console.log("Stream ended");
-                setDailyMessage((prevMessage) =>
-                    prevMessage.replace(/\s*```$/, "")
-                );
-                setIsDailyMessageLoading(false);
-                eventSource.close();
-            });
-
-            eventSource.onerror = (error) => {
-                console.error("Error fetching daily message:", error);
-                setIsDailyMessageLoading(false);
-                eventSource.close();
-            };
         },
         [user, setDailyMessage, pythonBackendUrl]
     );
 
     useEffect(() => {
         if (!user) return;
+        let active = true;
         golangAxios
             .get("/api/todos")
             .then((response) => {
+                if (!active) return;
                 setTodos(response.data.todos);
                 setFinalizedMap(response.data.finalized_map); // Set the finalized map
                 if (response.data.new_finalized_day) {
@@ -132,7 +146,10 @@ function AppContent() {
                 }
                 fetchDailyMessage(response.data.highest_finalized_day);
             })
-            .catch((error) => console.error(error));
+            .catch((error) => {
+                if (active) console.error(error);
+            });
+        return () => { active = false; };
     }, [user, setTodos, setDailyMessage, fetchDailyMessage]);
 
     const handleEditTodo = (todo) => {
@@ -211,7 +228,7 @@ function AppContent() {
                                 <p className="mt-4">
                                     I built this <strong>daily todo app</strong>
                                     , with AI encouragement, as a way to learn
-                                    React, Golang, and the OpenAI Assistants
+                                    React, Golang, and the OpenAI Responses
                                     API. I ended up deploying it to prod using
                                     AWS, so I learned that too :D
                                 </p>
@@ -321,7 +338,15 @@ function AppContent() {
             <div className="main-container w-[1300px] mx-auto grid grid-cols-[1fr_20px_540px_20px_1fr] grid-rows-auto gap-x-0 gap-y-[45px]">
                 {user && view === "todos" && (
                     <>
-                        {isDailyMessageLoading ? (
+                        {dailyMessageError ? (
+                            <div role="alert" className="daily-message col-start-5 col-end-6 row-start-1 row-span-10 text-sm">
+                                <p>{dailyMessageError}</p>
+                                <button type="button" className="underline mt-2" onClick={() => fetchDailyMessage(lastRequestedDay.current, lastRegenerate.current)}>
+                                    Retry daily message
+                                </button>
+                                {dailyMessage && <div className="mt-4"><p>Previously saved message:</p><Markdown>{dailyMessage}</Markdown></div>}
+                            </div>
+                        ) : isDailyMessageLoading ? (
                             <div className="daily-message-loading col-start-5 col-end-6 row-start-1 row-span-10 text-sm">
                                 <FontAwesomeIcon icon={faSpinner} spin />{" "}
                                 Loading daily message...
@@ -329,6 +354,9 @@ function AppContent() {
                         ) : dailyMessage ? (
                             <div className="daily-message col-start-5 col-end-6 row-start-1 row-span-10 text-sm">
                                 <Markdown>{dailyMessage}</Markdown>
+                                <button type="button" disabled={isDailyRequestActive} className="underline mt-3 disabled:opacity-50" onClick={() => fetchDailyMessage(lastRequestedDay.current, true)}>
+                                    {isDailyRequestActive ? "Generating…" : "Regenerate daily message"}
+                                </button>
                             </div>
                         ) : null}
                         <TodoList
